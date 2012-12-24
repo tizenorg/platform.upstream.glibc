@@ -32,10 +32,9 @@ Summary:        Standard Shared Libraries (from the GNU C Library)
 License:        LGPL-2.1+ and SUSE-LGPL-2.1+-with-GCC-exception and GPL-2.0+
 Group:          System/Libraries
 BuildRequires:  fdupes
-BuildRequires:  libselinux-devel
 BuildRequires:  makeinfo
 BuildRequires:  xz
-BuildRequires:  pkgconfig(systemd)
+#BuildRequires:  pkgconfig(systemd)
 
 %define _filter_GLIBC_PRIVATE 1
 %if %_target_cpu == "i686"
@@ -206,8 +205,6 @@ debugging.
 
 If you are unsure if you need this, don't install this package.
 
-# makedb requires libselinux. We add this program in a separate
-# package so that glibc does not require libselinux.
 %package extra
 Summary:        Extra binaries from GNU C Library
 License:        LGPL-2.1+
