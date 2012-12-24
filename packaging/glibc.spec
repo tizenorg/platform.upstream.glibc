@@ -12,13 +12,7 @@
 # license that conforms to the Open Source Definition (Version 1.9)
 # published by the Open Source Initiative.
 
-# Please submit bugfixes or comments via http://bugs.opensuse.org/
 #
-
-
-# PLEASE run pre_checkin.sh in this directory before submitting
-# this package. Otherwise the .spec and .changes for glibc-testsuite
-# aren't updated.
 
 # Run with osc --with=fast_build to have a shorter turnaround
 # It will avoid building some parts of glibc
@@ -34,6 +28,9 @@ Group:          System/Libraries
 BuildRequires:  fdupes
 BuildRequires:  makeinfo
 BuildRequires:  xz
+BuildRequires:  gcc-c++
+BuildRequires:  gettext-tools
+BuildRequires:  libstdc++-devel
 #BuildRequires:  pkgconfig(systemd)
 
 %define _filter_GLIBC_PRIVATE 1
@@ -61,18 +58,10 @@ BuildRequires:  xz
 
 
 %ifarch x86_64
-# 2.6.32 is the SLES 11 SP1 kernel
-# 2.6.34 is the openSUSE 11.3 kernel
-%define enablekernel 2.6.32
+%define enablekernel 2.6.16
 %else
-# 2.6.16 is the SLES 10 kernel, use this as oldest supported kernel
 %define enablekernel 2.6.16
 %endif
-# ngpt was used in 8.1 and SLES8
-Obsoletes:      ngpt < 2.2.2
-Obsoletes:      ngpt-devel < 2.2.2
-Provides:       ngpt = 2.2.2
-Provides:       ngpt-devel = 2.2.2
 Conflicts:      kernel < %{enablekernel}
 %ifarch armv7l armv7hl
 # The old runtime linker link gets not provided by rpm find.provides, but it exists
@@ -263,19 +252,20 @@ echo "#define GITID \"%{git_id}\"" >> version.h
 #
 # Default CFLAGS and Compiler
 #
-BuildFlags="%{optflags} -U_FORTIFY_SOURCE"
+BuildFlags=$(echo %{optflags} | sed -e "s/-Wp,-D_FORTIFY_SOURCE=2//g" | sed -s "s/-ffast-math//")
+BuildFlags="$BuildFlags -U_FORTIFY_SOURCE"
 BuildFlags="$(echo $BuildFlags | sed -e 's#-fstack-protector##' -e 's#-ffortify=[0-9]*##')"
 BuildCC="%__cc"
 BuildCCplus="%__cxx"
 add_ons=",libidn"
 
 
-	BuildFlags="$BuildFlags -g"
+BuildFlags="$BuildFlags -g"
 %if %{disable_assert}
 	BuildFlags="$BuildFlags -DNDEBUG=1"
 %endif
 %ifarch %ix86
-	add_ons=$add_ons,noversion
+	add_ons=$add_ons
 %endif
 %ifarch %arm 
 	add_ons=$add_ons,ports
@@ -321,9 +311,7 @@ configure_and_build_glibc() {
 		--enable-multi-arch \
 %endif
 		--enable-kernel=%{enablekernel} \
-		--enable-bind-now --enable-obsolete-rpc
-# Should we enable --enable-systemtap?
-# Should we enable --enable-nss-crypt to build use freebl3 hash functions?
+		--enable-bind-now 
 	# explicitly set CFLAGS to use the full CFLAGS (not the reduced one for configure)
 	make %{?_smp_mflags} CFLAGS="$cflags" BUILD_CFLAGS="$cflags"
 	cd ..
@@ -362,11 +350,7 @@ export LD_AS_NEEDED=0
 %if %{testsuite_build}
 # Increase timeout
 export TIMEOUTFACTOR=16
-%ifarch alpha %ix86 ppc ppc64 ia64 s390 s390x x86_64
-	# ix86: tst-cputimer? fails
-	# ia64: tst-timer4 fails
-	# ppc64: tst-pselect, ftwtest fails
-	# s390,s390x: tst-timer* fails
+%ifarch %ix86 x86_64
 	make %{?_smp_mflags} -C cc-base -k check || echo make check failed
 %else
 	make %{?_smp_mflags} -C cc-base check
@@ -478,7 +462,6 @@ mkdir -p %{buildroot}%{_datadir}/doc/glibc
 cp -p cc-base/manual/libc/*.html %{buildroot}%{_datadir}/doc/glibc
 %endif
 
-cd manpages; make install_root=%{buildroot} install; cd ..
 
 # nscd tools:
 
@@ -507,13 +490,6 @@ mkdir -p %{buildroot}/var/cache/ldconfig
 # Empty the ld.so.cache:
 rm -f %{buildroot}/etc/ld.so.cache
 touch %{buildroot}/etc/ld.so.cache
-
-# libNoVersion belongs only to glibc-obsolete:
-%ifarch %ix86
-	rm -f %{buildroot}%{_libdir}/libNoVersion*
-	mkdir -p %{buildroot}/%{_lib}/obsolete/noversion
-	mv -v %{buildroot}/%{_lib}/libNoVersion* %{buildroot}/%{_lib}/obsolete/noversion/
-%endif
 
 # Don't look at ldd! We don't wish a /bin/sh requires
 chmod 644 %{buildroot}%{_bindir}/ldd
@@ -583,25 +559,10 @@ done
 %postun info
 %install_info_delete --info-dir=%{_infodir} %{_infodir}/libc.info.gz
 
-%pre -n nscd
-%service_add_pre nscd.service
-
-%preun -n nscd
-%service_del_preun nscd.service
-
 %post -n nscd
-%service_add_post nscd.service
 mkdir -p /var/run/nscd
-# Previously we had nscd.socket, remove it
-test -x /usr/bin/systemctl && /usr/bin/systemctl stop nscd.socket 2>/dev/null || :
-test -x /usr/bin/systemctl && /usr/bin/systemctl disable nscd.socket 2>/dev/null  || :
-# Hard removal in case the above did not work
-rm -f /etc/systemd/system/sockets.target.wants/nscd.socket
 exit 0
 
-%postun -n nscd
-%service_del_postun nscd.service
-exit 0
 
 %if !%{testsuite_build}
 %files
@@ -621,12 +582,6 @@ exit 0
 %verify(not md5 size mtime) %config(noreplace) /etc/nsswitch.conf
 %verify(not md5 size mtime) %config(noreplace) /etc/gai.conf
 %config(noreplace) /etc/default/nss
-%doc %{_mandir}/man1/gencat.1.gz
-%doc %{_mandir}/man1/getconf.1.gz
-%doc %{_mandir}/man1/locale.1.gz
-%doc %{_mandir}/man1/localedef.1.gz
-%doc %{_mandir}/man5/*
-%doc %{_mandir}/man8/iconvconfig.8.gz
 /%{_lib}/ld-%{glibc_major_version}.so
 
 # Each architecture has a different name for the dynamic linker:
@@ -638,19 +593,6 @@ exit 0
 %else
 /%{_lib}/ld-linux.so.3
 %endif
-%endif
-%ifarch ia64
-/%{_lib}/ld-linux-ia64.so.2
-%endif
-%ifarch ppc s390 mips hppa
-/%{_lib}/ld.so.1
-%endif
-%ifarch ppc64
-/%{_lib}/ld64.so.1
-%endif
-%ifarch s390x
-/lib/ld64.so.1
-/%{_lib}/ld64.so.1
 %endif
 %ifarch x86_64
 /%{_lib}/ld-linux-x86-64.so.2
@@ -736,9 +678,9 @@ exit 0
 %files obsolete
 %defattr (755,root,root,755)
 %dir /%{_lib}/obsolete/
-	%dir /%{_lib}/obsolete/noversion
-	/%{_lib}/obsolete/noversion/libNoVersion-%{glibc_major_version}.so
-	/%{_lib}/obsolete/noversion/libNoVersion.so.1
+	#%dir /%{_lib}/obsolete/noversion
+	#/%{_lib}/obsolete/noversion/libNoVersion-%{glibc_major_version}.so
+	#/%{_lib}/obsolete/noversion/libNoVersion.so.1
 %endif
 
 %files locale -f libc.lang
@@ -752,10 +694,6 @@ exit 0
 %files devel
 %defattr(-,root,root)
 %doc COPYING COPYING.LIB NEWS README BUGS CONFORMANCE
-%doc %{_mandir}/man1/catchsegv.1.gz
-%doc %{_mandir}/man1/rpcgen.1.gz
-%doc %{_mandir}/man1/sprof.1.gz
-%doc %{_mandir}/man3/*
 %{_bindir}/catchsegv
 %{_bindir}/rpcgen
 %{_bindir}/sprof
@@ -851,7 +789,6 @@ exit 0
 %{_bindir}/sotruss
 %{_bindir}/xtrace
 %{_bindir}/pldd
-%doc %{_mandir}/man1/mtrace.1.gz
 
 %files extra
 %defattr(-,root,root)
@@ -860,4 +797,4 @@ exit 0
 
 %endif # !%{testsuite_build}
 
-%changelog
+%docs_package
