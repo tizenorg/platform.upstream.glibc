@@ -1,0 +1,25 @@
+addFilter(".*glibc-profile.* devel-file-in-non-devel-package.*/usr/lib.*/lib.*_p.a")
+addFilter(".*glibc.* incorrect-fsf-address")
+# False positive - glibc implements gethostbyname
+addFilter(".*binary-or-shlib-calls-gethostbyname")
+# We do need to keep the symtab (see comments in glibc.spec), so this is intented:
+addFilter(".*unstripped-binary-or-object.*")
+# The duplication is intented:
+addFilter(".*files-duplicate /usr/lib64/libbsd-compat.a /usr/lib.*/libg.a")
+# ld.so is special:
+addFilter(".*shared-lib-without-dependency-information /lib.*/ld-2.*.so")
+# Handled via glibc_post_upgrade:
+addFilter(".*permissions-missing-postin missing %set_permissions /usr/.*pt_chown in %post")
+# Do not require permissions, this will lead to a cycle (bnc#700925):
+addFilter("glibc\..*: permissions-missing-requires")
+# We will not rename glibc to follow the shlib policy
+addFilter("shlib-policy-missing-suffix")
+# The dynamic linker and libnsl call exit - this is fine
+addFilter(".*shared-lib-calls-exit.*")
+# The man-pages package contains a number of man pages for programs that come
+# with glibc, therefore do not warn about them
+addFilter(".*glibc.*no-manual-page-for-binary getent")
+addFilter(".*glibc.*no-manual-page-for-binary iconv")
+addFilter(".*glibc.*no-manual-page-for-binary ldd")
+addFilter(".*glibc.*no-manual-page-for-binary ldconfig")
+addFilter(".*nscd.*no-manual-page-for-binary nscd")
