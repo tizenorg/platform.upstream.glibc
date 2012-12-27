@@ -252,7 +252,7 @@ echo "#define GITID \"%{git_id}\"" >> version.h
 #
 # Default CFLAGS and Compiler
 #
-BuildFlags=$(echo %{optflags} | sed -e "s/-Wp,-D_FORTIFY_SOURCE=2//g" | sed -s "s/-ffast-math//")
+BuildFlags=$(echo %{optflags} | sed -e "s/-Wp,-D_FORTIFY_SOURCE=2//g" | sed -e "s/-ffast-math//" | sed -e "s/atom/i686/g" )
 BuildFlags="$BuildFlags -U_FORTIFY_SOURCE"
 BuildFlags="$(echo $BuildFlags | sed -e 's#-fstack-protector##' -e 's#-ffortify=[0-9]*##')"
 BuildCC="%__cc"
@@ -313,7 +313,7 @@ configure_and_build_glibc() {
 		--enable-kernel=%{enablekernel} \
 		--enable-bind-now 
 	# explicitly set CFLAGS to use the full CFLAGS (not the reduced one for configure)
-	make %{?_smp_mflags} CFLAGS="$cflags" BUILD_CFLAGS="$cflags"
+	make %{?_smp_mflags} #CFLAGS="$cflags" BUILD_CFLAGS="$cflags"
 	cd ..
 }
 
