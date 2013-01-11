@@ -68,12 +68,12 @@ Conflicts:      kernel < %{enablekernel}
 Provides:       ld-linux.so.3
 Provides:       ld-linux.so.3(GLIBC_2.4)
 %endif
-Version:        2.16.90
+Version:        2.17
 Release:        0
-%define glibc_major_version 2.16.90
-%define git_id 2bc2d8e82350
+%define glibc_major_version 2.17
+%define git_id c758a6861537
 Url:            http://www.gnu.org/software/libc/libc.html
-Source:         glibc-%{version}-%{git_id}.tar.xz
+Source:         glibc-%{version}.tar.xz
 Source5:        nsswitch.conf
 Source7:        bindresvport.blacklist
 Source8:        glibc_post_upgrade.c
