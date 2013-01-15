@@ -687,7 +687,7 @@ exit 0
 %defattr(-,root,root)
 %{_datadir}/locale/locale.alias
 %if %{build_locales}
-	/usr/lib/locale
+/usr/lib/locale/*
 %endif
 %{_libdir}/gconv
 
