@@ -130,7 +130,7 @@ created.
 Summary:        Locale Data for Localized Programs
 License:        GPL-2.0+ and MIT and LGPL-2.1+
 Group:          System/Libraries
-Requires(post): /bin/cat
+Requires(post): /usr/bin/cat
 Requires:       glibc = %{version}
 
 %description locale
