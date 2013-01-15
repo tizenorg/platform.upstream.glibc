@@ -1,3 +1,6 @@
+* Tue Jan 15 2013 Anas Nashif <anas.nashif@intel.com> submit/trunk/20130115.201422@52fa4e0
+- Build only supported locales
+
 * Tue Jan 15 2013 Anas Nashif <anas.nashif@intel.com> submit/trunk/20130115.131505@c32883f
 - remove thumb option for ARM
 
