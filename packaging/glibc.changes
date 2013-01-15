@@ -1,3 +1,6 @@
+* Tue Jan 15 2013 Anas Nashif <anas.nashif@intel.com> submit/trunk/20130114.165606@6013fa6
+- do not provide /usr/lib/locale
+
 * Mon Jan 14 2013 Anas Nashif <anas.nashif@intel.com> glibc-2.17@fe086f2
 - Update to 2.17
 
