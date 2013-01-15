@@ -252,7 +252,7 @@ echo "#define GITID \"%{git_id}\"" >> version.h
 #
 # Default CFLAGS and Compiler
 #
-BuildFlags=$(echo %{optflags} | sed -e "s/-Wp,-D_FORTIFY_SOURCE=2//g" | sed -e "s/-ffast-math//" | sed -e "s/atom/i686/g" |  sed -e "s/-fexceptions//" )
+BuildFlags=$(echo %{optflags} | sed -e "s/-Wp,-D_FORTIFY_SOURCE=2//g" | sed -e "s/-ffast-math//" | sed -e "s/atom/i686/g" | sed -e "s/-mthumb//" |   sed -e "s/-fexceptions//" )
 BuildFlags="$BuildFlags -O2 -g -U_FORTIFY_SOURCE"
 BuildFlags="$(echo $BuildFlags | sed -e 's#-fstack-protector##' -e 's#-ffortify=[0-9]*##')"
 BuildCC="%__cc"
