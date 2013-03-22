@@ -24,7 +24,7 @@ Name:           glibc
 %define testsuite_build ("%{name}" == "glibc-testsuite")
 Summary:        Standard Shared Libraries (from the GNU C Library)
 License:        LGPL-2.1+ and SUSE-LGPL-2.1+-with-GCC-exception and GPL-2.0+
-Group:          System/Libraries
+Group:          Base/Libraries
 BuildRequires:  fdupes
 BuildRequires:  makeinfo
 BuildRequires:  xz
@@ -95,7 +95,7 @@ without these libraries.
 %package info
 Summary:        Info Files for the GNU C Library
 License:        GFDL-1.1
-Group:          Documentation/Other
+Group:          Documentation
 BuildArch:      noarch
 
 %description info
@@ -106,7 +106,7 @@ complete and is partially out of date.
 %package html
 Summary:        HTML Documentation for the GNU C Library
 License:        GFDL-1.1
-Group:          Documentation/HTML
+Group:          Documentation
 BuildArch:      noarch
 
 %description html
@@ -117,7 +117,7 @@ partially out of date.
 %package i18ndata
 Summary:        Database Sources for 'locale'
 License:        GPL-2.0+ and MIT
-Group:          System/Libraries
+Group:          Base/Libraries
 BuildArch:      noarch
 
 %description i18ndata
@@ -129,7 +129,7 @@ created.
 %package locale
 Summary:        Locale Data for Localized Programs
 License:        GPL-2.0+ and MIT and LGPL-2.1+
-Group:          System/Libraries
+Group:          Base/Libraries
 Requires(post): /usr/bin/cat
 Requires:       glibc = %{version}
 
@@ -139,7 +139,7 @@ Locale data for the internationalisation features of the GNU C library.
 %package -n nscd
 Summary:        Name Service Caching Daemon
 License:        GPL-2.0+
-Group:          System/Daemons
+Group:          System/Services
 Provides:       glibc:/usr/sbin/nscd
 Requires:       glibc = %{version}
 
@@ -149,8 +149,8 @@ performance with NIS, NIS+, and LDAP.
 
 %package profile
 Summary:        Libc Profiling and Debugging Versions
-License:        LGPL-2.1+ and SUSE-LGPL-2.1+-with-GCC-exception and GPL-2.0+
-Group:          Development/Libraries/C and C++
+License:        LGPL-2.1+ and LGPL-2.1+-with-GCC-exception and GPL-2.0+
+Group:          Development/Libraries
 Requires:       glibc = %{version}
 
 %description profile
@@ -159,8 +159,8 @@ necessary for profiling and debugging.
 
 %package devel
 Summary:        Include Files and Libraries Mandatory for Development
-License:        BSD-3-Clause and LGPL-2.1+ and SUSE-LGPL-2.1+-with-GCC-exception and GPL-2.0+
-Group:          Development/Libraries/C and C++
+License:        BSD-3-Clause and LGPL-2.1+ and LGPL-2.1+-with-GCC-exception and GPL-2.0+
+Group:          Development/Libraries
 Requires:       glibc = %{version}
 Requires:       linux-kernel-headers
 
@@ -171,7 +171,7 @@ library.
 %package devel-static
 Summary:        C library static libraries for -static linking
 License:        BSD-3-Clause and LGPL-2.1+ and SUSE-LGPL-2.1+-with-GCC-exception and GPL-2.0+
-Group:          Development/Libraries/C and C++
+Group:          Development/Libraries
 Requires:       %{name}-devel = %{version}
 # Provide Fedora name for package to make packaging easier
 Provides:       %{name}-static = %version
@@ -184,7 +184,7 @@ which is highly discouraged.
 %package utils
 Summary:        Development utilities from GNU C library
 License:        LGPL-2.1+
-Group:          Development/Languages/C and C++
+Group:          Development/Languages
 Requires:       glibc = %{version}
 
 %description utils
@@ -197,7 +197,7 @@ If you are unsure if you need this, don't install this package.
 %package extra
 Summary:        Extra binaries from GNU C Library
 License:        LGPL-2.1+
-Group:          Development/Languages/C and C++
+Group:          Development/Languages
 Requires:       glibc = %{version}
 
 %description extra
