@@ -1,3 +1,6 @@
+* Fri Mar 22 2013 Anas Nashif <anas.nashif@intel.com> submit/trunk/20130115.205551@642c22b
+- Fixed package groups
+
 * Tue Jan 15 2013 Anas Nashif <anas.nashif@intel.com> submit/trunk/20130115.201422@52fa4e0
 - Build only supported locales
 
