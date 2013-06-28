@@ -82,6 +82,7 @@ Source10:       baselibs.conf
 # For systemd 
 Source20:       nscd.conf
 Source21:       nscd.service
+Source1001: 	glibc.manifest
 
 Requires(pre):  filesystem
 Provides:       rtld(GNU_HASH)
@@ -224,6 +225,7 @@ versions of your software.
 
 %prep
 %setup -n glibc-%{version} -q 
+cp %{SOURCE1001} .
 
 %build
 if [ -x /bin/uname.bin ]; then
@@ -566,6 +568,7 @@ exit 0
 
 %if !%{testsuite_build}
 %files
+%manifest %{name}.manifest
 #######################################################################
 ###
 ### FILES
@@ -676,6 +679,7 @@ exit 0
 %ifarch %ix86
 
 %files obsolete
+%manifest %{name}.manifest
 %defattr (755,root,root,755)
 %dir /%{_lib}/obsolete/
 	#%dir /%{_lib}/obsolete/noversion
@@ -684,6 +688,7 @@ exit 0
 %endif
 
 %files locale -f libc.lang
+%manifest %{name}.manifest
 %defattr(-,root,root)
 %{_datadir}/locale/locale.alias
 %if %{build_locales}
@@ -692,6 +697,7 @@ exit 0
 %{_libdir}/gconv
 
 %files devel
+%manifest %{name}.manifest
 %defattr(-,root,root)
 %doc COPYING COPYING.LIB NEWS README BUGS CONFORMANCE
 %{_bindir}/catchsegv
@@ -714,6 +720,7 @@ exit 0
 %{_libdir}/librpcsvc.a
 
 %files devel-static
+%manifest %{name}.manifest
 %defattr(-,root,root)
 %{_libdir}/libBrokenLocale.a
 %{_libdir}/libanl.a
@@ -728,6 +735,7 @@ exit 0
 %{_libdir}/libutil.a
 
 %files info
+%manifest %{name}.manifest
 %defattr(-,root,root)
 %doc %{_infodir}/libc.info.gz
 %doc %{_infodir}/libc.info-?.gz
@@ -735,15 +743,18 @@ exit 0
 
 %if %{build_html}
 %files html
+%manifest %{name}.manifest
 %defattr(-,root,root)
 %doc %{_prefix}/share/doc/glibc
 %endif
 
 %files i18ndata
+%manifest %{name}.manifest
 %defattr(-,root,root)
 %{_prefix}/share/i18n
 
 %files -n nscd
+%manifest %{name}.manifest
 %defattr(-,root,root)
 %config(noreplace) /etc/nscd.conf
 %{_sbindir}/nscd
@@ -760,6 +771,7 @@ exit 0
 
 %if %{build_profile}
 %files profile
+%manifest %{name}.manifest
 %defattr(-,root,root)
 %{_libdir}/libc_p.a
 %{_libdir}/libBrokenLocale_p.a
@@ -776,6 +788,7 @@ exit 0
 %endif
 
 %files utils
+%manifest %{name}.manifest
 %defattr(-,root,root)
 /%{_lib}/libmemusage.so
 /%{_lib}/libpcprofile.so
@@ -791,6 +804,7 @@ exit 0
 %{_bindir}/pldd
 
 %files extra
+%manifest %{name}.manifest
 %defattr(-,root,root)
 %{_bindir}/makedb
 /var/lib/misc/Makefile
