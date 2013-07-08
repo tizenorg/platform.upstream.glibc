@@ -512,7 +512,7 @@ install -m 644 %{SOURCE20} %{buildroot}/usr/lib/tmpfiles.d/
 mkdir -p %{buildroot}/usr/lib/systemd/system
 install -m 644 %{SOURCE21} %{buildroot}/usr/lib/systemd/system
 
-%ifarch armv7l armv7hl
+%ifarch armv7hl
 # Provide compatibility link
 ln -s ld-%{glibc_major_version}.so %{buildroot}/lib/ld-linux.so.3
 %endif
@@ -589,7 +589,7 @@ exit 0
 
 # Each architecture has a different name for the dynamic linker:
 %ifarch %arm
-%ifarch armv7l armv7hl
+%ifarch armv7hl
 /%{_lib}/ld-linux-armhf.so.3
 # Keep compatibility link
 /%{_lib}/ld-linux.so.3
