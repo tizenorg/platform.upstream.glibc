@@ -23,7 +23,7 @@
 Name:           glibc
 %define testsuite_build ("%{name}" == "glibc-testsuite")
 Summary:        Standard Shared Libraries (from the GNU C Library)
-License:        LGPL-2.1+ and SUSE-LGPL-2.1+-with-GCC-exception and GPL-2.0+
+License:        LGPL-2.1+ and LGPL-2.1+-with-GCC-exception and GPL-2.0+
 Group:          Base/Libraries
 BuildRequires:  fdupes
 BuildRequires:  makeinfo
@@ -130,7 +130,6 @@ created.
 %package locale
 Summary:        Locale Data for Localized Programs
 License:        GPL-2.0+ and MIT and LGPL-2.1+
-Group:          Base/Libraries
 Requires(post): /usr/bin/cat
 Requires:       glibc = %{version}
 
@@ -140,7 +139,7 @@ Locale data for the internationalisation features of the GNU C library.
 %package -n nscd
 Summary:        Name Service Caching Daemon
 License:        GPL-2.0+
-Group:          System/Services
+Group:          System/Service
 Provides:       glibc:/usr/sbin/nscd
 Requires:       glibc = %{version}
 
@@ -151,7 +150,7 @@ performance with NIS, NIS+, and LDAP.
 %package profile
 Summary:        Libc Profiling and Debugging Versions
 License:        LGPL-2.1+ and LGPL-2.1+-with-GCC-exception and GPL-2.0+
-Group:          Development/Libraries
+Group:          Base/Utilities
 Requires:       glibc = %{version}
 
 %description profile
@@ -161,7 +160,6 @@ necessary for profiling and debugging.
 %package devel
 Summary:        Include Files and Libraries Mandatory for Development
 License:        BSD-3-Clause and LGPL-2.1+ and LGPL-2.1+-with-GCC-exception and GPL-2.0+
-Group:          Development/Libraries
 Requires:       glibc = %{version}
 Requires:       linux-kernel-headers
 
@@ -171,8 +169,7 @@ library.
 
 %package devel-static
 Summary:        C library static libraries for -static linking
-License:        BSD-3-Clause and LGPL-2.1+ and SUSE-LGPL-2.1+-with-GCC-exception and GPL-2.0+
-Group:          Development/Libraries
+License:        BSD-3-Clause and LGPL-2.1+ and LGPL-2.1+-with-GCC-exception and GPL-2.0+
 Requires:       %{name}-devel = %{version}
 # Provide Fedora name for package to make packaging easier
 Provides:       %{name}-static = %version
@@ -185,7 +182,6 @@ which is highly discouraged.
 %package utils
 Summary:        Development utilities from GNU C library
 License:        LGPL-2.1+
-Group:          Development/Languages
 Requires:       glibc = %{version}
 
 %description utils
@@ -198,7 +194,6 @@ If you are unsure if you need this, don't install this package.
 %package extra
 Summary:        Extra binaries from GNU C Library
 License:        LGPL-2.1+
-Group:          Development/Languages
 Requires:       glibc = %{version}
 
 %description extra
@@ -210,7 +205,6 @@ makedb: A program to create a database for nss
 %package obsolete
 Summary:        Obsolete Shared Libraries from the GNU C Library
 License:        LGPL-2.0+
-Group:          System/Libraries
 Requires:       glibc = %{version}
 
 %description obsolete
@@ -501,11 +495,6 @@ for i in sbin/sln usr/bin/tzselect usr/sbin/zic usr/sbin/zdump etc/localtime; do
 	rm -f %{buildroot}/$i
 done
 rm -rf %{buildroot}%{_datadir}/zoneinfo
-
-# Remove the buildflags tracking section and the build-id
-#for o in %{buildroot}/%{_libdir}/crt[1in].o %{buildroot}/%{_libdir}/lib*_nonshared.a; do
-#	objcopy -R ".comment.SUSE.OPTs" -R ".note.gnu.build-id" $o
-#done
 
 mkdir -p %{buildroot}/usr/lib/tmpfiles.d/
 install -m 644 %{SOURCE20} %{buildroot}/usr/lib/tmpfiles.d/
