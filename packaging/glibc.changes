@@ -1,3 +1,6 @@
+* Thu Aug 01 2013 Anas Nashif <anas.nashif@intel.com> submit/tizen/20130711.122834@23f8266
+- Update package groups
+
 * Mon Jul 08 2013 Junfeng Dong <junfeng.dong@intel.com> accepted/tizen/20130520.095530@99d0fc1
 - No ld-linux-armhf.so.3 on armv7l architecture.
 
