@@ -12,16 +12,10 @@
 # license that conforms to the Open Source Definition (Version 1.9)
 # published by the Open Source Initiative.
 
-#
-
-# Run with osc --with=fast_build to have a shorter turnaround
-# It will avoid building some parts of glibc
+# This will avoid building some parts of glibc
 %bcond_with    fast_build
 
-%define crypt_bf_version 1.2
-
 Name:           glibc
-%define testsuite_build ("%{name}" == "glibc-testsuite")
 Summary:        Standard Shared Libraries (from the GNU C Library)
 License:        LGPL-2.1+ and LGPL-2.1+-with-GCC-exception and GPL-2.0+
 Group:          Base/Libraries
@@ -68,10 +62,10 @@ Conflicts:      kernel < %{enablekernel}
 Provides:       ld-linux.so.3
 Provides:       ld-linux.so.3(GLIBC_2.4)
 %endif
-Version:        2.17
+Version:        2.18
 Release:        0
-%define glibc_major_version 2.17
-%define git_id c758a6861537
+%define glibc_major_version 2.18
+%define git_id eefa3be8e4c2
 Url:            http://www.gnu.org/software/libc/libc.html
 Source:         glibc-%{version}.tar.xz
 Source5:        nsswitch.conf
@@ -343,15 +337,6 @@ $BuildCC -static %{optflags} -Os $RPM_SOURCE_DIR/glibc_post_upgrade.c -o glibc_p
 %check
 # The testsuite will fail if asneeded is used
 export LD_AS_NEEDED=0
-%if %{testsuite_build}
-# Increase timeout
-export TIMEOUTFACTOR=16
-%ifarch %ix86 x86_64
-	make %{?_smp_mflags} -C cc-base -k check || echo make check failed
-%else
-	make %{?_smp_mflags} -C cc-base check
-%endif
-%endif
 # This has to pass on all platforms!
 # Exceptions:
 # None!
@@ -364,7 +349,6 @@ make %{?_smp_mflags} -C cc-base check-abi
 #######################################################################
 
 %install
-%if !%{testsuite_build}
 # We don't want to strip the .symtab from our libraries in find-debuginfo.sh,
 # certainly not from libpthread.so.* because it is used by libthread_db to find
 # some non-exported symbols in order to detect if threading support
@@ -509,7 +493,6 @@ ln -s ld-%{glibc_major_version}.so %{buildroot}/lib/ld-linux.so.3
 # Move getconf to %{_libexecdir}/getconf/ to avoid cross device link
 mv %{buildroot}%{_bindir}/getconf %{buildroot}%{_libexecdir}/getconf/getconf
 ln -s %{_libexecdir}/getconf/getconf %{buildroot}%{_bindir}/getconf
-%endif # !%{testsuite_build}
 
 #######################################################################
 ###
@@ -517,22 +500,7 @@ ln -s %{_libexecdir}/getconf/getconf %{buildroot}%{_bindir}/getconf
 ###
 #######################################################################
 
-# Note: glibc_post_upgrade does:
-# %%set_permissions %%{_libexecdir}/pt_chown
-# since we cannot do it in our own post section
-
 %post -p %{_sbindir}/glibc_post_upgrade
-
-%if 0
-# Enabling the following lines will generate a 
-# requires on /bin/sh but glibc should not require any other binary
-# packages. Therefore we do the change with the built-in lua:
-# %%verifyscript
-# %%verify_permissions -e %%{_libexecdir}/pt_chown
-%endif
-
-%verifyscript -p <lua>
-os.execute("/usr/bin/chkstat -n --warn --system -e %{_libexecdir}/pt_chown")
 
 %postun -p /sbin/ldconfig
 
@@ -555,18 +523,11 @@ mkdir -p /var/run/nscd
 exit 0
 
 
-%if !%{testsuite_build}
 %files
 %manifest %{name}.manifest
-#######################################################################
-###
-### FILES
-###
-#######################################################################
-
 # glibc
 %defattr(-,root,root)
-%doc LICENSES
+%license LICENSES
 %config(noreplace) /etc/bindresvport.blacklist
 %config /etc/ld.so.conf
 %attr(0644,root,root) %verify(not md5 size mtime) %ghost %config(missingok,noreplace) /etc/ld.so.cache
@@ -659,7 +620,6 @@ exit 0
 %endif
 %{_bindir}/locale
 %{_bindir}/localedef
-%verify(not mode caps) %attr(4755,root,root) %{_libexecdir}/pt_chown
 %dir %attr(0755,root,root) %{_libexecdir}/getconf
 %{_libexecdir}/getconf/*
 %{_sbindir}/glibc_post_upgrade
@@ -688,7 +648,8 @@ exit 0
 %files devel
 %manifest %{name}.manifest
 %defattr(-,root,root)
-%doc COPYING COPYING.LIB NEWS README BUGS CONFORMANCE
+%license COPYING COPYING.LIB 
+%doc NEWS README BUGS CONFORMANCE
 %{_bindir}/catchsegv
 %{_bindir}/rpcgen
 %{_bindir}/sprof
@@ -798,6 +759,5 @@ exit 0
 %{_bindir}/makedb
 /var/lib/misc/Makefile
 
-%endif # !%{testsuite_build}
 
 %docs_package
