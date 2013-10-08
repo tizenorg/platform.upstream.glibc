@@ -1,3 +1,6 @@
+* Fri Oct 11 2013 Jacek Bukarewicz <j.bukarewicz@samsung.com> accepted/tizen/20130912.200215@22e25d2
+- Minor subpackage reorganization
+
 * Mon Aug 26 2013 Anas Nashif <anas.nashif@intel.com> glibc-2.18@e8510fa
 - Update to 2.18
 

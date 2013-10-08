@@ -126,6 +126,7 @@ Summary:        Locale Data for Localized Programs
 License:        GPL-2.0+ and MIT and LGPL-2.1+
 Requires(post): /usr/bin/cat
 Requires:       glibc = %{version}
+Requires:       glibc-tools = %{version}
 
 %description locale
 Locale data for the internationalisation features of the GNU C library.
@@ -173,17 +174,40 @@ The glibc-devel-static package contains the C library static libraries
 for -static linking.  You don't need these, unless you link statically,
 which is highly discouraged.
 
-%package utils
+%package tools
+Summary:        Various tools from GNU C library
+License:        GPL-2.0+
+Requires:       glibc = %{version}
+
+%description tools
+The glibc-tools package contains various useful utilities from the GNU C library
+
+%package tools-devel
 Summary:        Development utilities from GNU C library
 License:        LGPL-2.1+
 Requires:       glibc = %{version}
 
-%description utils
-The glibc-utils package contains mtrace, a memory leak tracer and
-xtrace, a function call tracer which can be helpful during program
+%description tools-devel
+The glibc-tools-devel package contains various binaries which can be helpful during program
 debugging.
 
 If you are unsure if you need this, don't install this package.
+
+%package -n libidn
+Summary:        GNU IDN Library
+License:        LGPL-2.1+
+Requires:       glibc = %{version}
+
+%description -n libidn
+GNU libidn is an implementation of the Stringprep, Punycode and IDNA specifications.
+
+%package -n libanl
+Summary:        Asynchronous Name Lookup Library
+License:        LGPL-2.1+
+Requires:       glibc = %{version}
+
+%description -n libanl
+GNU libanl allows to perform asynchronous DNS name lookups
 
 %package extra
 Summary:        Extra binaries from GNU C Library
@@ -554,15 +578,8 @@ exit 0
 /%{_lib}/ld-linux.so.2
 %endif
 
-/%{_lib}/libBrokenLocale-%{glibc_major_version}.so
-/%{_lib}/libBrokenLocale.so.1
-/%{_lib}/libSegFault.so
-/%{_lib}/libanl-%{glibc_major_version}.so
-/%{_lib}/libanl.so.1
 /%{_lib}/libc-%{glibc_major_version}.so
 /%{_lib}/libc.so.6*
-/%{_lib}/libcidn-%{glibc_major_version}.so
-/%{_lib}/libcidn.so.1
 /%{_lib}/libcrypt-%{glibc_major_version}.so
 /%{_lib}/libcrypt.so.1
 /%{_lib}/libdl-%{glibc_major_version}.so
@@ -591,8 +608,6 @@ exit 0
 /%{_lib}/libresolv.so.2
 /%{_lib}/librt-%{glibc_major_version}.so
 /%{_lib}/librt.so.1
-/%{_lib}/libthread_db-1.0.so
-/%{_lib}/libthread_db.so.1
 /%{_lib}/libutil-%{glibc_major_version}.so
 /%{_lib}/libutil.so.1
 %define optimized_libs() \
@@ -610,20 +625,12 @@ exit 0
 
 %dir %attr(0700,root,root) /var/cache/ldconfig
 /sbin/ldconfig
-%{_bindir}/gencat
-%{_bindir}/getconf
 %{_bindir}/getent
-%{_bindir}/iconv
 %attr(755,root,root) %{_bindir}/ldd
 %ifarch %ix86 sparc sparcv9
 	%{_bindir}/lddlibc4
 %endif
-%{_bindir}/locale
-%{_bindir}/localedef
-%dir %attr(0755,root,root) %{_libexecdir}/getconf
-%{_libexecdir}/getconf/*
 %{_sbindir}/glibc_post_upgrade
-%{_sbindir}/iconvconfig
 
 %ifarch %ix86
 
@@ -644,6 +651,18 @@ exit 0
 /usr/lib/locale/*
 %endif
 %{_libdir}/gconv
+
+%files -n libidn
+%manifest %{name}.manifest
+%defattr(-,root,root)
+/%{_lib}/libcidn-%{glibc_major_version}.so
+/%{_lib}/libcidn.so.1
+
+%files -n libanl
+%manifest %{name}.manifest
+%defattr(-,root,root)
+/%{_lib}/libanl-%{glibc_major_version}.so
+/%{_lib}/libanl.so.1
 
 %files devel
 %manifest %{name}.manifest
@@ -737,11 +756,26 @@ exit 0
 %{_libdir}/libdl_p.a
 %endif
 
-%files utils
+%files tools
+%{_bindir}/gencat
+%{_bindir}/getconf
+%dir %attr(0755,root,root) %{_libexecdir}/getconf
+%{_libexecdir}/getconf/*
+%{_bindir}/iconv
+%{_bindir}/locale
+%{_bindir}/localedef
+%{_sbindir}/iconvconfig
+
+%files tools-devel
 %manifest %{name}.manifest
 %defattr(-,root,root)
 /%{_lib}/libmemusage.so
 /%{_lib}/libpcprofile.so
+/%{_lib}/libBrokenLocale-%{glibc_major_version}.so
+/%{_lib}/libBrokenLocale.so.1
+/%{_lib}/libSegFault.so
+/%{_lib}/libthread_db-1.0.so
+/%{_lib}/libthread_db.so.1
 %dir /%{_libdir}/audit
 /%{_libdir}/audit/sotruss-lib.so
 # These need gd-devel for building
