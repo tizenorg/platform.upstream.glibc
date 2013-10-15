@@ -173,14 +173,13 @@ The glibc-devel-static package contains the C library static libraries
 for -static linking.  You don't need these, unless you link statically,
 which is highly discouraged.
 
-%package utils
+%package devel-utils
 Summary:        Development utilities from GNU C library
 License:        LGPL-2.1+
 Requires:       glibc = %{version}
 
-%description utils
-The glibc-utils package contains mtrace, a memory leak tracer and
-xtrace, a function call tracer which can be helpful during program
+%description devel-utils
+The glibc-devel-utils package contains various binaries which can be helpful during program
 debugging.
 
 If you are unsure if you need this, don't install this package.
@@ -554,9 +553,6 @@ exit 0
 /%{_lib}/ld-linux.so.2
 %endif
 
-/%{_lib}/libBrokenLocale-%{glibc_major_version}.so
-/%{_lib}/libBrokenLocale.so.1
-/%{_lib}/libSegFault.so
 /%{_lib}/libanl-%{glibc_major_version}.so
 /%{_lib}/libanl.so.1
 /%{_lib}/libc-%{glibc_major_version}.so
@@ -591,8 +587,6 @@ exit 0
 /%{_lib}/libresolv.so.2
 /%{_lib}/librt-%{glibc_major_version}.so
 /%{_lib}/librt.so.1
-/%{_lib}/libthread_db-1.0.so
-/%{_lib}/libthread_db.so.1
 /%{_lib}/libutil-%{glibc_major_version}.so
 /%{_lib}/libutil.so.1
 %define optimized_libs() \
@@ -650,12 +644,12 @@ exit 0
 %defattr(-,root,root)
 %license COPYING COPYING.LIB 
 %doc NEWS README BUGS CONFORMANCE
-%{_bindir}/catchsegv
 %{_bindir}/rpcgen
-%{_bindir}/sprof
 %{_includedir}/*
 %{_libdir}/*.o
 %{_libdir}/*.so
+%exclude /%{_libdir}/libSegFault.so
+%exclude /%{_libdir}/libthread_db.so
 # These static libraries are needed even for shared builds
 %{_libdir}/libbsd-compat.a
 %{_libdir}/libc_nonshared.a
@@ -737,11 +731,18 @@ exit 0
 %{_libdir}/libdl_p.a
 %endif
 
-%files utils
+%files devel-utils
 %manifest %{name}.manifest
 %defattr(-,root,root)
 /%{_lib}/libmemusage.so
 /%{_lib}/libpcprofile.so
+/%{_lib}/libBrokenLocale-%{glibc_major_version}.so
+/%{_lib}/libBrokenLocale.so.1
+/%{_libdir}/libBrokenLocale.so
+/%{_lib}/libSegFault.so
+/%{_lib}/libthread_db-1.0.so
+/%{_lib}/libthread_db.so.1
+/%{_libdir}/libthread_db.so
 %dir /%{_libdir}/audit
 /%{_libdir}/audit/sotruss-lib.so
 # These need gd-devel for building
@@ -752,6 +753,8 @@ exit 0
 %{_bindir}/sotruss
 %{_bindir}/xtrace
 %{_bindir}/pldd
+%{_bindir}/catchsegv
+%{_bindir}/sprof
 
 %files extra
 %manifest %{name}.manifest
