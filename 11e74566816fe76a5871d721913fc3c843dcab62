@@ -1,0 +1,8 @@
+Code-Review+2: Junfeng dong <junfeng.dong@intel.com>
+Code-Review+1: Patrick McCarty <patrick.mccarty@linux.intel.com>
+Verified+1: Jacek Bukarewicz <j.bukarewicz@samsung.com>
+Submitted-by: Junfeng dong <junfeng.dong@intel.com>
+Submitted-at: Thu, 17 Oct 2013 01:36:48 -0700
+Reviewed-on: https://review.tizen.org/gerrit/10869
+Project: platform/upstream/glibc
+Branch: refs/heads/tizen
