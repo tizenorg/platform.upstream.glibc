@@ -62,9 +62,9 @@ Conflicts:      kernel < %{enablekernel}
 Provides:       ld-linux.so.3
 Provides:       ld-linux.so.3(GLIBC_2.4)
 %endif
-Version:        2.18
+Version:        2.19
 Release:        0
-%define glibc_major_version 2.18
+%define glibc_major_version 2.19
 %define git_id eefa3be8e4c2
 Url:            http://www.gnu.org/software/libc/libc.html
 Source:         glibc-%{version}.tar.xz
@@ -648,10 +648,8 @@ exit 0
 %{_includedir}/*
 %{_libdir}/*.o
 %{_libdir}/*.so
-%exclude /%{_libdir}/libSegFault.so
 %exclude /%{_libdir}/libthread_db.so
 # These static libraries are needed even for shared builds
-%{_libdir}/libbsd-compat.a
 %{_libdir}/libc_nonshared.a
 %{_libdir}/libg.a
 %{_libdir}/libieee.a
