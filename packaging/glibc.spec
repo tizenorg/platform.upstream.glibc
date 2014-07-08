@@ -62,10 +62,10 @@ Conflicts:      kernel < %{enablekernel}
 Provides:       ld-linux.so.3
 Provides:       ld-linux.so.3(GLIBC_2.4)
 %endif
-Version:        2.18
+Version:        2.19
 Release:        0
-%define glibc_major_version 2.18
-%define git_id eefa3be8e4c2
+%define glibc_major_version 2.19
+%define git_id 9a869d822025
 Url:            http://www.gnu.org/software/libc/libc.html
 Source:         glibc-%{version}.tar.xz
 Source5:        nsswitch.conf
@@ -256,10 +256,10 @@ BuildFlags="$BuildFlags -g"
 %ifarch %ix86
 	add_ons=$add_ons
 %endif
-%ifarch %arm 
+%ifarch %arm aarch64
 	add_ons=$add_ons,ports
 %endif
-%ifarch %arm
+%ifarch mipsel
 	# fails to build otherwise - need to recheck and fix
 	%define enable_stackguard_randomization 0
 %endif
@@ -270,7 +270,7 @@ configure_and_build_glibc() {
 	local addons="$1"; shift
 	mkdir "cc-$dirname"
 	cd "cc-$dirname"
-%ifarch %arm
+%ifarch %arm aarch64
 	# remove asynchronous-unwind-tables during configure as it causes
 	# some checks to fail spuriously on arm
 	conf_cflags="${cflags/-fasynchronous-unwind-tables/}"
@@ -455,7 +455,7 @@ touch %{buildroot}/var/run/nscd/{socket,nscd.pid}
 # Create ld.so.conf
 #
 cat > %{buildroot}/etc/ld.so.conf <<EOF
-%ifarch x86_64
+%if "%{_lib}" == "lib64"
 /usr/local/lib64
 %endif
 /usr/local/lib
@@ -551,6 +551,10 @@ exit 0
 %endif
 %ifarch %ix86 %sparc
 /%{_lib}/ld-linux.so.2
+%endif
+%ifarch aarch64
+/lib/ld-linux-aarch64.so.1
+/%{_lib}/ld-linux-aarch64.so.1
 %endif
 
 /%{_lib}/libanl-%{glibc_major_version}.so
