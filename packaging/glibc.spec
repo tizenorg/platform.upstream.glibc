@@ -652,10 +652,7 @@ exit 0
 %{_includedir}/*
 %{_libdir}/*.o
 %{_libdir}/*.so
-%exclude /%{_libdir}/libSegFault.so
-%exclude /%{_libdir}/libthread_db.so
 # These static libraries are needed even for shared builds
-%{_libdir}/libbsd-compat.a
 %{_libdir}/libc_nonshared.a
 %{_libdir}/libg.a
 %{_libdir}/libieee.a
