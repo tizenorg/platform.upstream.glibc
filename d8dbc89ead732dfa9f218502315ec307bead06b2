@@ -1,0 +1,10 @@
+Code-Review+2: Casey Schaufler <casey.schaufler@intel.com>
+Code-Review+2: Chanho Park
+Verified+1: Chanho Park
+Verified+1: Yury Usishchev <y.usishchev@samsung.com>
+Code-Review+1: Konstantin Tafintsev <k.tafintsev@samsung.com>
+Submitted-by: Chanho Park
+Submitted-at: Tue, 05 Aug 2014 08:22:32 -0700
+Reviewed-on: https://review.tizen.org/gerrit/25367
+Project: platform/upstream/glibc
+Branch: refs/heads/toolchain_upgrade
