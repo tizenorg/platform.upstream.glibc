@@ -555,6 +555,7 @@ exit 0
 %endif
 %ifarch aarch64
 /%{_lib}/ld-linux-aarch64.so.1
+/lib/ld-linux-aarch64.so.1
 %endif
 
 /%{_lib}/libanl-%{glibc_major_version}.so
