@@ -489,10 +489,6 @@ install -m 644 %{SOURCE21} %{buildroot}/usr/lib/systemd/system
 ln -s ld-%{glibc_major_version}.so %{buildroot}/lib/ld-linux.so.3
 %endif
 
-%ifarch aarch64
-# We don't need a symlink as our filesystem already solves this issue
-rm -f %{buildroot}/lib/ld-linux-aarch64.so.1
-%endif
 
 # Move getconf to %{_libexecdir}/getconf/ to avoid cross device link
 mv %{buildroot}%{_bindir}/getconf %{buildroot}%{_libexecdir}/getconf/getconf
@@ -559,6 +555,7 @@ exit 0
 %endif
 %ifarch aarch64
 /%{_lib}/ld-linux-aarch64.so.1
+/lib/ld-linux-aarch64.so.1
 %endif
 
 /%{_lib}/libanl-%{glibc_major_version}.so
