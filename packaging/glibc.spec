@@ -289,7 +289,7 @@ configure_and_build_glibc() {
         CC="$BuildCC" CXX="$BuildCCplus"  ../configure \
 		--prefix=%{_prefix} \
 		--libexecdir=%{_libexecdir} --infodir=%{_infodir} \
-		--enable-add-ons=nptl$addons \
+		--enable-add-ons=$addons \
 	        $profile \
 		"$@" \
 %if %{enable_stackguard_randomization}
