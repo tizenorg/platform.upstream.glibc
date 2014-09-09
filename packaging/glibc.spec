@@ -62,9 +62,9 @@ Conflicts:      kernel < %{enablekernel}
 Provides:       ld-linux.so.3
 Provides:       ld-linux.so.3(GLIBC_2.4)
 %endif
-Version:        2.19
+Version:        2.20
 Release:        0
-%define glibc_major_version 2.19
+%define glibc_major_version 2.20
 %define git_id 9a869d822025
 Url:            http://www.gnu.org/software/libc/libc.html
 Source:         glibc-%{version}.tar.xz
