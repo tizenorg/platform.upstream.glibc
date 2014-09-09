@@ -257,7 +257,7 @@ BuildFlags="$BuildFlags -g"
 	add_ons=$add_ons
 %endif
 %ifarch %arm aarch64
-	add_ons=$add_ons,ports
+	add_ons=$add_ons
 %endif
 %ifarch mipsel
 	# fails to build otherwise - need to recheck and fix
@@ -289,7 +289,7 @@ configure_and_build_glibc() {
         CC="$BuildCC" CXX="$BuildCCplus"  ../configure \
 		--prefix=%{_prefix} \
 		--libexecdir=%{_libexecdir} --infodir=%{_infodir} \
-		--enable-add-ons=nptl$addons \
+		--enable-add-ons=$addons \
 	        $profile \
 		"$@" \
 %if %{enable_stackguard_randomization}
