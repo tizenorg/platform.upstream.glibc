@@ -1,3 +1,6 @@
+* Tue Sep 09 2014 Chanho Park <chanho61.park@samsung.com> upstream/2.20-26-g1a827dc
+- Update to 2.20
+
 * Tue Oct 15 2013 Jacek Bukarewicz <j.bukarewicz@samsung.com> accepted/tizen/20130912.200215@1ee152e
 - Subpackage reorganization - devel-utils package
 
