@@ -1,5 +1,9 @@
 2014-10-22  Will Newton  <will.newton@linaro.org>
 
+	* version.h (VERSION): Bump for development.
+
+2014-10-22  Will Newton  <will.newton@linaro.org>
+
 	glibc Linaro 2.20-2014.11 released.
 
 	* version.h (VERSION): Update.
