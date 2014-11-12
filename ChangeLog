@@ -1,3 +1,8 @@
+2014-11-12  Tatiana Udalova  <t.udalova@samsung.com>
+
+	[BZ #17475]
+	* locale/iso-639.def: Define Bhili and Tulu language codes.
+
 2014-10-08  Roland McGrath  <roland@hack.frob.com>
 
 	[BZ #17460]
