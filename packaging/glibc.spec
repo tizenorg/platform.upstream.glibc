@@ -62,10 +62,11 @@ Conflicts:      kernel < %{enablekernel}
 Provides:       ld-linux.so.3
 Provides:       ld-linux.so.3(GLIBC_2.4)
 %endif
-Version:        2.20
+Version:        2.21
 Release:        0
-%define glibc_major_version 2.20
-%define git_id 9a869d822025
+%define glibc_major_version 2.21
+%define git_id 4e42b5b8f89f
+
 Url:            http://www.gnu.org/software/libc/libc.html
 Source:         glibc-%{version}.tar.xz
 Source5:        nsswitch.conf
