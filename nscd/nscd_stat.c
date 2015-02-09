@@ -36,13 +36,8 @@
 #endif /* HAVE_SELINUX */
 
 
-/* We use this to make sure the receiver is the same.  Capture mtime
-   of this file if possible.  */
-#if defined(__TIMESTAMP__)
-static const char compilation[21] = __TIMESTAMP__;
-#else
+/* We use this to make sure the receiver is the same. */
 static const char compilation[21] = __DATE__ " " __TIME__;
-#endif
 
 /* Statistic data for one database.  */
 struct dbstat

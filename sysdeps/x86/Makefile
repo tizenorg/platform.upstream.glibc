@@ -1,6 +1,6 @@
 ifeq ($(subdir),elf)
 CFLAGS-.os += $(if $(filter $(@F),$(patsubst %,%.os,$(all-rtld-routines))),\
-		   -mno-sse -mno-mmx)
+		   -mno-sse -mno-mmx -Wno-error)
 
 tests-special += $(objpfx)tst-xmmymm.out
 $(objpfx)tst-xmmymm.out: ../sysdeps/x86/tst-xmmymm.sh $(objpfx)ld.so
