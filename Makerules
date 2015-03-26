@@ -188,7 +188,7 @@ ifdef gen-as-const-headers
 $(common-objpfx)%.h $(common-objpfx)%.h.d: $(..)scripts/gen-as-const.awk \
 					   %.sym $(common-before-compile)
 	$(AWK) -f $< $(filter %.sym,$^) \
-	| $(CC) -S -o $(@:.h.d=.h)T3 $(CFLAGS) $(CPPFLAGS) -x c - \
+	| $(CC) -S -o $(@:.h.d=.h)T3 $(CFLAGS) $(CPPFLAGS) -fno-lto -x c - \
 		-MD -MP -MF $(@:.h=.h.d)T -MT '$(@:.h=.h.d) $(@:.h.d=.h)'
 	sed -n 's/^.*@@@name@@@\([^@]*\)@@@value@@@[^0-9Xxa-fA-F-]*\([0-9Xxa-fA-F-][0-9Xxa-fA-F-]*\).*@@@end@@@.*$$/#define \1 \2/p' \
 		$(@:.h.d=.h)T3 > $(@:.h.d=.h)T
