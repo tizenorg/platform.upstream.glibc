@@ -1264,7 +1264,7 @@ AC_CACHE_CHECK(for .preinit_array/.init_array/.fini_array support,
 	       libc_cv_initfini_array, [dnl
 LIBC_TRY_LINK_STATIC([
 int foo (void) { return 1; }
-int (*fp) (void) __attribute__ ((section (".init_array"))) = foo;
+int (*fp) (void) __attribute__ ((section (".init_array"), used)) = foo;
 ],
   [if $READELF -S conftest | fgrep INIT_ARRAY > /dev/null; then
     libc_cv_initfini_array=yes

@@ -5730,7 +5730,7 @@ int _start (void) { return 0; }
 int __start (void) { return 0; }
 
 int foo (void) { return 1; }
-int (*fp) (void) __attribute__ ((section (".init_array"))) = foo;
+int (*fp) (void) __attribute__ ((section (".init_array"), used)) = foo;
 
 EOF
 if { ac_try='${CC-cc} $CFLAGS $CPPFLAGS $LDFLAGS -o conftest
