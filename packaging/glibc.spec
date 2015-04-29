@@ -271,14 +271,7 @@ configure_and_build_glibc() {
 	local addons="$1"; shift
 	mkdir "cc-$dirname"
 	cd "cc-$dirname"
-%ifarch %arm aarch64
-	# remove asynchronous-unwind-tables during configure as it causes
-	# some checks to fail spuriously on arm
-	conf_cflags="${cflags/-fasynchronous-unwind-tables/}"
-	conf_cflags="${conf_cflags/-funwind-tables/}"
-%else
-	conf_cflags="$cflags"
-%endif
+	conf_cflags="$cflags -fasynchronous-unwind-tables"
 
 	profile="--disable-profile"
 %if %{build_profile}
