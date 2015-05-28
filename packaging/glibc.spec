@@ -271,7 +271,7 @@ configure_and_build_glibc() {
 	local addons="$1"; shift
 	mkdir "cc-$dirname"
 	cd "cc-$dirname"
-	conf_cflags="$cflags -fasynchronous-unwind-tables"
+	conf_cflags="$cflags -funwind-tables"
 
 	profile="--disable-profile"
 %if %{build_profile}
