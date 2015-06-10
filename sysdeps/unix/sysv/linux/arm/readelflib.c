@@ -1,7 +1,7 @@
 /* Copyright (C) 1999-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Andreas Jaeger <aj@suse.de>, 1999 and
-		  Jakub Jelinek <jakub@redhat.com>, 1999.
+		  Jakub Jelinek <jakub@redhat.com>, 2000.
 
    The GNU C Library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -32,37 +32,75 @@ process_elf_file (const char *file_name, const char *lib, int *flag,
 		  size_t file_length)
 {
   ElfW(Ehdr) *elf_header = (ElfW(Ehdr) *) file_contents;
-  int ret;
+  int ret, file_flag = 0;
 
-  if (elf_header->e_ident [EI_CLASS] == ELFCLASS32)
+  switch (elf_header->e_machine)
     {
-      Elf32_Ehdr *elf32_header = (Elf32_Ehdr *) elf_header;
-
-      ret = process_elf32_file (file_name, lib, flag, osversion, soname,
-				file_contents, file_length);
-
-      if (!ret && EF_ARM_EABI_VERSION (elf32_header->e_flags) == EF_ARM_EABI_VER5)
+    case EM_X86_64:
+      if (elf_header->e_ident[EI_CLASS] == ELFCLASS64)
+	/* X86-64 64bit libraries are always libc.so.6+.  */
+	file_flag = FLAG_X8664_LIB64|FLAG_ELF_LIBC6;
+      else
+	/* X32 libraries are always libc.so.6+.  */
+	file_flag = FLAG_X8664_LIBX32|FLAG_ELF_LIBC6;
+      break;
+#ifndef SKIP_EM_IA_64
+    case EM_IA_64:
+      if (elf_header->e_ident[EI_CLASS] == ELFCLASS64)
 	{
-	  if (elf32_header->e_flags & EF_ARM_ABI_FLOAT_HARD)
-	    *flag = FLAG_ARM_LIBHF|FLAG_ELF_LIBC6;
-	  else if (elf32_header->e_flags & EF_ARM_ABI_FLOAT_SOFT)
-	    *flag = FLAG_ARM_LIBSF|FLAG_ELF_LIBC6;
-	  else
-	    /* We must assume the unmarked objects are compatible
-	       with all ABI variants. Such objects may have been
-	       generated in a transitional period when the ABI
-	       tags were not added to all objects.  */
-	    *flag = FLAG_ELF_LIBC6;
+	  /* IA64 64bit libraries are always libc.so.6+.  */
+	  file_flag = FLAG_IA64_LIB64|FLAG_ELF_LIBC6;
+	  break;
 	}
+      goto failed;
+#endif
+    case EM_ARM:
+      if (elf_header->e_ident [EI_CLASS] == ELFCLASS32)
+      {
+        Elf32_Ehdr *elf32_header = (Elf32_Ehdr *) elf_header;
+        if (EF_ARM_EABI_VERSION (elf32_header->e_flags) == EF_ARM_EABI_VER5)
+        {
+	    if (elf32_header->e_flags & EF_ARM_ABI_FLOAT_HARD)
+	      file_flag = FLAG_ARM_LIBHF|FLAG_ELF_LIBC6;
+	    else if (elf32_header->e_flags & EF_ARM_ABI_FLOAT_SOFT)
+	      file_flag = FLAG_ARM_LIBSF|FLAG_ELF_LIBC6;
+	    else
+	      /* We must assume the unmarked objects are compatible
+	         with all ABI variants. Such objects may have been
+	         generated in a transitional period when the ABI
+	         tags were not added to all objects.  */
+	      file_flag = FLAG_ELF_LIBC6;
+	    break;
+	  }
+      }
+      else
+      {
+        /* AArch64 libraries are always libc.so.6+.  */
+	  file_flag = FLAG_AARCH64_LIB64|FLAG_ELF_LIBC6;
+	  break;
+      }
+      goto failed;
+    case EM_386:
+      if (elf_header->e_ident[EI_CLASS] == ELFCLASS32)
+	break;
+      /* Fall through.  */
+    default:
+failed:
+      error (0, 0, _("%s is for unknown machine %d.\n"),
+	     file_name, elf_header->e_machine);
+      return 1;
     }
+
+  if (elf_header->e_ident[EI_CLASS] == ELFCLASS32)
+    ret = process_elf32_file (file_name, lib, flag, osversion, soname,
+			      file_contents, file_length);
   else
-    {
-      ret = process_elf64_file (file_name, lib, flag, osversion, soname,
-				file_contents, file_length);
-      /* AArch64 libraries are always libc.so.6+.  */
-      if (!ret)
-	*flag = FLAG_AARCH64_LIB64|FLAG_ELF_LIBC6;
-    }
+    ret = process_elf64_file (file_name, lib, flag, osversion, soname,
+			      file_contents, file_length);
+
+  if (!ret && file_flag)
+    *flag = file_flag;
+
   return ret;
 }
 
