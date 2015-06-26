@@ -140,6 +140,7 @@ elf_machine_runtime_setup (struct link_map *l, int lazy, int profile)
 .globl _dl_start_user\n\
 .type _dl_start_user, %function\n\
 _start:\n\
+	.fnstart\n\
 	@ we are PIC code, so get global offset table\n\
 	ldr	sl, .L_GET_GOT\n\
 	@ See if we were run as a command with the executable file\n\
@@ -149,7 +150,10 @@ _start:\n\
 	mov	r0, sp\n\
 	bl	_dl_start\n\
 	@ returns user entry point in r0\n\
+	.cantunwind\n\
+	.fnend\n\
 _dl_start_user:\n\
+	.fnstart\n\
 	adr	r6, .L_GET_GOT\n\
 	add	sl, sl, r6\n\
 	ldr	r4, [sl, r4]\n\
@@ -206,6 +210,8 @@ _dl_start_user:\n\
 	ldr	r3, .L_ARGV\n\
 	str	r2, [sl, r3]\n\
 	b	.L_done_fixup\n\
+	.cantunwind\n\
+	.fnend\n\
 \n\
 .L_GET_GOT:\n\
 	.word	_GLOBAL_OFFSET_TABLE_ - .L_GET_GOT\n\
