@@ -1,0 +1,8 @@
+<manifest>
+ <request>
+    <domain name="_"/>
+ </request>
+ <assign>
+    <filesystem path="/sbin/ldconfig" exec_label="_" />
+ </assign>
+</manifest>
