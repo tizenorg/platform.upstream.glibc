@@ -62,9 +62,9 @@ Conflicts:      kernel < %{enablekernel}
 Provides:       ld-linux.so.3
 Provides:       ld-linux.so.3(GLIBC_2.4)
 %endif
-Version:        2.21
+Version:        2.20.2
 Release:        0
-%define glibc_major_version 2.21
+%define glibc_major_version 2.20-2014.11
 %define git_id 4e42b5b8f89f
 
 Url:            http://www.gnu.org/software/libc/libc.html
@@ -755,7 +755,7 @@ exit 0
 %manifest %{name}.manifest
 %defattr(-,root,root)
 %{_bindir}/makedb
-/var/lib/misc/Makefile
+/var/db/Makefile
 
 
 %docs_package
