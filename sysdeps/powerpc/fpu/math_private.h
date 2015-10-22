@@ -1,5 +1,5 @@
 /* Private inline math functions for powerpc.
-   Copyright (C) 2006-2015 Free Software Foundation, Inc.
+   Copyright (C) 2006-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -25,17 +25,26 @@
 #include <fenv_private.h>
 #include_next <math_private.h>
 
+# if __WORDSIZE == 64 || defined _ARCH_PWR4
+#  define __CPU_HAS_FSQRT 1
+# else
+#  define __CPU_HAS_FSQRT ((GLRO(dl_hwcap) & PPC_FEATURE_64) != 0)
+# endif
+
 extern double __slow_ieee754_sqrt (double);
 extern __always_inline double
 __ieee754_sqrt (double __x)
 {
   double __z;
 
-#ifdef _ARCH_PPCSQ
-   asm ("fsqrt	%0,%1" : "=f" (__z) : "f" (__x));
-#else
-   __z = __slow_ieee754_sqrt(__x);
-#endif
+  if (__CPU_HAS_FSQRT)
+    {
+      /* Volatile is required to prevent the compiler from moving the
+         fsqrt instruction above the branch.  */
+      __asm __volatile ("fsqrt	%0,%1" : "=f" (__z) : "f" (__x));
+    }
+  else
+     __z = __slow_ieee754_sqrt(__x);
 
   return __z;
 }
@@ -46,11 +55,14 @@ __ieee754_sqrtf (float __x)
 {
   float __z;
 
-#ifdef _ARCH_PPCSQ
-  asm ("fsqrts	%0,%1" : "=f" (__z) : "f" (__x));
-#else
-   __z = __slow_ieee754_sqrtf(__x);
-#endif
+  if (__CPU_HAS_FSQRT)
+    {
+      /* Volatile is required to prevent the compiler from moving the
+         fsqrts instruction above the branch.  */
+      __asm __volatile ("fsqrts	%0,%1" : "=f" (__z) : "f" (__x));
+    }
+  else
+     __z = __slow_ieee754_sqrtf(__x);
 
   return __z;
 }

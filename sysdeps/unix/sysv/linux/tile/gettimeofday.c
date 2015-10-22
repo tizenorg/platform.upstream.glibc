@@ -1,4 +1,4 @@
-/* Copyright (C) 2012-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2012-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -24,7 +24,12 @@
 int
 __gettimeofday (struct timeval *tv, struct timezone *tz)
 {
-  return INLINE_VSYSCALL (gettimeofday, 2, tv, tz);
+#ifdef SHARED
+  /* If the vDSO is available we use it. */
+  if (__vdso_gettimeofday != NULL)
+    return __vdso_gettimeofday (tv, tz);
+#endif
+  return INLINE_SYSCALL (gettimeofday, 2, tv, tz);
 }
 
 libc_hidden_def (__gettimeofday)

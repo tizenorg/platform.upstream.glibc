@@ -1,4 +1,4 @@
-/* Copyright (C) 2003-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2003-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 2003.
 
@@ -21,7 +21,7 @@
 #include <sysdep.h>
 
 
-#if IS_IN (libc)
+#ifndef NOT_IN_libc
 static inline __attribute__((always_inline)) pid_t really_getpid (pid_t oldval);
 
 static inline __attribute__((always_inline)) pid_t
@@ -48,7 +48,7 @@ really_getpid (pid_t oldval)
 pid_t
 __getpid (void)
 {
-#if !IS_IN (libc)
+#ifdef NOT_IN_libc
   INTERNAL_SYSCALL_DECL (err);
   pid_t result = INTERNAL_SYSCALL (getpid, err, 0);
 #else

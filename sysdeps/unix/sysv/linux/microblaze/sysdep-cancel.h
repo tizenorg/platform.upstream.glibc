@@ -1,4 +1,4 @@
-/* Copyright (C) 2014-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -21,9 +21,9 @@
 # include <nptl/pthreadP.h>
 #endif
 
-#if IS_IN (libc) || IS_IN (libpthread) || IS_IN (librt)
+#if !defined NOT_IN_libc || defined IS_IN_libpthread || defined IS_IN_librt
 
-# if !IS_IN (librt) || !defined(PIC)
+# if !defined(IS_IN_librt) || !defined(PIC)
 #  define AC_STACK_SIZE  16  /* space for r15, async_cancel arg and 2 temp words */
 #  define AC_SET_GOT /* empty */
 #  define AC_RESTORE_GOT /* empty */
@@ -102,15 +102,15 @@ L(pseudo_cancel):                                                    \
 #  define PSEUDO_JMP(sym)  brlid r15, sym; addk r0, r0, r0
 # endif
 
-# if IS_IN (libpthread)
+# ifdef IS_IN_libpthread
 #  define CENABLE PSEUDO_JMP (__pthread_enable_asynccancel)
 #  define CDISABLE  PSEUDO_JMP (__pthread_disable_asynccancel)
 #  define __local_multiple_threads __pthread_multiple_threads
-# elif IS_IN (libc)
+# elif !defined NOT_IN_libc
 #  define CENABLE PSEUDO_JMP (__libc_enable_asynccancel)
 #  define CDISABLE  PSEUDO_JMP (__libc_disable_asynccancel)
 #  define __local_multiple_threads __libc_multiple_threads
-# elif IS_IN (librt)
+# elif defined IS_IN_librt
 #  define CENABLE PSEUDO_JMP (__librt_enable_asynccancel)
 #  define CDISABLE  PSEUDO_JMP (__librt_disable_asynccancel)
 # else
@@ -118,7 +118,7 @@ L(pseudo_cancel):                                                    \
 # endif
 
 
-# if IS_IN (libpthread) || IS_IN (libc)
+# if defined IS_IN_libpthread || !defined NOT_IN_libc
 #  ifndef __ASSEMBLER__
 extern int __local_multiple_threads attribute_hidden;
 #   define SINGLE_THREAD_P __builtin_expect (__local_multiple_threads == 0, 1)

@@ -1,6 +1,6 @@
 /* Software floating-point emulation.
    Basic eight-word fraction declaration and manipulation.
-   Copyright (C) 1997-2015 Free Software Foundation, Inc.
+   Copyright (C) 1997-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Richard Henderson (rth@cygnus.com),
 		  Jakub Jelinek (jj@ultra.linux.cz) and
@@ -30,7 +30,7 @@
    <http://www.gnu.org/licenses/>.  */
 
 /* We need just a few things from here for op-4, if we ever need some
-   other macros, they can be added.  */
+   other macros, they can be added. */
 #define _FP_FRAC_DECL_8(X)	_FP_W_TYPE X##_f[8]
 #define _FP_FRAC_HIGH_8(X)	(X##_f[7])
 #define _FP_FRAC_LOW_8(X)	(X##_f[0])
@@ -100,9 +100,10 @@
 
 
 /* Right shift with sticky-lsb.
-   What this actually means is that we do a standard right-shift,
-   but that if any of the bits that fall off the right hand side
-   were one then we always set the LSbit.  */
+ * What this actually means is that we do a standard right-shift,
+ * but that if any of the bits that fall off the right hand side
+ * were one then we always set the LSbit.
+ */
 #define _FP_FRAC_SRS_8(X, N, size)					\
   do									\
     {									\
@@ -138,8 +139,8 @@
 	}								\
       for (; _FP_FRAC_SRS_8_i < 8; ++_FP_FRAC_SRS_8_i)			\
 	X##_f[_FP_FRAC_SRS_8_i] = 0;					\
-      /* Don't fix the LSB until the very end when we're sure f[0] is	\
-	 stable.  */							\
+      /* don't fix the LSB until the very end when we're sure f[0] is	\
+	 stable */							\
       X##_f[0] |= (_FP_FRAC_SRS_8_s != 0);				\
     }									\
   while (0)

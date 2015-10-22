@@ -1,5 +1,5 @@
 /* Definition for thread-local data handling.  NPTL/PowerPC version.
-   Copyright (C) 2003-2015 Free Software Foundation, Inc.
+   Copyright (C) 2003-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -63,8 +63,6 @@ typedef union dtv
    are private.  */
 typedef struct
 {
-  /* Indicate if HTM capable (ISA 2.07).  */
-  int tm_capable;
   /* Reservation for Dynamic System Optimizer ABI.  */
   uintptr_t dso_slot2;
   uintptr_t dso_slot1;
@@ -132,17 +130,11 @@ register void *__thread_register __asm__ ("r13");
    special attention since 'errno' is not yet available and if the
    operation can cause a failure 'errno' must not be touched.  */
 # define TLS_INIT_TP(tcbp) \
-  ({ 									      \
-    __thread_register = (void *) (tcbp) + TLS_TCB_OFFSET;		      \
-    THREAD_SET_TM_CAPABLE (GLRO (dl_hwcap2) & PPC_FEATURE2_HAS_HTM ? 1 : 0);  \
-    NULL;								      \
-  })
+    (__thread_register = (void *) (tcbp) + TLS_TCB_OFFSET, NULL)
 
 /* Value passed to 'clone' for initialization of the thread register.  */
 # define TLS_DEFINE_INIT_TP(tp, pd) \
-    void *tp = (void *) (pd) + TLS_TCB_OFFSET + TLS_PRE_TCB_SIZE;	      \
-    (((tcbhead_t *) ((char *) tp - TLS_TCB_OFFSET))[-1].tm_capable) =	      \
-      THREAD_GET_TM_CAPABLE ();
+  void *tp = (void *) (pd) + TLS_TCB_OFFSET + TLS_PRE_TCB_SIZE
 
 /* Return the address of the dtv for the current thread.  */
 # define THREAD_DTV() \
@@ -195,13 +187,6 @@ register void *__thread_register __asm__ ("r13");
     (((tcbhead_t *) ((char *) (descr)					      \
 		     + TLS_PRE_TCB_SIZE))[-1].pointer_guard		      \
      = THREAD_GET_POINTER_GUARD())
-
-/* tm_capable field in TCB head.  */
-# define THREAD_GET_TM_CAPABLE() \
-    (((tcbhead_t *) ((char *) __thread_register				      \
-		     - TLS_TCB_OFFSET))[-1].tm_capable)
-# define THREAD_SET_TM_CAPABLE(value) \
-    (THREAD_GET_TM_CAPABLE () = (value))
 
 /* l_tls_offset == 0 is perfectly valid on PPC, so we have to use some
    different value to mean unset l_tls_offset.  */

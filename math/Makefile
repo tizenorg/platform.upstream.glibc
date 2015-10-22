@@ -1,4 +1,4 @@
-# Copyright (C) 1996-2015 Free Software Foundation, Inc.
+# Copyright (C) 1996-2014 Free Software Foundation, Inc.
 # This file is part of the GNU C Library.
 
 # The GNU C Library is free software; you can redistribute it and/or
@@ -36,7 +36,7 @@ aux		:= setfpucw fpu_control
 extra-libs	:= libm
 extra-libs-others = $(extra-libs)
 
-libm-support = s_lib_version s_matherr s_signgam			\
+libm-support = k_standard s_lib_version s_matherr s_signgam		\
 	       fclrexcpt fgetexcptflg fraiseexcpt fsetexcptflg		\
 	       ftestexcept fegetround fesetround fegetenv feholdexcpt	\
 	       fesetenv feupdateenv t_exp fedisblxcpt feenablxcpt	\
@@ -61,7 +61,7 @@ libm-calls = e_acos e_acosh e_asin e_atan2 e_atanh e_cosh e_exp e_fmod	\
 	     s_casinh s_cacosh s_catanh s_csqrt s_cpow s_cproj s_clog10 \
 	     s_fma s_lrint s_llrint s_lround s_llround e_exp10 w_log2	\
 	     s_isinf_ns s_issignaling $(calls:s_%=m_%) x2y2m1 k_casinh	\
-	     gamma_product k_standard
+	     gamma_product
 
 dbl-only-routines := branred doasin dosincos halfulp mpa mpatan2	\
 		     mpatan mpexp mplog mpsqrt mptan sincos32 slowexp	\
@@ -126,9 +126,9 @@ $(objpfx)test-ldouble.o: $(objpfx)libm-test.stmp
 $(objpfx)test-ildoubl.o: $(objpfx)libm-test.stmp
 endif
 
-CFLAGS-test-float.c = -fno-inline -ffloat-store -fno-builtin
-CFLAGS-test-double.c = -fno-inline -ffloat-store -fno-builtin
-CFLAGS-test-ldouble.c = -fno-inline -ffloat-store -fno-builtin
+CFLAGS-test-float.c = -fno-inline -ffloat-store -fno-builtin -frounding-math
+CFLAGS-test-double.c = -fno-inline -ffloat-store -fno-builtin -frounding-math
+CFLAGS-test-ldouble.c = -fno-inline -ffloat-store -fno-builtin -frounding-math
 CFLAGS-test-tgmath.c = -fno-builtin
 # The following testcase uses very long lines (>3 million), so it may take a
 # while to compile it. See: http://llvm.org/bugs/show_bug.cgi?id=14106 and
@@ -136,12 +136,14 @@ CFLAGS-test-tgmath.c = -fno-builtin
 CFLAGS-test-tgmath2.c = -fno-builtin
 CFLAGS-test-tgmath-ret.c = -fno-builtin
 CFLAGS-test-powl.c = -fno-builtin
+CFLAGS-test-test-fenv.c = -frounding-math
+CFLAGS-test-misc.c = -frounding-math
 CPPFLAGS-test-ifloat.c = -U__LIBC_INTERNAL_MATH_INLINES -D__FAST_MATH__ \
-			 -DTEST_FAST_MATH -fno-builtin
+			 -DTEST_FAST_MATH -fno-builtin -frounding-math
 CPPFLAGS-test-idouble.c = -U__LIBC_INTERNAL_MATH_INLINES -D__FAST_MATH__ \
-			  -DTEST_FAST_MATH -fno-builtin
+			 -DTEST_FAST_MATH -fno-builtin -frounding-math
 CPPFLAGS-test-ildoubl.c = -U__LIBC_INTERNAL_MATH_INLINES -D__FAST_MATH__ \
-			  -DTEST_FAST_MATH -fno-builtin
+			  -DTEST_FAST_MATH -fno-builtin -frounding-math
 
 
 # The -lieee module sets the _LIB_VERSION_ switch to IEEE mode

@@ -1,4 +1,4 @@
-/* Copyright (C) 2002-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2002-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -430,7 +430,8 @@ allocate_stack (const struct pthread_attr *attr, struct pthread **pdp,
 #endif
 
 #ifdef NEED_DL_SYSINFO
-      SETUP_THREAD_SYSINFO (pd);
+      /* Copy the sysinfo value from the parent.  */
+      THREAD_SYSINFO(pd) = THREAD_SELF_SYSINFO;
 #endif
 
       /* The process ID is also the same as that of the caller.  */
@@ -566,7 +567,8 @@ allocate_stack (const struct pthread_attr *attr, struct pthread **pdp,
 #endif
 
 #ifdef NEED_DL_SYSINFO
-	  SETUP_THREAD_SYSINFO (pd);
+	  /* Copy the sysinfo value from the parent.  */
+	  THREAD_SYSINFO(pd) = THREAD_SELF_SYSINFO;
 #endif
 
 	  /* Don't allow setxid until cloned.  */
@@ -976,7 +978,6 @@ __find_thread_by_id (pid_t tid)
 #endif
 
 
-#ifdef SIGSETXID
 static void
 internal_function
 setxid_mark_thread (struct xid_command *cmdp, struct pthread *t)
@@ -1184,8 +1185,6 @@ __nptl_setxid (struct xid_command *cmdp)
   lll_unlock (stack_cache_lock, LLL_PRIVATE);
   return result;
 }
-#endif  /* SIGSETXID.  */
-
 
 static inline void __attribute__((always_inline))
 init_one_static_tls (struct pthread *curp, struct link_map *map)

@@ -1,4 +1,4 @@
-/* Copyright (C) 2011-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2011-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Chris Metcalf <cmetcalf@tilera.com>, 2011.
 
@@ -30,7 +30,16 @@ weak_alias (__ffs, ffs)
 libc_hidden_def (__ffs)
 libc_hidden_builtin_def (ffs)
 
-#if ULONG_MAX == UINT_MAX
+#undef ffsll
+int
+ffsll (long long x)
+{
+  return __builtin_ffsll (x);
+}
+
 #undef ffsl
+#if ULONG_MAX == UINT_MAX
 weak_alias (__ffs, ffsl)
+#else
+weak_alias (ffsll, ffsl)
 #endif

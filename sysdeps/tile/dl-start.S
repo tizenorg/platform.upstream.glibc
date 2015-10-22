@@ -1,4 +1,4 @@
-/* Copyright (C) 2011-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2011-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Chris Metcalf <cmetcalf@tilera.com>, 2011.
 
@@ -94,7 +94,7 @@ ENTRY (_start)
 	}
 	{
 	 SHL_PTR_ADD r3, r3, r2  /* point r3 at envp */
-	 jal _dl_init
+	 jal _dl_init_internal
 	}
 
 	/* Call user program whose address we saved in r50.

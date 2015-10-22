@@ -1,5 +1,5 @@
 /* setjmp for ARM.
-   Copyright (C) 1997-2015 Free Software Foundation, Inc.
+   Copyright (C) 1997-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -57,16 +57,22 @@ ENTRY (__sigsetjmp)
 
 #ifdef NEED_HWCAP
 	/* Check if we have a VFP unit.  */
-# if IS_IN (rtld)
-	LDST_PCREL (ldr, a3, a4, \
-		    C_SYMBOL_NAME(_rtld_local_ro) \
-		    + RTLD_GLOBAL_RO_DL_HWCAP_OFFSET)
+# ifdef IS_IN_rtld
+	ldr	a3, 1f
+	ldr	a4, .Lrtld_local_ro
+0:	add	a3, pc, a3
+	add	a3, a3, a4
+	ldr	a3, [a3, #RTLD_GLOBAL_RO_DL_HWCAP_OFFSET]
 # else
 #  ifdef PIC
-	LDR_GLOBAL (a3, a4, C_SYMBOL_NAME(_rtld_global_ro), \
-		    RTLD_GLOBAL_RO_DL_HWCAP_OFFSET)
+	ldr	a3, 1f
+	ldr	a4, .Lrtld_global_ro
+0:	add	a3, pc, a3
+	ldr	a3, [a3, a4]
+	ldr	a3, [a3, #RTLD_GLOBAL_RO_DL_HWCAP_OFFSET]
 #  else
-	LDR_GLOBAL (a3, a4, C_SYMBOL_NAME(_dl_hwcap), 0)
+	ldr	a3, .Lhwcap
+	ldr	a3, [a3, #0]
 #  endif
 # endif
 #endif
@@ -107,6 +113,23 @@ ENTRY (__sigsetjmp)
 
 	/* Make a tail call to __sigjmp_save; it takes the same args.  */
 	B	PLTJMP(C_SYMBOL_NAME(__sigjmp_save))
+
+#ifdef NEED_HWCAP
+# ifdef IS_IN_rtld
+1:	.long	_GLOBAL_OFFSET_TABLE_ - 0b - PC_OFS
+.Lrtld_local_ro:
+	.long	C_SYMBOL_NAME(_rtld_local_ro)(GOTOFF)
+# else
+#  ifdef PIC
+1:	.long	_GLOBAL_OFFSET_TABLE_ - 0b - PC_OFS
+.Lrtld_global_ro:
+	.long	C_SYMBOL_NAME(_rtld_global_ro)(GOT)
+#  else
+.Lhwcap:
+	.long	C_SYMBOL_NAME(_dl_hwcap)
+#  endif
+# endif
+#endif
 
 END (__sigsetjmp)
 

@@ -1,4 +1,4 @@
-/* Copyright (C) 2002-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2002-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -108,7 +108,7 @@ __lll_lock_wait_private:
 	cfi_endproc
 	.size	__lll_lock_wait_private,.-__lll_lock_wait_private
 
-#if !IS_IN (libc)
+#ifdef NOT_IN_libc
 	.globl	__lll_lock_wait
 	.type	__lll_lock_wait,@function
 	.hidden	__lll_lock_wait
@@ -348,7 +348,7 @@ __lll_unlock_wake_private:
 	cfi_endproc
 	.size	__lll_unlock_wake_private,.-__lll_unlock_wake_private
 
-#if !IS_IN (libc)
+#ifdef NOT_IN_libc
 	.globl	__lll_unlock_wake
 	.type	__lll_unlock_wake,@function
 	.hidden	__lll_unlock_wake

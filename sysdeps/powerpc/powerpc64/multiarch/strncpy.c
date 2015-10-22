@@ -1,5 +1,5 @@
 /* Multiple versions of strncpy.
-   Copyright (C) 2014-2015 Free Software Foundation, Inc.
+   Copyright (C) 2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -17,22 +17,19 @@
    <http://www.gnu.org/licenses/ >.  */
 
 /* Define multiple versions only for definition in libc. */
-#if IS_IN (libc)
+#ifndef NOT_IN_libc
 # include <string.h>
 # include <shlib-compat.h>
 # include "init-arch.h"
 
 extern __typeof (strncpy) __strncpy_ppc attribute_hidden;
 extern __typeof (strncpy) __strncpy_power7 attribute_hidden;
-extern __typeof (strncpy) __strncpy_power8 attribute_hidden;
 
 /* Avoid DWARF definition DIE on ifunc symbol so that GDB can handle
  ifunc symbol properly. */
 libc_ifunc (strncpy,
-            (hwcap2 & PPC_FEATURE2_ARCH_2_07)
-            ? __strncpy_power8 :
-              (hwcap & PPC_FEATURE_HAS_VSX)
-              ? __strncpy_power7
+            (hwcap & PPC_FEATURE_HAS_VSX)
+            ? __strncpy_power7
             : __strncpy_ppc);
 
 #endif

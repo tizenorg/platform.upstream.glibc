@@ -1,4 +1,4 @@
-/* Copyright (C) 2011-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2011-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Chris Metcalf <cmetcalf@tilera.com>, 2011.
 
@@ -20,17 +20,6 @@
 #define _BITS_ATOMIC_H	1
 
 #include <arch/spr_def.h>
-
-#ifdef _LP64
-# define __HAVE_64B_ATOMICS 1
-#else
-/* tilegx32 does have 64-bit atomics, but assumptions in the semaphore
-   code mean that unaligned 64-bit atomics will be used if this symbol
-   is true, and unaligned atomics are not supported on tile.  */
-# define __HAVE_64B_ATOMICS 0
-#endif
-
-#define USE_ATOMIC_COMPILER_BUILTINS 0
 
 /* Pick appropriate 8- or 4-byte instruction. */
 #define __atomic_update(mem, v, op)                                     \

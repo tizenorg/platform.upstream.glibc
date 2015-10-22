@@ -1,5 +1,5 @@
 /* Low-level statistical profiling support function.  Linux/ARM version.
-   Copyright (C) 1996-2015 Free Software Foundation, Inc.
+   Copyright (C) 1996-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -20,7 +20,7 @@
 #include <sigcontextinfo.h>
 
 void
-__profil_counter (int signo, const SIGCONTEXT scp)
+profil_counter (int signo, const SIGCONTEXT scp)
 {
   profil_count ((void *) GET_PC (scp));
 
@@ -29,6 +29,3 @@ __profil_counter (int signo, const SIGCONTEXT scp)
      the signal context.  */
   asm volatile ("");
 }
-#ifndef __profil_counter
-weak_alias (__profil_counter, profil_counter)
-#endif

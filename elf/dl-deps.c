@@ -1,5 +1,5 @@
 /* Load the dependencies of a mapped object.
-   Copyright (C) 1996-2015 Free Software Foundation, Inc.
+   Copyright (C) 1996-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -108,7 +108,7 @@ struct list
 	char *__newp;							      \
 									      \
 	/* DST must not appear in SUID/SGID programs.  */		      \
-	if (__libc_enable_secure)					      \
+	if (INTUSE(__libc_enable_secure))				      \
 	  _dl_signal_error (0, __str, NULL, N_("\
 DST not allowed in SUID/SGID programs"));				      \
 									      \
@@ -138,19 +138,6 @@ cannot load auxiliary `%s' because of empty dynamic string token "	      \
 									      \
     __result; })
 
-static void
-preload (struct list *known, unsigned int *nlist, struct link_map *map)
-{
-  known[*nlist].done = 0;
-  known[*nlist].map = map;
-  known[*nlist].next = &known[*nlist + 1];
-
-  ++*nlist;
-  /* We use `l_reserved' as a mark bit to detect objects we have
-     already put in the search list and avoid adding duplicate
-     elements later in the list.  */
-  map->l_reserved = 1;
-}
 
 void
 internal_function
@@ -168,15 +155,28 @@ _dl_map_object_deps (struct link_map *map,
   const char *errstring;
   const char *objname;
 
+  void preload (struct link_map *map)
+    {
+      known[nlist].done = 0;
+      known[nlist].map = map;
+      known[nlist].next = &known[nlist + 1];
+
+      ++nlist;
+      /* We use `l_reserved' as a mark bit to detect objects we have
+	 already put in the search list and avoid adding duplicate
+	 elements later in the list.  */
+      map->l_reserved = 1;
+    }
+
   /* No loaded object so far.  */
   nlist = 0;
 
   /* First load MAP itself.  */
-  preload (known, &nlist, map);
+  preload (map);
 
   /* Add the preloaded items after MAP but before any of its dependencies.  */
   for (i = 0; i < npreloads; ++i)
-    preload (known, &nlist, preloads[i]);
+    preload (preloads[i]);
 
   /* Terminate the lists.  */
   known[nlist - 1].next = NULL;

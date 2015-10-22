@@ -1,4 +1,4 @@
-# Copyright (C) 1994-2015 Free Software Foundation, Inc.
+# Copyright (C) 1994-2014 Free Software Foundation, Inc.
 # This file is part of the GNU C Library.
 
 # The GNU C Library is free software; you can redistribute it and/or
@@ -166,7 +166,7 @@ $(cross-rpcgen-objs): $(objpfx)cross-%.o: %.c $(before-compile)
 $(objpfx)cross-rpcgen: $(cross-rpcgen-objs)
 	$(BUILD_CC) $^ $(BUILD_LDFLAGS) -o $@
 
-# This makes sure -DIN_MODULE is passed for all these modules.
+# This makes sure -DNOT_IN_libc is passed for all these modules.
 cpp-srcs-left := $(rpcgen-objs:.o=.c)
 lib := nonlib
 include $(patsubst %,$(..)cppflags-iterator.mk,$(cpp-srcs-left))

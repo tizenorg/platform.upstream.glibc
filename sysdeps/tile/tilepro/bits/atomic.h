@@ -1,4 +1,4 @@
-/* Copyright (C) 2011-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2011-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Chris Metcalf <cmetcalf@tilera.com>, 2011.
 
@@ -20,9 +20,6 @@
 #define _BITS_ATOMIC_H	1
 
 #include <asm/unistd.h>
-
-#define __HAVE_64B_ATOMICS 0
-#define USE_ATOMIC_COMPILER_BUILTINS 0
 
 /* 32-bit integer compare-and-exchange. */
 static __inline __attribute__ ((always_inline))

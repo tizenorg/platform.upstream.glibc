@@ -1,5 +1,5 @@
 /* Run time dynamic linker.
-   Copyright (C) 1995-2015 Free Software Foundation, Inc.
+   Copyright (C) 1995-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -83,7 +83,7 @@ int _dl_argc attribute_relro attribute_hidden;
 char **_dl_argv attribute_relro = NULL;
 unsigned int _dl_skip_args attribute_relro attribute_hidden;
 #endif
-rtld_hidden_data_def (_dl_argv)
+INTDEF(_dl_argv)
 
 #ifndef THREAD_SET_STACK_GUARD
 /* Only exported for architectures that don't store the stack guard canary
@@ -116,7 +116,7 @@ static struct audit_list
    and will be since that dynamic linker's _dl_start and dl_main will
    never be called.  */
 int _dl_starting_up = 0;
-rtld_hidden_def (_dl_starting_up)
+INTVARDEF(_dl_starting_up)
 #endif
 
 /* This is the structure which defines all variables global to ld.so
@@ -170,7 +170,7 @@ struct rtld_global_ro _rtld_global_ro attribute_relro =
     ._dl_debug_printf = _dl_debug_printf,
     ._dl_catch_error = _dl_catch_error,
     ._dl_signal_error = _dl_signal_error,
-    ._dl_mcount = _dl_mcount,
+    ._dl_mcount = _dl_mcount_internal,
     ._dl_lookup_symbol_x = _dl_lookup_symbol_x,
     ._dl_check_caller = _dl_check_caller,
     ._dl_open = _dl_open,
@@ -441,7 +441,7 @@ struct relocate_args
 struct map_args
 {
   /* Argument to map_doit.  */
-  const char *str;
+  char *str;
   struct link_map *loader;
   int mode;
   /* Return value of map_doit.  */
@@ -492,7 +492,7 @@ dlmopen_doit (void *a)
   args->map = _dl_open (args->fname,
 			(RTLD_LAZY | __RTLD_DLOPEN | __RTLD_AUDIT
 			 | __RTLD_SECURE),
-			dl_main, LM_ID_NEWLM, _dl_argc, _dl_argv,
+			dl_main, LM_ID_NEWLM, _dl_argc, INTUSE(_dl_argv),
 			__environ);
 }
 
@@ -651,7 +651,7 @@ _dl_initial_error_catch_tsd (void)
 
 
 static unsigned int
-do_preload (const char *fname, struct link_map *main_map, const char *where)
+do_preload (char *fname, struct link_map *main_map, const char *where)
 {
   const char *objname;
   const char *err_str = NULL;
@@ -778,7 +778,7 @@ dl_main (const ElfW(Phdr) *phdr,
 
 #ifndef HAVE_INLINED_SYSCALLS
   /* Set up a flag which tells we are just starting.  */
-  _dl_starting_up = 1;
+  INTUSE(_dl_starting_up) = 1;
 #endif
 
   if (*user_entry == (ElfW(Addr)) ENTRY_POINT)
@@ -804,55 +804,55 @@ dl_main (const ElfW(Phdr) *phdr,
       GL(dl_rtld_map).l_name = rtld_progname;
 
       while (_dl_argc > 1)
-	if (! strcmp (_dl_argv[1], "--list"))
+	if (! strcmp (INTUSE(_dl_argv)[1], "--list"))
 	  {
 	    mode = list;
 	    GLRO(dl_lazy) = -1;	/* This means do no dependency analysis.  */
 
 	    ++_dl_skip_args;
 	    --_dl_argc;
-	    ++_dl_argv;
+	    ++INTUSE(_dl_argv);
 	  }
-	else if (! strcmp (_dl_argv[1], "--verify"))
+	else if (! strcmp (INTUSE(_dl_argv)[1], "--verify"))
 	  {
 	    mode = verify;
 
 	    ++_dl_skip_args;
 	    --_dl_argc;
-	    ++_dl_argv;
+	    ++INTUSE(_dl_argv);
 	  }
-	else if (! strcmp (_dl_argv[1], "--inhibit-cache"))
+	else if (! strcmp (INTUSE(_dl_argv)[1], "--inhibit-cache"))
 	  {
 	    GLRO(dl_inhibit_cache) = 1;
 	    ++_dl_skip_args;
 	    --_dl_argc;
-	    ++_dl_argv;
+	    ++INTUSE(_dl_argv);
 	  }
-	else if (! strcmp (_dl_argv[1], "--library-path")
+	else if (! strcmp (INTUSE(_dl_argv)[1], "--library-path")
 		 && _dl_argc > 2)
 	  {
-	    library_path = _dl_argv[2];
+	    library_path = INTUSE(_dl_argv)[2];
 
 	    _dl_skip_args += 2;
 	    _dl_argc -= 2;
-	    _dl_argv += 2;
+	    INTUSE(_dl_argv) += 2;
 	  }
-	else if (! strcmp (_dl_argv[1], "--inhibit-rpath")
+	else if (! strcmp (INTUSE(_dl_argv)[1], "--inhibit-rpath")
 		 && _dl_argc > 2)
 	  {
-	    GLRO(dl_inhibit_rpath) = _dl_argv[2];
+	    GLRO(dl_inhibit_rpath) = INTUSE(_dl_argv)[2];
 
 	    _dl_skip_args += 2;
 	    _dl_argc -= 2;
-	    _dl_argv += 2;
+	    INTUSE(_dl_argv) += 2;
 	  }
-	else if (! strcmp (_dl_argv[1], "--audit") && _dl_argc > 2)
+	else if (! strcmp (INTUSE(_dl_argv)[1], "--audit") && _dl_argc > 2)
 	  {
-	    process_dl_audit (_dl_argv[2]);
+	    process_dl_audit (INTUSE(_dl_argv)[2]);
 
 	    _dl_skip_args += 2;
 	    _dl_argc -= 2;
-	    _dl_argv += 2;
+	    INTUSE(_dl_argv) += 2;
 	  }
 	else
 	  break;
@@ -886,7 +886,7 @@ of this helper program; chances are you did not intend to run this program.\n\
 
       ++_dl_skip_args;
       --_dl_argc;
-      ++_dl_argv;
+      ++INTUSE(_dl_argv);
 
       /* The initialization of _dl_stack_flags done below assumes the
 	 executable's PT_GNU_STACK may have been honored by the kernel, and
@@ -1498,7 +1498,7 @@ ERROR: ld.so: object '%s' cannot be loaded as audit interface: %s; ignored.\n",
       /* Prevent optimizing strsep.  Speed is not important here.  */
       while ((p = (strsep) (&list, " :")) != NULL)
 	if (p[0] != '\0'
-	    && (__builtin_expect (! __libc_enable_secure, 1)
+	    && (__builtin_expect (! INTUSE(__libc_enable_secure), 1)
 		|| strchr (p, '/') == NULL))
 	  npreloads += do_preload (p, main_map, "LD_PRELOAD");
 
@@ -1800,7 +1800,7 @@ ERROR: ld.so: object '%s' cannot be loaded as audit interface: %s; ignored.\n",
 	    ElfW(Addr) loadbase;
 	    lookup_t result;
 
-	    result = _dl_lookup_symbol_x (_dl_argv[i], main_map,
+	    result = _dl_lookup_symbol_x (INTUSE(_dl_argv)[i], main_map,
 					  &ref, main_map->l_scope,
 					  NULL, ELF_RTYPE_CLASS_PLT,
 					  DL_LOOKUP_ADD_DEPENDENCY, NULL);
@@ -1808,7 +1808,7 @@ ERROR: ld.so: object '%s' cannot be loaded as audit interface: %s; ignored.\n",
 	    loadbase = LOOKUP_VALUE_ADDRESS (result);
 
 	    _dl_printf ("%s found at 0x%0*Zd in object at 0x%0*Zd\n",
-			_dl_argv[i],
+			INTUSE(_dl_argv)[i],
 			(int) sizeof ref->st_value * 2,
 			(size_t) ref->st_value,
 			(int) sizeof loadbase * 2, (size_t) loadbase);
@@ -2318,7 +2318,7 @@ process_dl_audit (char *str)
 
   while ((p = (strsep) (&str, ":")) != NULL)
     if (p[0] != '\0'
-	&& (__builtin_expect (! __libc_enable_secure, 1)
+	&& (__builtin_expect (! INTUSE(__libc_enable_secure), 1)
 	    || strchr (p, '/') == NULL))
       {
 	/* This is using the local malloc, not the system malloc.  The
@@ -2352,7 +2352,7 @@ process_envvars (enum mode *modep)
 
   /* This is the default place for profiling data file.  */
   GLRO(dl_profile_output)
-    = &"/var/tmp\0/var/profile"[__libc_enable_secure ? 9 : 0];
+    = &"/var/tmp\0/var/profile"[INTUSE(__libc_enable_secure) ? 9 : 0];
 
   while ((envline = _dl_next_ld_env_entry (&runp)) != NULL)
     {
@@ -2420,7 +2420,7 @@ process_envvars (enum mode *modep)
 	case 9:
 	  /* Test whether we want to see the content of the auxiliary
 	     array passed up from the kernel.  */
-	  if (!__libc_enable_secure
+	  if (!INTUSE(__libc_enable_secure)
 	      && memcmp (envline, "SHOW_AUXV", 9) == 0)
 	    _dl_show_auxv ();
 	  break;
@@ -2434,7 +2434,7 @@ process_envvars (enum mode *modep)
 
 	case 11:
 	  /* Path where the binary is found.  */
-	  if (!__libc_enable_secure
+	  if (!INTUSE(__libc_enable_secure)
 	      && memcmp (envline, "ORIGIN_PATH", 11) == 0)
 	    GLRO(dl_origin_path) = &envline[12];
 	  break;
@@ -2454,7 +2454,7 @@ process_envvars (enum mode *modep)
 	      break;
 	    }
 
-	  if (!__libc_enable_secure
+	  if (!INTUSE(__libc_enable_secure)
 	      && memcmp (envline, "DYNAMIC_WEAK", 12) == 0)
 	    GLRO(dl_dynamic_weak) = 1;
 	  break;
@@ -2465,7 +2465,7 @@ process_envvars (enum mode *modep)
 #ifdef EXTRA_LD_ENVVARS_13
 	  EXTRA_LD_ENVVARS_13
 #endif
-	  if (!__libc_enable_secure
+	  if (!INTUSE(__libc_enable_secure)
 	      && memcmp (envline, "USE_LOAD_BIAS", 13) == 0)
 	    {
 	      GLRO(dl_use_load_bias) = envline[14] == '1' ? -1 : 0;
@@ -2478,7 +2478,7 @@ process_envvars (enum mode *modep)
 
 	case 14:
 	  /* Where to place the profiling data file.  */
-	  if (!__libc_enable_secure
+	  if (!INTUSE(__libc_enable_secure)
 	      && memcmp (envline, "PROFILE_OUTPUT", 14) == 0
 	      && envline[15] != '\0')
 	    GLRO(dl_profile_output) = &envline[15];
@@ -2516,7 +2516,7 @@ process_envvars (enum mode *modep)
 
   /* Extra security for SUID binaries.  Remove all dangerous environment
      variables.  */
-  if (__builtin_expect (__libc_enable_secure, 0))
+  if (__builtin_expect (INTUSE(__libc_enable_secure), 0))
     {
       static const char unsecure_envvars[] =
 #ifdef EXTRA_UNSECURE_ENVVARS

@@ -1,5 +1,5 @@
 /* Install given floating-point environment and raise exceptions.
-   Copyright (C) 1998-2015 Free Software Foundation, Inc.
+   Copyright (C) 1998-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Andreas Jaeger <aj@suse.de>, 1998.
 
@@ -21,7 +21,7 @@
 #include <fpu_control.h>
 
 int
-__feupdateenv (const fenv_t *envp)
+feupdateenv (const fenv_t *envp)
 {
   int temp;
 
@@ -30,16 +30,14 @@ __feupdateenv (const fenv_t *envp)
   temp &= FE_ALL_EXCEPT;
 
   /* Install new environment.  */
-  __fesetenv (envp);
+  fesetenv (envp);
 
   /* Raise the safed exception.  Incidently for us the implementation
      defined format of the values in objects of type fexcept_t is the
      same as the ones specified using the FE_* constants.  */
-  __feraiseexcept (temp);
+  feraiseexcept (temp);
 
   /* Success.  */
   return 0;
 }
-libm_hidden_def (__feupdateenv)
-weak_alias (__feupdateenv, feupdateenv)
-libm_hidden_weak (feupdateenv)
+libm_hidden_def (feupdateenv)

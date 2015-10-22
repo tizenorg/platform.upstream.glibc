@@ -1,4 +1,4 @@
-/* Copyright (C) 2007-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2007-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -61,4 +61,4 @@ posix_fallocate (int fd, __off_t offset, __off_t len)
 
   return internal_fallocate (fd, offset, len);
 }
-weak_alias (posix_fallocate, posix_fallocate64)
+strong_alias (posix_fallocate, posix_fallocate64)

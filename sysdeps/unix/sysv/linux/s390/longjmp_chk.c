@@ -1,4 +1,4 @@
-/* Copyright (C) 2014-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -20,7 +20,7 @@
 
 #include <shlib-compat.h>
 
-#if IS_IN (libc) && defined SHARED && SHLIB_COMPAT (libc, GLIBC_2_19, GLIBC_2_20)
+#if !defined NOT_IN_libc && defined SHARED && SHLIB_COMPAT (libc, GLIBC_2_19, GLIBC_2_20)
 /* this is a copy from debug/longjmp_chk.c because we need an unique name
    for __longjmp_chk, but it is already named via a define
    for __libc_siglongjmp in debug/longjmp_chk.c.  */

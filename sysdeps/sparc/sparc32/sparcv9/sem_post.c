@@ -1,1 +1,1 @@
-#include <nptl/sem_post.c>
+#include <sysdeps/sparc/nptl/sem_post.c>

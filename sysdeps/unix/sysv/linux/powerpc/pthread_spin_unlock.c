@@ -1,5 +1,5 @@
 /* pthread_spin_unlock -- unlock a spin lock.  PowerPC version.
-   Copyright (C) 2007-2015 Free Software Foundation, Inc.
+   Copyright (C) 2007-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -22,7 +22,7 @@
 int
 pthread_spin_unlock (pthread_spinlock_t *lock)
 {
-  __asm __volatile (__ARCH_REL_INSTR ::: "memory");
+  __asm __volatile (__lll_rel_instr ::: "memory");
   *lock = 0;
   return 0;
 }

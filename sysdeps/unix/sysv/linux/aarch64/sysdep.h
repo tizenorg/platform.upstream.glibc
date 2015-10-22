@@ -1,4 +1,4 @@
-/* Copyright (C) 2005-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2005-2014 Free Software Foundation, Inc.
 
    This file is part of the GNU C Library.
 
@@ -92,7 +92,7 @@
 
 # define ret_ERRVAL ret
 
-# if !IS_IN (libc)
+# if NOT_IN_libc
 #  define SYSCALL_ERROR  .Lsyscall_error
 #  if RTLD_PRIVATE_ERRNO
 #   define SYSCALL_ERROR_HANDLER				\
@@ -309,9 +309,9 @@
 #endif	/* __ASSEMBLER__ */
 
 /* Pointer mangling is supported for AArch64.  */
-#if (IS_IN (rtld) || \
-     (!defined SHARED && (IS_IN (libc) \
-			  || IS_IN (libpthread))))
+#if (defined IS_IN_rtld || \
+     (!defined SHARED && (!defined NOT_IN_libc \
+			  || defined IS_IN_libpthread)))
 # ifdef __ASSEMBLER__
 #  define PTR_MANGLE(dst, src, guard, tmp)                                \
   LDST_PCREL (ldr, guard, tmp, C_SYMBOL_NAME(__pointer_chk_guard_local)); \

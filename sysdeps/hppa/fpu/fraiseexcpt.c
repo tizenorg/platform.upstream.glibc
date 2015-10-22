@@ -1,5 +1,5 @@
 /* Raise given exceptions.
-   Copyright (C) 1997-2015 Free Software Foundation, Inc.
+   Copyright (C) 1997-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by David Huggins-Daines <dhd@debian.org>
 
@@ -25,7 +25,7 @@
    page 10-5 "Delayed Trapping" in the PA-RISC 2.0 Architecture manual */
 
 int
-__feraiseexcept (int excepts)
+feraiseexcept (int excepts)
 {
   /* Raise exceptions represented by EXCEPTS.  But we must raise only one
      signal at a time.  It is important that if the overflow/underflow
@@ -98,6 +98,4 @@ __feraiseexcept (int excepts)
   /* Success.  */
   return 0;
 }
-libm_hidden_def (__feraiseexcept)
-weak_alias (__feraiseexcept, feraiseexcept)
-libm_hidden_weak (feraiseexcept)
+libm_hidden_def (feraiseexcept)

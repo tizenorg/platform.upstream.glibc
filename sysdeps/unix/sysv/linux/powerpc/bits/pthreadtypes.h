@@ -1,5 +1,5 @@
 /* Machine-specific pthread type layouts.  PowerPC version.
-   Copyright (C) 2003-2015 Free Software Foundation, Inc.
+   Copyright (C) 2003-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -90,23 +90,14 @@ typedef union
        binary compatibility.  */
     int __kind;
 #if __WORDSIZE == 64
-    short __spins;
-    short __elision;
+    int __spins;
     __pthread_list_t __list;
 # define __PTHREAD_MUTEX_HAVE_PREV	1
-# define __PTHREAD_SPINS             0, 0
 #else
     unsigned int __nusers;
     __extension__ union
     {
-      struct
-      {
-	short __espins;
-	short __elision;
-# define __spins __elision_data.__espins
-# define __elision __elision_data.__elision
-# define __PTHREAD_SPINS         { 0, 0 }
-      } __elision_data;
+      int __spins;
       __pthread_slist_t __list;
     };
 #endif
@@ -114,6 +105,9 @@ typedef union
   char __size[__SIZEOF_PTHREAD_MUTEX_T];
   long int __align;
 } pthread_mutex_t;
+
+/* Mutex __spins initializer used by PTHREAD_MUTEX_INITIALIZER.  */
+#define __PTHREAD_SPINS 0
 
 typedef union
 {
@@ -172,13 +166,11 @@ typedef union
     unsigned int __nr_writers_queued;
     int __writer;
     int __shared;
-    unsigned char __rwelision;
-    unsigned char __pad1[7];
+    unsigned long int __pad1;
     unsigned long int __pad2;
     /* FLAGS must stay at this position in the structure to maintain
        binary compatibility.  */
     unsigned int __flags;
-# define __PTHREAD_RWLOCK_ELISION_EXTRA 0, {0, 0, 0, 0, 0, 0, 0 }
   } __data;
 # else
   struct
@@ -189,20 +181,20 @@ typedef union
     unsigned int __writer_wakeup;
     unsigned int __nr_readers_queued;
     unsigned int __nr_writers_queued;
-    unsigned char __rwelision;
+    unsigned char __pad1;
     unsigned char __pad2;
     unsigned char __shared;
     /* FLAGS must stay at this position in the structure to maintain
        binary compatibility.  */
     unsigned char __flags;
     int __writer;
-#define __PTHREAD_RWLOCK_ELISION_EXTRA 0
   } __data;
 # endif
   char __size[__SIZEOF_PTHREAD_RWLOCK_T];
   long int __align;
 } pthread_rwlock_t;
 
+#define __PTHREAD_RWLOCK_ELISION_EXTRA 0
 
 typedef union
 {

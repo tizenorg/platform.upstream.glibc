@@ -1,5 +1,5 @@
 /* Low-level locking access to futex facilities.  Linux version.
-   Copyright (C) 2005-2015 Free Software Foundation, Inc.
+   Copyright (C) 2005-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -19,11 +19,10 @@
 #ifndef _LOWLEVELLOCK_FUTEX_H
 #define _LOWLEVELLOCK_FUTEX_H	1
 
-#ifndef __ASSEMBLER__
 #include <sysdep.h>
 #include <tls.h>
 #include <kernel-features.h>
-#endif
+
 
 #define FUTEX_WAIT		0
 #define FUTEX_WAKE		1
@@ -49,9 +48,8 @@
 #define LLL_PRIVATE	0
 #define LLL_SHARED	FUTEX_PRIVATE_FLAG
 
-#ifndef __ASSEMBLER__
 
-#if IS_IN (libc) || IS_IN (rtld)
+#if !defined NOT_IN_libc || defined IS_IN_rtld
 /* In libc.so or ld.so all futexes are private.  */
 # ifdef __ASSUME_PRIVATE_FUTEX
 #  define __lll_private_flag(fl, private) \
@@ -135,6 +133,5 @@
 					 private),                      \
 		     nr_wake, nr_move, mutex, val)
 
-#endif  /* !__ASSEMBLER__  */
 
 #endif  /* lowlevellock-futex.h */

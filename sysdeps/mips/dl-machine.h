@@ -1,5 +1,5 @@
 /* Machine-dependent ELF dynamic relocation inline functions.  MIPS version.
-   Copyright (C) 1996-2015 Free Software Foundation, Inc.
+   Copyright (C) 1996-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Kazumoto Kojima <kkojima@info.kanagawa-u.ac.jp>.
 
@@ -30,7 +30,6 @@
 #endif
 
 #include <sgidefs.h>
-#include <sysdep.h>
 #include <sys/asm.h>
 #include <dl-tls.h>
 
@@ -100,11 +99,6 @@ elf_machine_matches_host (const ElfW(Ehdr) *ehdr)
   if ((ehdr->e_flags & EF_MIPS_NAN2008) != ELF_MACHINE_NAN2008)
     return 0;
 
-  /* Ensure that the old O32 FP64 ABI is never loaded, it is not supported
-     on linux.  */
-  if (ehdr->e_flags & EF_MIPS_FP64)
-    return 0;
-
   switch (ehdr->e_machine)
     {
     case EM_MIPS:
@@ -144,14 +138,9 @@ elf_machine_load_address (void)
 #ifndef __mips16
   asm ("	.set noreorder\n"
        "	" STRINGXP (PTR_LA) " %0, 0f\n"
-# if __mips_isa_rev < 6
        "	bltzal $0, 0f\n"
        "	nop\n"
        "0:	" STRINGXP (PTR_SUBU) " %0, $31, %0\n"
-# else
-       "0:	addiupc $31, 0\n"
-       "	" STRINGXP (PTR_SUBU) " %0, $31, %0\n"
-# endif
        "	.set reorder\n"
        :	"=r" (addr)
        :	/* No inputs */
@@ -252,13 +241,6 @@ do {									\
       and not just plain _start.  */
 
 #ifndef __mips16
-# if __mips_isa_rev < 6
-#  define LCOFF STRINGXP(.Lcof2)
-#  define LOAD_31 STRINGXP(bltzal $8) "," STRINGXP(.Lcof2)
-# else
-#  define LCOFF STRINGXP(.Lcof1)
-#  define LOAD_31 "addiupc $31, 0"
-# endif
 # define RTLD_START asm (\
 	".text\n\
 	" _RTLD_PROLOGUE(ENTRY_POINT) "\
@@ -273,9 +255,9 @@ do {									\
 	move $4, $29\n\
 	" STRINGXP(PTR_SUBIU) " $29, 16\n\
 	\n\
-	" STRINGXP(PTR_LA) " $8, " LCOFF "\n\
-.Lcof1:	" LOAD_31 "\n\
-.Lcof2:	" STRINGXP(PTR_SUBU) " $8, $31, $8\n\
+	" STRINGXP(PTR_LA) " $8, .Lcoff\n\
+	bltzal $8, .Lcoff\n\
+.Lcoff:	" STRINGXP(PTR_SUBU) " $8, $31, $8\n\
 	\n\
 	" STRINGXP(PTR_LA) " $25, _dl_start\n\
 	" STRINGXP(PTR_ADDU) " $25, $8\n\
@@ -313,14 +295,14 @@ do {									\
 	sll $7, $5, " STRINGXP (PTRLOG) "\n\
 	" STRINGXP(PTR_ADDU) " $7, $7, $6\n\
 	" STRINGXP(PTR_ADDU) " $7, $7, " STRINGXP (PTRSIZE) " \n\
-	# Make sure the stack pointer is aligned for _dl_init.\n\
+	# Make sure the stack pointer is aligned for _dl_init_internal.\n\
 	and $2, $29, -2 * " STRINGXP(SZREG) "\n\
 	move $8, $29\n\
 	" STRINGXP(PTR_SUBIU) " $29, $2, 32\n\
 	" STRINGXP(PTR_S) " $8, (32 - " STRINGXP(SZREG) ")($29)\n\
 	" STRINGXP(SAVE_GP(16)) "\n\
 	# Call the function to run the initializers.\n\
-	jal _dl_init\n\
+	jal _dl_init_internal\n\
 	# Restore the stack pointer for _start.\n\
 	" STRINGXP(PTR_L)  " $29, (32 - " STRINGXP(SZREG) ")($29)\n\
 	# Pass our finalizer function to the user in $2 as per ELF ABI.\n\
@@ -389,7 +371,7 @@ do {									\
 	sll $7, $5, " STRINGXP (PTRLOG) "\n\
 	addu $7, $6\n\
 	addu $7, " STRINGXP (PTRSIZE) "\n\
-	# Make sure the stack pointer is aligned for _dl_init.\n\
+	# Make sure the stack pointer is aligned for _dl_init_internal.\n\
 	li $2, 2 * " STRINGXP (SZREG) "\n\
 	neg $2, $2\n\
 	move $3, $sp\n\
@@ -399,7 +381,7 @@ do {									\
 	move $sp, $2\n\
 	sw $16, 16($sp)\n\
 	# Call the function to run the initializers.\n\
-	lw $2, %call16(_dl_init)($16)\n\
+	lw $2, %call16(_dl_init_internal)($16)\n\
 	move $25, $2\n\
 	jalr $2\n\
 	# Restore the stack pointer for _start.\n\

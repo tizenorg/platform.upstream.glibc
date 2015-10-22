@@ -1,4 +1,4 @@
-/* Copyright (C) 1999-2015 Free Software Foundation, Inc.
+/* Copyright (C) 1999-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Written by Jes Sorensen, <Jes.Sorensen@cern.ch>, April 1999.
    Based on code originally written by David Mosberger-Tang
@@ -61,8 +61,8 @@
 #endif
 
 #if defined USE_DL_SYSINFO \
-	&& (IS_IN (libc) \
-	    || IS_IN (libpthread) || IS_IN (librt))
+	&& (!defined NOT_IN_libc \
+	    || defined IS_IN_libpthread || defined IS_IN_librt)
 # define IA64_USE_NEW_STUB
 #else
 # undef IA64_USE_NEW_STUB
@@ -364,7 +364,7 @@
 #endif /* not __ASSEMBLER__ */
 
 /* Pointer mangling support.  */
-#if IS_IN (rtld)
+#ifdef IS_IN_rtld
 /* We cannot use the thread descriptor because in ld.so we use setjmp
    earlier than the descriptor is initialized.  */
 #else

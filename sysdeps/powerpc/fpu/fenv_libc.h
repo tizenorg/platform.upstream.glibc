@@ -1,5 +1,5 @@
 /* Internal libc stuff for floating point environment routines.
-   Copyright (C) 1997-2015 Free Software Foundation, Inc.
+   Copyright (C) 1997-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -76,7 +76,16 @@ typedef union
 
 
 static inline int
-__fesetround_inline (int round)
+__fegetround (void)
+{
+  int result;
+  asm volatile ("mcrfs 7,7\n\t"
+		"mfcr  %0" : "=r"(result) : : "cr7");
+  return result & 3;
+}
+
+static inline int
+__fesetround (int round)
 {
   if ((unsigned int) round < 2)
     {

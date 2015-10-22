@@ -1,4 +1,4 @@
-/* Copyright (C) 1997-2015 Free Software Foundation, Inc.
+/* Copyright (C) 1997-2014 Free Software Foundation, Inc.
 
    This file is part of the GNU C Library.
 
@@ -20,7 +20,7 @@
 #include <fpu_control.h>
 
 int
-__fegetenv (fenv_t *envp)
+fegetenv (fenv_t *envp)
 {
   fpu_control_t fpcr;
   fpu_fpsr_t fpsr;
@@ -30,6 +30,4 @@ __fegetenv (fenv_t *envp)
   envp->__fpsr = fpsr;
   return 0;
 }
-libm_hidden_def (__fegetenv)
-weak_alias (__fegetenv, fegetenv)
-libm_hidden_weak (fegetenv)
+libm_hidden_def (fegetenv)

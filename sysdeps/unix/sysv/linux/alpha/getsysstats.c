@@ -1,5 +1,5 @@
 /* Determine various system internal values, Linux/Alpha version.
-   Copyright (C) 1999-2015 Free Software Foundation, Inc.
+   Copyright (C) 1999-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Andreas Schwab <schwab@suse.de>
 
@@ -47,7 +47,7 @@
 	 the kernel will not generate them.  8192 bytes are really enough. \
 	 If there is no "CPUs ..." line then we are on a UP system.  */	   \
       (RESULT) = 1;							   \
-      while (__fgets_unlocked ((BUFFER), sizeof (BUFFER), (FP)) != NULL)   \
+      while (fgets_unlocked ((BUFFER), sizeof (BUFFER), (FP)) != NULL)	   \
 	if ((sscanf (buffer, "cpus detected : %d", &(RESULT)) == 1)	   \
 	    || (sscanf (buffer, "CPUs probed %d", &(RESULT)) == 1))	   \
 	  break;							   \

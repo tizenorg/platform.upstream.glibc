@@ -54,6 +54,9 @@
    directive.  */
 #undef	HAVE_ASM_POPSECTION_DIRECTIVE
 
+/* Defined to the oldest ABI we support, like 2.1.  */
+#undef GLIBC_OLDEST_ABI
+
 /* Define if static NSS modules are wanted.  */
 #undef	DO_STATIC_NSS
 
@@ -243,9 +246,6 @@
 /* The ARM hard-float ABI is being used.  */
 #undef HAVE_ARM_PCS_VFP
 
-/* The ARM movw/movt instructions using PC-relative relocs work right.  */
-#define ARM_PCREL_MOVW_OK 0
-
 /* The pt_chown binary is being built and used by grantpt.  */
 #define HAVE_PT_CHOWN 0
 
@@ -256,8 +256,5 @@
 /* ports/sysdeps/mips/configure.in  */
 /* Define if using the IEEE 754-2008 NaN encoding on the MIPS target.  */
 #undef HAVE_MIPS_NAN2008
-
-/* The PowerPC64 ELFv2 ABI is being used.  */
-#undef HAVE_ELFV2_ABI
 
 #endif

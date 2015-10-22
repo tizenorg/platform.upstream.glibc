@@ -1,5 +1,5 @@
 /* Map in a shared object's segments from the file.
-   Copyright (C) 1995-2015 Free Software Foundation, Inc.
+   Copyright (C) 1995-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -41,7 +41,6 @@
 #include <dl-load.h>
 #include <dl-map-segments.h>
 #include <dl-unmap-segments.h>
-#include <dl-machine-reject-phdr.h>
 
 
 #include <endian.h>
@@ -111,6 +110,20 @@ static const size_t system_dirs_len[] =
 };
 #define nsystem_dirs_len \
   (sizeof (system_dirs_len) / sizeof (system_dirs_len[0]))
+
+
+/* Local version of `strdup' function.  */
+static char *
+local_strdup (const char *s)
+{
+  size_t len = strlen (s) + 1;
+  void *new = malloc (len);
+
+  if (new == NULL)
+    return NULL;
+
+  return (char *) memcpy (new, s, len);
+}
 
 
 static bool
@@ -249,7 +262,7 @@ _dl_dst_count (const char *name, int is_path)
 	 is $ORIGIN alone) and it must always appear first in path.  */
       ++name;
       if ((len = is_dst (start, name, "ORIGIN", is_path,
-			 __libc_enable_secure)) != 0
+			 INTUSE(__libc_enable_secure))) != 0
 	  || (len = is_dst (start, name, "PLATFORM", is_path, 0)) != 0
 	  || (len = is_dst (start, name, "LIB", is_path, 0)) != 0)
 	++cnt;
@@ -285,10 +298,10 @@ _dl_dst_substitute (struct link_map *l, const char *name, char *result,
 
 	  ++name;
 	  if ((len = is_dst (start, name, "ORIGIN", is_path,
-			     __libc_enable_secure)) != 0)
+			     INTUSE(__libc_enable_secure))) != 0)
 	    {
 	      repl = l->l_origin;
-	      check_for_trusted = (__libc_enable_secure
+	      check_for_trusted = (INTUSE(__libc_enable_secure)
 				   && l->l_type == lt_executable);
 	    }
 	  else if ((len = is_dst (start, name, "PLATFORM", is_path, 0)) != 0)
@@ -371,7 +384,7 @@ expand_dynamic_string_token (struct link_map *l, const char *s, int is_path)
 
   /* If we do not have to replace anything simply copy the string.  */
   if (__glibc_likely (cnt == 0))
-    return __strdup (s);
+    return local_strdup (s);
 
   /* Determine the length of the substituted string.  */
   total = DL_DST_REQUIRED (l, s, strlen (s), cnt);
@@ -550,7 +563,7 @@ decompose_rpath (struct r_search_path_struct *sps,
   /* First see whether we must forget the RUNPATH and RPATH from this
      object.  */
   if (__glibc_unlikely (GLRO(dl_inhibit_rpath) != NULL)
-      && !__libc_enable_secure)
+      && !INTUSE(__libc_enable_secure))
     {
       const char *inhp = GLRO(dl_inhibit_rpath);
 
@@ -580,7 +593,7 @@ decompose_rpath (struct r_search_path_struct *sps,
     }
 
   /* Make a writable copy.  */
-  copy = __strdup (rpath);
+  copy = local_strdup (rpath);
   if (copy == NULL)
     {
       errstring = N_("cannot create RUNPATH/RPATH copy");
@@ -815,7 +828,7 @@ _dl_init_paths (const char *llp)
 	}
 
       (void) fillin_rpath (llp_tmp, env_path_list.dirs, ":;",
-			   __libc_enable_secure, "LD_LIBRARY_PATH",
+			   INTUSE(__libc_enable_secure), "LD_LIBRARY_PATH",
 			   NULL, l);
 
       if (env_path_list.dirs[0] == NULL)
@@ -1684,11 +1697,6 @@ open_verify (const char *name, struct filebuf *fbp, struct link_map *loader,
 	    }
 	}
 
-      if (__glibc_unlikely (elf_machine_reject_phdr_p
-			    (phdr, ehdr->e_phnum, fbp->buf, fbp->len,
-			     loader, fd)))
-	goto close_and_out;
-
       /* Check .note.ABI-tag if present.  */
       for (ph = phdr; ph < &phdr[ehdr->e_phnum]; ++ph)
 	if (ph->p_type == PT_NOTE && ph->p_filesz >= 32 && ph->p_align >= 4)
@@ -1834,7 +1842,7 @@ open_path (const char *name, size_t namelen, int mode,
 	  here_any |= this_dir->status[cnt] != nonexisting;
 
 	  if (fd != -1 && __glibc_unlikely (mode & __RTLD_SECURE)
-	      && __libc_enable_secure)
+	      && INTUSE(__libc_enable_secure))
 	    {
 	      /* This is an extra security effort to make sure nobody can
 		 preload broken shared objects which are in the trusted
@@ -1889,9 +1897,9 @@ open_path (const char *name, size_t namelen, int mode,
       if (sps->malloced)
 	free (sps->dirs);
 
-      /* rtld_search_dirs and env_path_list are attribute_relro, therefore
-         avoid writing into it.  */
-      if (sps != &rtld_search_dirs && sps != &env_path_list)
+      /* rtld_search_dirs is attribute_relro, therefore avoid writing
+	 into it.  */
+      if (sps != &rtld_search_dirs)
 	sps->dirs = (void *) -1;
     }
 
@@ -2046,12 +2054,12 @@ _dl_map_object (struct link_map *loader, const char *name,
 #ifdef USE_LDCONFIG
       if (fd == -1
 	  && (__glibc_likely ((mode & __RTLD_SECURE) == 0)
-	      || ! __libc_enable_secure)
+	      || ! INTUSE(__libc_enable_secure))
 	  && __glibc_likely (GLRO(dl_inhibit_cache) == 0))
 	{
 	  /* Check the list of libraries in the file /etc/ld.so.cache,
 	     for compatibility with Linux's ldconfig program.  */
-	  char *cached = _dl_load_cache_lookup (name);
+	  const char *cached = _dl_load_cache_lookup (name);
 
 	  if (cached != NULL)
 	    {
@@ -2075,7 +2083,6 @@ _dl_map_object (struct link_map *loader, const char *name,
 		      if (memcmp (cached, dirp, system_dirs_len[cnt]) == 0)
 			{
 			  /* The prefix matches.  Don't use the entry.  */
-			  free (cached);
 			  cached = NULL;
 			  break;
 			}
@@ -2093,9 +2100,14 @@ _dl_map_object (struct link_map *loader, const char *name,
 				    LA_SER_CONFIG, mode, &found_other_class,
 				    false);
 		  if (__glibc_likely (fd != -1))
-		    realname = cached;
-		  else
-		    free (cached);
+		    {
+		      realname = local_strdup (cached);
+		      if (realname == NULL)
+			{
+			  __close (fd);
+			  fd = -1;
+			}
+		    }
 		}
 	    }
 	}
@@ -2118,7 +2130,7 @@ _dl_map_object (struct link_map *loader, const char *name,
       /* The path may contain dynamic string tokens.  */
       realname = (loader
 		  ? expand_dynamic_string_token (loader, name, 0)
-		  : __strdup (name));
+		  : local_strdup (name));
       if (realname == NULL)
 	fd = -1;
       else
@@ -2152,7 +2164,7 @@ _dl_map_object (struct link_map *loader, const char *name,
 	  static const Elf_Symndx dummy_bucket = STN_UNDEF;
 
 	  /* Allocate a new object map.  */
-	  if ((name_copy = __strdup (name)) == NULL
+	  if ((name_copy = local_strdup (name)) == NULL
 	      || (l = _dl_new_object (name_copy, name, type, loader,
 				      mode, nsid)) == NULL)
 	    {
@@ -2189,45 +2201,6 @@ _dl_map_object (struct link_map *loader, const char *name,
 				 &stack_end, nsid);
 }
 
-struct add_path_state
-{
-  bool counting;
-  unsigned int idx;
-  Dl_serinfo *si;
-  char *allocptr;
-};
-
-static void
-add_path (struct add_path_state *p, const struct r_search_path_struct *sps,
-	  unsigned int flags)
-{
-  if (sps->dirs != (void *) -1)
-    {
-      struct r_search_path_elem **dirs = sps->dirs;
-      do
-	{
-	  const struct r_search_path_elem *const r = *dirs++;
-	  if (p->counting)
-	    {
-	      p->si->dls_cnt++;
-	      p->si->dls_size += MAX (2, r->dirnamelen);
-	    }
-	  else
-	    {
-	      Dl_serpath *const sp = &p->si->dls_serpath[p->idx++];
-	      sp->dls_name = p->allocptr;
-	      if (r->dirnamelen < 2)
-		*p->allocptr++ = r->dirnamelen ? '/' : '.';
-	      else
-		p->allocptr = __mempcpy (p->allocptr,
-					  r->dirname, r->dirnamelen - 1);
-	      *p->allocptr++ = '\0';
-	      sp->dls_flags = flags;
-	    }
-	}
-      while (*dirs != NULL);
-    }
-}
 
 void
 internal_function
@@ -2239,15 +2212,38 @@ _dl_rtld_di_serinfo (struct link_map *loader, Dl_serinfo *si, bool counting)
       si->dls_size = 0;
     }
 
-  struct add_path_state p =
+  unsigned int idx = 0;
+  char *allocptr = (char *) &si->dls_serpath[si->dls_cnt];
+  void add_path (const struct r_search_path_struct *sps, unsigned int flags)
+# define add_path(sps, flags) add_path(sps, 0) /* XXX */
     {
-      .counting = counting,
-      .idx = 0,
-      .si = si,
-      .allocptr = (char *) &si->dls_serpath[si->dls_cnt]
-    };
-
-# define add_path(p, sps, flags) add_path(p, sps, 0) /* XXX */
+      if (sps->dirs != (void *) -1)
+	{
+	  struct r_search_path_elem **dirs = sps->dirs;
+	  do
+	    {
+	      const struct r_search_path_elem *const r = *dirs++;
+	      if (counting)
+		{
+		  si->dls_cnt++;
+		  si->dls_size += MAX (2, r->dirnamelen);
+		}
+	      else
+		{
+		  Dl_serpath *const sp = &si->dls_serpath[idx++];
+		  sp->dls_name = allocptr;
+		  if (r->dirnamelen < 2)
+		    *allocptr++ = r->dirnamelen ? '/' : '.';
+		  else
+		    allocptr = __mempcpy (allocptr,
+					  r->dirname, r->dirnamelen - 1);
+		  *allocptr++ = '\0';
+		  sp->dls_flags = flags;
+		}
+	    }
+	  while (*dirs != NULL);
+	}
+    }
 
   /* When the object has the RUNPATH information we don't use any RPATHs.  */
   if (loader->l_info[DT_RUNPATH] == NULL)
@@ -2259,7 +2255,7 @@ _dl_rtld_di_serinfo (struct link_map *loader, Dl_serinfo *si, bool counting)
       do
 	{
 	  if (cache_rpath (l, &l->l_rpath_dirs, DT_RPATH, "RPATH"))
-	    add_path (&p, &l->l_rpath_dirs, XXX_RPATH);
+	    add_path (&l->l_rpath_dirs, XXX_RPATH);
 	  l = l->l_loader;
 	}
       while (l != NULL);
@@ -2270,16 +2266,16 @@ _dl_rtld_di_serinfo (struct link_map *loader, Dl_serinfo *si, bool counting)
 	  l = GL(dl_ns)[LM_ID_BASE]._ns_loaded;
 	  if (l != NULL && l->l_type != lt_loaded && l != loader)
 	    if (cache_rpath (l, &l->l_rpath_dirs, DT_RPATH, "RPATH"))
-	      add_path (&p, &l->l_rpath_dirs, XXX_RPATH);
+	      add_path (&l->l_rpath_dirs, XXX_RPATH);
 	}
     }
 
   /* Try the LD_LIBRARY_PATH environment variable.  */
-  add_path (&p, &env_path_list, XXX_ENV);
+  add_path (&env_path_list, XXX_ENV);
 
   /* Look at the RUNPATH information for this binary.  */
   if (cache_rpath (loader, &loader->l_runpath_dirs, DT_RUNPATH, "RUNPATH"))
-    add_path (&p, &loader->l_runpath_dirs, XXX_RUNPATH);
+    add_path (&loader->l_runpath_dirs, XXX_RUNPATH);
 
   /* XXX
      Here is where ld.so.cache gets checked, but we don't have
@@ -2287,7 +2283,7 @@ _dl_rtld_di_serinfo (struct link_map *loader, Dl_serinfo *si, bool counting)
 
   /* Finally, try the default path.  */
   if (!(loader->l_flags_1 & DF_1_NODEFLIB))
-    add_path (&p, &rtld_search_dirs, XXX_default);
+    add_path (&rtld_search_dirs, XXX_default);
 
   if (counting)
     /* Count the struct size before the string area, which we didn't

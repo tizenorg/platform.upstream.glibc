@@ -1,4 +1,4 @@
-/* Copyright (C) 2002-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2002-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -22,8 +22,6 @@
 #include <fork.h>
 #include <atomic.h>
 
-
-struct fork_handler *__fork_handlers;
 
 /* Lock to protect allocation and deallocation of fork handlers.  */
 int __fork_lock = LLL_LOCK_INITIALIZER;

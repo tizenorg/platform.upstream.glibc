@@ -1,4 +1,4 @@
-# Copyright (C) 1991-2015 Free Software Foundation, Inc.
+# Copyright (C) 1991-2014 Free Software Foundation, Inc.
 # This file is part of the GNU C Library.
 
 # The GNU C Library is free software; you can redistribute it and/or
@@ -87,7 +87,7 @@ tests		:= tstgetopt testfnm runtests runptests	     \
 		   bug-getopt1 bug-getopt2 bug-getopt3 bug-getopt4 \
 		   bug-getopt5 tst-getopt_long1 bug-regex34 bug-regex35 \
 		   tst-pathconf tst-getaddrinfo4 tst-rxspencer-no-utf8 \
-		   tst-fnmatch3 bug-regex36 tst-getaddrinfo5
+		   tst-fnmatch3 bug-regex36
 xtests		:= bug-ga2
 ifeq (yes,$(build-shared))
 test-srcs	:= globtest
@@ -99,7 +99,7 @@ others		:= getconf
 install-bin	:= getconf
 install-others-programs	:= $(inst_libexecdir)/getconf
 
-before-compile	+= testcases.h ptestcases.h $(objpfx)posix-conf-vars-def.h
+before-compile	+= testcases.h ptestcases.h
 
 # So they get cleaned up.
 generated += $(addprefix wordexp-test-result, 1 2 3 4 5 6 7 8 9 10) \
@@ -325,9 +325,3 @@ $(objpfx)getconf.speclist: getconf-speclist.c posix-envs.def
 # be built both makes it available for eyeball inspection and avoids the
 # surprise of things that look like compilation being done by 'make install'.
 others: $(objpfx)getconf.speclist
-
-$(objpfx)posix-conf-vars-def.h: $(..)scripts/gen-posix-conf-vars.awk \
-				posix-conf-vars.list Makefile
-	$(make-target-directory)
-	$(AWK) -f $(filter-out Makefile, $^) > $@.tmp
-	mv -f $@.tmp $@

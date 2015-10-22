@@ -1,5 +1,5 @@
 /* Raise given exceptions.
-   Copyright (C) 2004-2015 Free Software Foundation, Inc.
+   Copyright (C) 2004-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -23,7 +23,7 @@
 
 
 int
-__feraiseexcept (int excepts)
+feraiseexcept (int excepts)
 {
   /* Fail if a VFP unit isn't present unless nothing needs to be done.  */
   if (!ARM_HAVE_VFP)
@@ -102,6 +102,4 @@ __feraiseexcept (int excepts)
       return 0;
     }
 }
-libm_hidden_def (__feraiseexcept)
-weak_alias (__feraiseexcept, feraiseexcept)
-libm_hidden_weak (feraiseexcept)
+libm_hidden_def (feraiseexcept)

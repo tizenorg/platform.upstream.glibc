@@ -1,4 +1,4 @@
-/* Copyright (C) 1997-2015 Free Software Foundation, Inc.
+/* Copyright (C) 1997-2014 Free Software Foundation, Inc.
 
    This file is part of the GNU C Library.
 
@@ -63,7 +63,7 @@ ENTRY (__sigsetjmp)
 	mov	x2,  sp
 	str	x2,  [x0, #JB_SP<<3]
 #endif
-#if IS_IN (rtld)
+#ifdef IS_IN_rtld
 	/* In ld.so we never save the signal mask */
 	mov	w0, #0
 	RET

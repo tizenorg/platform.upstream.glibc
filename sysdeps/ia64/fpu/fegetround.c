@@ -1,5 +1,5 @@
 /* Return current rounding direction.
-   Copyright (C) 1999-2015 Free Software Foundation, Inc.
+   Copyright (C) 1999-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Christian Boissat <Christian.Boissat@cern.ch>, 1999.
 
@@ -20,10 +20,8 @@
 #include <get-rounding-mode.h>
 
 int
-__fegetround (void)
+fegetround (void)
 {
   return get_rounding_mode ();
 }
-libm_hidden_def (__fegetround)
-weak_alias (__fegetround, fegetround)
-libm_hidden_weak (fegetround)
+libm_hidden_def (fegetround)

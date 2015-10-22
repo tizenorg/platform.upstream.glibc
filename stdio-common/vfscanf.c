@@ -1,4 +1,4 @@
-/* Copyright (C) 1991-2015 Free Software Foundation, Inc.
+/* Copyright (C) 1991-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -272,10 +272,9 @@ _IO_vfscanf_internal (_IO_FILE *s, const char *format, _IO_va_list argptr,
       if (__glibc_unlikely (wpsize == wpmax))				      \
 	{								    \
 	  CHAR_T *old = wp;						    \
-	  bool fits = __glibc_likely (wpmax <= SIZE_MAX / sizeof (CHAR_T) / 2); \
-	  size_t wpneed = MAX (UCHAR_MAX + 1, 2 * wpmax);		    \
-	  size_t newsize = fits ? wpneed * sizeof (CHAR_T) : SIZE_MAX;	    \
-	  if (!__libc_use_alloca (newsize))				    \
+	  size_t newsize = (UCHAR_MAX + 1 > 2 * wpmax			    \
+			    ? UCHAR_MAX + 1 : 2 * wpmax);		    \
+	  if (use_malloc || !__libc_use_alloca (newsize))		    \
 	    {								    \
 	      wp = realloc (use_malloc ? wp : NULL, newsize);		    \
 	      if (wp == NULL)						    \
@@ -287,13 +286,14 @@ _IO_vfscanf_internal (_IO_FILE *s, const char *format, _IO_va_list argptr,
 		}							    \
 	      if (! use_malloc)						    \
 		MEMCPY (wp, old, wpsize);				    \
-	      wpmax = wpneed;						    \
+	      wpmax = newsize;						    \
 	      use_malloc = true;					    \
 	    }								    \
 	  else								    \
 	    {								    \
 	      size_t s = wpmax * sizeof (CHAR_T);			    \
-	      wp = (CHAR_T *) extend_alloca (wp, s, newsize);		    \
+	      wp = (CHAR_T *) extend_alloca (wp, s,			    \
+					     newsize * sizeof (CHAR_T));    \
 	      wpmax = s / sizeof (CHAR_T);				    \
 	      if (old != NULL)						    \
 		MEMCPY (wp, old, wpsize);				    \

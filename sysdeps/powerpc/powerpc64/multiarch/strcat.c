@@ -1,5 +1,5 @@
 /* Multiple versions of strcat. PowerPC64 version.
-   Copyright (C) 2014-2015 Free Software Foundation, Inc.
+   Copyright (C) 2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -16,19 +16,16 @@
    License along with the GNU C Library; if not, see
    <http://www.gnu.org/licenses/>.  */
 
-#if IS_IN (libc)
+#ifndef NOT_IN_libc
 # include <string.h>
 # include <shlib-compat.h>
 # include "init-arch.h"
 
 extern __typeof (strcat) __strcat_ppc attribute_hidden;
 extern __typeof (strcat) __strcat_power7 attribute_hidden;
-extern __typeof (strcat) __strcat_power8 attribute_hidden;
 
 libc_ifunc (strcat,
-            (hwcap2 & PPC_FEATURE2_ARCH_2_07)
-            ? __strcat_power8 :
-              (hwcap & PPC_FEATURE_HAS_VSX)
-              ? __strcat_power7
+            (hwcap & PPC_FEATURE_HAS_VSX)
+            ? __strcat_power7
             : __strcat_ppc);
 #endif

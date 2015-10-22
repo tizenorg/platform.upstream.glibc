@@ -1,4 +1,4 @@
-/* Copyright (C) 1997-2015 Free Software Foundation, Inc.
+/* Copyright (C) 1997-2014 Free Software Foundation, Inc.
 
    This file is part of the GNU C Library.
 
@@ -17,13 +17,13 @@
    <http://www.gnu.org/licenses/>.  */
 
 #include <fenv.h>
-#include <get-rounding-mode.h>
+#include <fpu_control.h>
 
 int
-__fegetround (void)
+fegetround (void)
 {
-  return get_rounding_mode ();
+  fpu_control_t fpcr;
+  _FPU_GETCW (fpcr);
+  return fpcr & FE_TOWARDZERO;
 }
-libm_hidden_def (__fegetround)
-weak_alias (__fegetround, fegetround)
-libm_hidden_weak (fegetround)
+libm_hidden_def (fegetround)

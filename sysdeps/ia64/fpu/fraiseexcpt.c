@@ -1,5 +1,5 @@
 /* Raise given exceptions.
-   Copyright (C) 1997-2015 Free Software Foundation, Inc.
+   Copyright (C) 1997-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Jes Sorensen <Jes.Sorensen@cern.ch>, 2000.
 
@@ -24,7 +24,7 @@
 #include <unistd.h>
 
 int
-__feraiseexcept (int excepts)
+feraiseexcept (int excepts)
 {
   double tmp;
   double dummy;
@@ -75,6 +75,4 @@ __feraiseexcept (int excepts)
   /* Success.  */
   return 0;
 }
-libm_hidden_def (__feraiseexcept)
-weak_alias (__feraiseexcept, feraiseexcept)
-libm_hidden_weak (feraiseexcept)
+libm_hidden_def (feraiseexcept)

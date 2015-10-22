@@ -1,4 +1,4 @@
-/* Copyright (C) 1992-2015 Free Software Foundation, Inc.
+/* Copyright (C) 1992-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -217,13 +217,6 @@ __add_to_environ (name, value, combined, replace)
 	      /* And remember the value.  */
 	      STORE_VALUE (np);
 	    }
-#ifdef USE_TSEARCH
-	  else
-	    {
-	      if (__glibc_unlikely (! use_alloca))
-		free (new_value);
-	    }
-#endif
 	}
 
       *ep = np;

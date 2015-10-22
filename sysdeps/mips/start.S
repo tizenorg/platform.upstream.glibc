@@ -1,5 +1,5 @@
 /* Startup code compliant to the ELF Mips ABI.
-   Copyright (C) 1995-2015 Free Software Foundation, Inc.
+   Copyright (C) 1995-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -106,8 +106,7 @@ ENTRY_POINT:
 	move $9, $2		/* rtld_fini */
 	move $10, $29		/* stack_end */
 # endif
-	PTR_LA $25, __libc_start_main
-	jalr   $25
+	jal __libc_start_main
 hlt:	b hlt			/* Crash if somehow it does return.  */
 
 #elif _MIPS_SIM == _ABIO32 /* __mips16 */
@@ -158,9 +157,7 @@ ENTRY_POINT:
 	sw	$4, 16($sp)			/* fini */
 	lw	$4, 3f				/* main */
 	sw	$2, 20($sp)			/* rtld_fini */
-	/* Load and call __libc_start_main().  */
-	lw	$3, 4f
-	jalr	$3
+	jal	__libc_start_main
 # endif
 hlt:	b	hlt		/* Crash if somehow it does return.  */
 # ifndef __PIC__
@@ -168,7 +165,6 @@ hlt:	b	hlt		/* Crash if somehow it does return.  */
 1:	.word	__libc_csu_fini
 2:	.word	__libc_csu_init
 3:	.word	main
-4:	.word	__libc_start_main
 # endif
 
 #else /* __mips16 && _MIPS_SIM != _ABIO32 */

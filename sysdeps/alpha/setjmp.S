@@ -1,4 +1,4 @@
-/* Copyright (C) 1992-2015 Free Software Foundation, Inc.
+/* Copyright (C) 1992-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -86,7 +86,7 @@ $sigsetjmp_local:
 	ldq	ra, 0(sp)
 	addq	sp, 16, sp
 	ret
-#elif IS_IN (rtld)
+#elif defined IS_IN_rtld
 	/* In ld.so we never save the signal mask.  */
 	mov	0, v0
 	ret

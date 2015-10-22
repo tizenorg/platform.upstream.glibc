@@ -1,7 +1,7 @@
 /* MIPS3 __mpn_addmul_1 -- Multiply a limb vector with a single limb and
  * add the product to a second limb vector.
  *
- * Copyright (C) 1992-2015 Free Software Foundation, Inc.
+ * Copyright (C) 1992-2014 Free Software Foundation, Inc.
  *
  * This file is part of the GNU MP Library.
  *
@@ -44,12 +44,7 @@ ENTRY (__mpn_addmul_1)
 
  # warm up phase 1
 	daddiu	$5,$5,8
-#if __mips_isa_rev < 6
 	dmultu	$8,$7
-#else
-	dmulu	$11,$8,$7
-	dmuhu	$12,$8,$7
-#endif
 
 	daddiu	$6,$6,-1
 	beq	$6,$0,L(LC0)
@@ -60,21 +55,11 @@ ENTRY (__mpn_addmul_1)
 	ld	$8,0($5)	# load new s1 limb as early as possible
 
 L(Loop):	ld	$10,0($4)
-#if __mips_isa_rev < 6
 	mflo	$3
 	mfhi	$9
-#else
-	move	$3,$11
-	move	$9,$12
-#endif
 	daddiu	$5,$5,8
 	daddu	$3,$3,$2	# add old carry limb to low product limb
-#if __mips_isa_rev < 6
 	dmultu	$8,$7
-#else
-	dmulu	$11,$8,$7
-	dmuhu	$12,$8,$7
-#endif
 	ld	$8,0($5)	# load new s1 limb as early as possible
 	daddiu	$6,$6,-1	# decrement loop counter
 	sltu	$2,$3,$2	# carry from previous addition -> $2
@@ -88,21 +73,11 @@ L(Loop):	ld	$10,0($4)
 
  # cool down phase 1
 L(LC1):	ld	$10,0($4)
-#if __mips_isa_rev < 6
 	mflo	$3
 	mfhi	$9
-#else
-	move	$3,$11
-	move	$9,$12
-#endif
 	daddu	$3,$3,$2
 	sltu	$2,$3,$2
-#if __mips_isa_rev < 6
 	dmultu	$8,$7
-#else
-	dmulu	$11,$8,$7
-	dmuhu	$12,$8,$7
-#endif
 	daddu	$3,$10,$3
 	sltu	$10,$3,$10
 	daddu	$2,$2,$10
@@ -112,13 +87,8 @@ L(LC1):	ld	$10,0($4)
 
  # cool down phase 0
 L(LC0):	ld	$10,0($4)
-#if __mips_isa_rev < 6
 	mflo	$3
 	mfhi	$9
-#else
-	move	$3,$11
-	move	$9,$12
-#endif
 	daddu	$3,$3,$2
 	sltu	$2,$3,$2
 	daddu	$3,$10,$3

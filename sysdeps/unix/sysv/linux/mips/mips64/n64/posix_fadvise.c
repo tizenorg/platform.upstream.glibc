@@ -1,4 +1,4 @@
-/* Copyright (C) 2003-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2003-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -46,5 +46,5 @@ compat_symbol (libc, __posix_fadvise64_l32, posix_fadvise64, GLIBC_2_2);
 strong_alias (posix_fadvise, __posix_fadvise64_l64);
 versioned_symbol (libc, __posix_fadvise64_l64, posix_fadvise64, GLIBC_2_3_3);
 #else
-weak_alias (posix_fadvise, posix_fadvise64);
+strong_alias (posix_fadvise, posix_fadvise64);
 #endif

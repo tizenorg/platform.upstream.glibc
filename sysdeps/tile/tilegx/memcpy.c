@@ -1,4 +1,4 @@
-/* Copyright (C) 2011-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2011-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Chris Metcalf <cmetcalf@tilera.com>, 2011.
 
@@ -25,7 +25,7 @@
 /* How many cache lines ahead should we prefetch? */
 #define PREFETCH_LINES_AHEAD 3
 
-void * inhibit_loop_to_libcall
+void *
 __memcpy (void *__restrict dstv, const void *__restrict srcv, size_t n)
 {
   char *__restrict dst1 = (char *) dstv;

@@ -1,4 +1,4 @@
-# Copyright (C) 2002-2015 Free Software Foundation, Inc.
+# Copyright (C) 2002-2014 Free Software Foundation, Inc.
 # This file is part of the GNU C Library.
 
 # The GNU C Library is free software; you can redistribute it and/or
@@ -96,11 +96,10 @@ libpthread-routines = nptl-init vars events version \
 		      old_pthread_atfork pthread_atfork \
 		      pthread_getcpuclockid \
 		      pthread_clock_gettime pthread_clock_settime \
-		      shm-directory \
 		      sem_init sem_destroy \
 		      sem_open sem_close sem_unlink \
 		      sem_getvalue \
-		      sem_wait sem_timedwait sem_post \
+		      sem_wait sem_trywait sem_timedwait sem_post \
 		      cleanup cleanup_defer cleanup_compat \
 		      cleanup_defer_compat unwind \
 		      pt-longjmp pt-cleanup\
@@ -255,7 +254,7 @@ tests = tst-typesizes \
 	tst-exec1 tst-exec2 tst-exec3 tst-exec4 \
 	tst-exit1 tst-exit2 tst-exit3 \
 	tst-stdio1 tst-stdio2 \
-	tst-stack1 tst-stack2 tst-stack3 tst-stack4 tst-pthread-getattr \
+	tst-stack1 tst-stack2 tst-stack3 tst-pthread-getattr \
 	tst-pthread-attr-affinity \
 	tst-unload \
 	tst-dlsym1 \
@@ -271,8 +270,7 @@ tests = tst-typesizes \
 	tst-vfork1 tst-vfork2 tst-vfork1x tst-vfork2x \
 	tst-getpid1 tst-getpid2 tst-getpid3 \
 	tst-setuid3 \
-	tst-initializers1 $(addprefix tst-initializers1-,c89 gnu89 c99 gnu99) \
-	tst-bad-schedattr
+	tst-initializers1 $(patsubst %,tst-initializers1-%,c89 gnu89 c99 gnu99)
 xtests = tst-setuid1 tst-setuid1-static tst-setuid2 \
 	tst-mutexpp1 tst-mutexpp6 tst-mutexpp10
 test-srcs = tst-oddstacklimit
@@ -283,7 +281,8 @@ tests-nolibpthread = tst-unload
 gen-as-const-headers = pthread-errnos.sym \
 		       lowlevelcond.sym lowlevelrwlock.sym \
 		       lowlevelbarrier.sym unwindbuf.sym \
-		       lowlevelrobustlock.sym pthread-pi-defines.sym
+		       lowlevelrobustlock.sym pthread-pi-defines.sym \
+		       structsem.sym
 
 
 LDFLAGS-pthread.so = -Wl,--enable-new-dtags,-z,nodelete,-z,initfirst
@@ -311,7 +310,7 @@ endif
 
 modules-names = tst-atfork2mod tst-tls3mod tst-tls4moda tst-tls4modb \
 		tst-tls5mod tst-tls5moda tst-tls5modb tst-tls5modc \
-		tst-tls5modd tst-tls5mode tst-tls5modf tst-stack4mod \
+		tst-tls5modd tst-tls5mode tst-tls5modf \
 		tst-_res1mod1 tst-_res1mod2 tst-execstack-mod tst-fini1mod
 extra-test-objs += $(addsuffix .os,$(strip $(modules-names))) tst-cleanup4aux.o
 test-extras += $(modules-names) tst-cleanup4aux
@@ -479,19 +478,6 @@ $(objpfx)tst-stack3-mem.out: $(objpfx)tst-stack3.out
 	$(evaluate-test)
 generated += tst-stack3-mem.out tst-stack3.mtrace
 
-$(objpfx)tst-stack4: $(libdl) $(shared-thread-library)
-tst-stack4mod.sos=$(shell for i in 0 1 2 3 4 5 6 7 8 9 10 \
-				   11 12 13 14 15 16 17 18 19; do \
-			    for j in 0 1 2 3 4 5 6 7 8 9 10 \
-				     11 12 13 14 15 16 17 18 19; do \
-			      echo $(objpfx)tst-stack4mod-$$i-$$j.so; \
-			    done; done)
-$(objpfx)tst-stack4.out: $(tst-stack4mod.sos)
-$(tst-stack4mod.sos): $(objpfx)tst-stack4mod.so
-	cp -f $< $@
-clean:
-	rm -f $(tst-stack4mod.sos)
-
 $(objpfx)tst-cleanup4: $(objpfx)tst-cleanup4aux.o $(shared-thread-library)
 $(objpfx)tst-cleanupx4: $(objpfx)tst-cleanup4aux.o $(shared-thread-library)
 
@@ -618,7 +604,6 @@ tst-exec4-ARGS = $(host-test-program-cmd)
 $(objpfx)tst-execstack: $(libdl)
 $(objpfx)tst-execstack.out: $(objpfx)tst-execstack-mod.so
 LDFLAGS-tst-execstack = -Wl,-z,noexecstack
-CFLAGS-tst-execstack-mod.c += -Wno-trampolines
 
 $(objpfx)tst-fini1mod.so: $(shared-thread-library)
 

@@ -1,5 +1,5 @@
 /* low level locking for pthread library.  SPARC version.
-   Copyright (C) 2003-2015 Free Software Foundation, Inc.
+   Copyright (C) 2003-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Paul Mackerras <paulus@au.ibm.com>, 2003.
 
@@ -37,7 +37,7 @@ __lll_lock_wait_private (int *futex)
 
 
 /* These functions don't get included in libc.so  */
-#if IS_IN (libpthread)
+#ifdef IS_IN_libpthread
 void
 __lll_lock_wait (int *futex, int private)
 {

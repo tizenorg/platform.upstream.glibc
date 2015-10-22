@@ -1,4 +1,4 @@
-/* Copyright (C) 2003-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2003-2014 Free Software Foundation, Inc.
 
    This file is part of the GNU C Library.
 
@@ -22,7 +22,7 @@
 # include <nptl/pthreadP.h>
 #endif
 
-#if IS_IN (libc) || IS_IN (libpthread) || IS_IN (librt)
+#if !defined NOT_IN_libc || defined IS_IN_libpthread || defined IS_IN_librt
 
 # undef PSEUDO
 # define PSEUDO(name, syscall_name, args)				\
@@ -81,22 +81,22 @@ ENTRY (name);								\
 # define UNDOCARGS_5	UNDOCARGS_3; ldp x3, x4, [sp, 32]
 # define UNDOCARGS_6	UNDOCARGS_4; ldp x4, x5, [sp, 40]
 
-# if IS_IN (libpthread)
+# ifdef IS_IN_libpthread
 #  define CENABLE	bl __pthread_enable_asynccancel
 #  define CDISABLE	bl __pthread_disable_asynccancel
 #  define __local_multiple_threads __pthread_multiple_threads
-# elif IS_IN (libc)
+# elif !defined NOT_IN_libc
 #  define CENABLE	bl __libc_enable_asynccancel
 #  define CDISABLE	bl __libc_disable_asynccancel
 #  define __local_multiple_threads __libc_multiple_threads
-# elif IS_IN (librt)
+# elif defined IS_IN_librt
 #  define CENABLE	bl __librt_enable_asynccancel
 #  define CDISABLE	bl __librt_disable_asynccancel
 # else
 #  error Unsupported library
 # endif
 
-# if IS_IN (libpthread) || IS_IN (libc)
+# if defined IS_IN_libpthread || !defined NOT_IN_libc
 #  ifndef __ASSEMBLER__
 extern int __local_multiple_threads attribute_hidden;
 #   define SINGLE_THREAD_P __builtin_expect (__local_multiple_threads == 0, 1)

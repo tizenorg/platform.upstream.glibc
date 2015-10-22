@@ -1,4 +1,4 @@
-/* Copyright (C) 2002-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2002-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -26,9 +26,6 @@
 #include <bits/libc-lock.h>
 #include <sysdep.h>
 #include <ldsodefs.h>
-
-
-unsigned long int *__fork_generation_pointer;
 
 
 #ifdef TLS_MULTIPLE_THREADS_IN_TCB

@@ -1,6 +1,6 @@
 /* Multiple versions of memset_chk
    All versions must be listed in ifunc-impl-list.c.
-   Copyright (C) 2014-2015 Free Software Foundation, Inc.
+   Copyright (C) 2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -21,7 +21,7 @@
 #include <init-arch.h>
 
 /* Define multiple versions only for the definition in lib.  */
-#if IS_IN (libc)
+#ifndef NOT_IN_libc
 # if defined SHARED && defined HAVE_AVX2_SUPPORT
 ENTRY(__memset_chk)
 	.type	__memset_chk, @gnu_indirect_function

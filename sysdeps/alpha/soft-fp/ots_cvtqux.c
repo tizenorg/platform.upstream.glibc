@@ -1,5 +1,5 @@
 /* Software floating-point emulation: unsigned integer to float conversion.
-   Copyright (C) 1997-2015 Free Software Foundation, Inc.
+   Copyright (C) 1997-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Richard Henderson (rth@cygnus.com) and
 		  Jakub Jelinek (jj@ultra.linux.cz).
@@ -30,10 +30,10 @@ _OtsCvtQUX (unsigned long a)
 {
   FP_DECL_EX;
   FP_DECL_Q(C);
-  AXP_DECL_RETURN_Q(c);
+  FP_DECL_RETURN(c);
 
   FP_FROM_INT_Q(C, a, 64, unsigned long);
-  AXP_PACK_RAW_Q(c, C);
+  FP_PACK_RAW_Q(c, C);
 
-  AXP_RETURN_Q(c);
+  FP_RETURN(c);
 }

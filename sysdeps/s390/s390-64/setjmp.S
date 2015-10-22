@@ -1,5 +1,5 @@
 /* setjmp for 64 bit S/390, ELF version.
-   Copyright (C) 2001-2015 Free Software Foundation, Inc.
+   Copyright (C) 2001-2014 Free Software Foundation, Inc.
    Contributed by Martin Schwidefsky (schwidefsky@de.ibm.com).
    This file is part of the GNU C Library.
 
@@ -22,14 +22,13 @@
 #define _SETJMP_H
 #include <bits/setjmp.h>
 #include <shlib-compat.h>
-#include <stap-probe.h>
 
-#if !IS_IN (rtld)
+#if !defined IS_IN_rtld
 # if defined SHARED &&  SHLIB_COMPAT (libc, GLIBC_2_19, GLIBC_2_20)
 	/* we need a unique name in case of symbol versioning.  */
 #  define __sigsetjmp __v1__sigsetjmp
 # endif /* if defined SHARED && SHLIB_COMPAT (libc, GLIBC_2_19, GLIBC_2_20)  */
-#endif /* !IS_IN (rtld)  */
+#endif /* !defined IS_IN_rtld  */
 
 	/* We include the BSD entry points here as well but we make
 	   them weak.  */
@@ -54,9 +53,6 @@ END (__setjmp)
 
 ENTRY(__sigsetjmp)
 .Linternal_sigsetjmp:
-	/* setjmp probe expects sig/setjmp first argument (8@%r2), second
-	   argument (-8@%r3) and target address (8@%r14).  */
-	LIBC_PROBE (setjmp, 3, 8@%r2, -4@%r3, 8@%r14)
 #ifdef PTR_MANGLE
 	stmg   %r6,%r13,0(%r2)      /* Store registers in jmp_buf.  */
 	lgr    %r4,%r14
@@ -75,7 +71,7 @@ ENTRY(__sigsetjmp)
 	std    %f13,120(%r2)
 	std    %f14,128(%r2)
 	std    %f15,136(%r2)
-#if IS_IN (rtld)
+#ifdef IS_IN_rtld
 	/* In ld.so we never save the signal mask.  */
 	lghi   %r2,0
 	br     %r14
@@ -86,7 +82,7 @@ ENTRY(__sigsetjmp)
 #endif
 END (__sigsetjmp)
 
-#if !IS_IN (rtld)
+#if !defined IS_IN_rtld
 # if defined SHARED &&  SHLIB_COMPAT (libc, GLIBC_2_19, GLIBC_2_20)
 /* In glibc release 2.19 new versions of setjmp-functions were introduced,
    but were reverted before 2.20. Thus both versions are the same function.  */
@@ -107,4 +103,4 @@ strong_alias (__v1__sigsetjmp, __v2__sigsetjmp);
 versioned_symbol (libc, __v1__sigsetjmp, __sigsetjmp, GLIBC_2_0);
 compat_symbol (libc, __v2__sigsetjmp, __sigsetjmp, GLIBC_2_19);
 # endif /* if defined SHARED && SHLIB_COMPAT (libc, GLIBC_2_19, GLIBC_2_20)  */
-#endif /* if !IS_IN (rtld)  */
+#endif /* if !defined IS_IN_rtld  */

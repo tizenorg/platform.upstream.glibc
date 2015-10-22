@@ -1,4 +1,4 @@
-/* Copyright (C) 2005-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2005-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -28,11 +28,13 @@
 /* Change the access time of FILE relative to FD to TVP[0] and
    the modification time of FILE to TVP[1].  */
 int
-futimesat (int fd, const char *file, const struct timeval tvp[2])
+futimesat (fd, file, tvp)
+     int fd;
+     const char *file;
+     const struct timeval tvp[2];
 {
   if (file == NULL)
     return __futimes (fd, tvp);
 
-  /* Avoid implicit array coercion in syscall macros.  */
-  return INLINE_SYSCALL (futimesat, 3, fd, file, &tvp[0]);
+  return INLINE_SYSCALL (futimesat, 3, fd, file, tvp);
 }

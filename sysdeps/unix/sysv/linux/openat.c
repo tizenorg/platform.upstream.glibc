@@ -1,4 +1,4 @@
-/* Copyright (C) 2005-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2005-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -37,7 +37,11 @@
 
 
 int
-OPENAT_NOT_CANCEL (int fd, const char *file, int oflag, mode_t mode)
+OPENAT_NOT_CANCEL (fd, file, oflag, mode)
+     int fd;
+     const char *file;
+     int oflag;
+     mode_t mode;
 {
 
   /* We have to add the O_LARGEFILE flag for openat64.  */
@@ -57,7 +61,10 @@ OPENAT_NOT_CANCEL (int fd, const char *file, int oflag, mode_t mode)
    the directory associated with FD.  If OFLAG includes O_CREAT, a
    third argument is the file protection.  */
 int
-__OPENAT (int fd, const char *file, int oflag, ...)
+__OPENAT (fd, file, oflag)
+     int fd;
+     const char *file;
+     int oflag;
 {
   mode_t mode = 0;
   if (oflag & O_CREAT)

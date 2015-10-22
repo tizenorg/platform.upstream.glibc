@@ -1,4 +1,4 @@
-/* Copyright (C) 1998-2015 Free Software Foundation, Inc.
+/* Copyright (C) 1998-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -86,7 +86,7 @@ compat_symbol (libc, __adjtime_tv32, adjtime, GLIBC_2_0);
 int
 __adjtimex_tv64 (struct timex *tx) { return ADJTIMEX (tx); }
 
-libc_hidden_ver (__adjtimex_tv64, __adjtimex)
+strong_alias (__adjtimex_tv64, __adjtimex_internal);
 strong_alias (__adjtimex_tv64, __adjtimex_tv64p);
 weak_alias (__adjtimex_tv64, ntp_adjtime);
 versioned_symbol (libc, __adjtimex_tv64, __adjtimex, GLIBC_2_1);

@@ -1,4 +1,4 @@
-/* Copyright (C) 2003-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2003-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Martin Schwidefsky <schwidefsky@de.ibm.com>, 2003.
 
@@ -51,7 +51,7 @@
 #define LLL_SHARED	FUTEX_PRIVATE_FLAG
 
 
-#if IS_IN (libc) || IS_IN (rtld)
+#if !defined NOT_IN_libc || defined IS_IN_rtld
 /* In libc.so or ld.so all futexes are private.  */
 # ifdef __ASSUME_PRIVATE_FUTEX
 #  define __lll_private_flag(fl, private) \

@@ -1,5 +1,5 @@
 /* Uncancelable versions of cancelable interfaces.  Linux/NPTL version.
-   Copyright (C) 2003-2015 Free Software Foundation, Inc.
+   Copyright (C) 2003-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 2003.
 
@@ -19,7 +19,7 @@
 
 #include <sysdep.h>
 
-#if IS_IN (libc) || IS_IN (libpthread) || IS_IN (librt)
+#if !defined NOT_IN_libc || defined IS_IN_libpthread || defined IS_IN_librt
 extern int __open_nocancel (const char *, int, ...) attribute_hidden;
 extern int __close_nocancel (int) attribute_hidden;
 extern int __read_nocancel (int, void *, size_t) attribute_hidden;

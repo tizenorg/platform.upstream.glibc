@@ -1,4 +1,4 @@
-/* Copyright (C) 2002-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2002-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -24,7 +24,9 @@
 
 
 int
-__pthread_kill (pthread_t threadid, int signo)
+__pthread_kill (threadid, signo)
+     pthread_t threadid;
+     int signo;
 {
   struct pthread *pd = (struct pthread *) threadid;
 

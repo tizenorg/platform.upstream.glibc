@@ -1,4 +1,4 @@
-/* Copyright (C) 2003-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2003-2014 Free Software Foundation, Inc.
 
    This file is part of the GNU C Library.
 
@@ -34,9 +34,6 @@ typedef intptr_t atomicptr_t;
 typedef uintptr_t uatomicptr_t;
 typedef intmax_t atomic_max_t;
 typedef uintmax_t uatomic_max_t;
-
-#define __HAVE_64B_ATOMICS 0
-#define USE_ATOMIC_COMPILER_BUILTINS 0
 
 
 /* Microblaze does not have byte and halfword forms of load and reserve and

@@ -1,5 +1,5 @@
 /* Return current rounding direction.
-   Copyright (C) 1997-2015 Free Software Foundation, Inc.
+   Copyright (C) 1997-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Richard Henderson <rth@tamu.edu>, 1997
 
@@ -20,7 +20,7 @@
 #include <fenv_libc.h>
 
 int
-__fegetround (void)
+fegetround (void)
 {
   unsigned long fpcr;
 
@@ -28,6 +28,4 @@ __fegetround (void)
 
   return (fpcr >> FPCR_ROUND_SHIFT) & 3;
 }
-libm_hidden_def (__fegetround)
-weak_alias (__fegetround, fegetround)
-libm_hidden_weak (fegetround)
+libm_hidden_def (fegetround)

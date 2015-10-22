@@ -1,4 +1,4 @@
-/* Copyright (C) 1993-2015 Free Software Foundation, Inc.
+/* Copyright (C) 1993-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Brendan Kehoe (brendan@zen.org).
 
@@ -28,7 +28,7 @@
 	.text
 #endif
 
-#if IS_IN (libc)
+#ifndef NOT_IN_libc
 # define SYSCALL_ERROR_ERRNO __libc_errno
 #else
 # define SYSCALL_ERROR_ERRNO errno

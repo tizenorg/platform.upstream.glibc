@@ -1,4 +1,4 @@
-/* Copyright (C) 1997-2015 Free Software Foundation, Inc.
+/* Copyright (C) 1997-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Andreas Jaeger <aj@suse.de>, 1997.
 
@@ -590,7 +590,6 @@ print_complex_max_error (const char *func_name)
 }
 
 
-#if FE_ALL_EXCEPT
 /* Test whether a given exception was raised.  */
 static void
 test_single_exception (const char *test_name,
@@ -599,7 +598,7 @@ test_single_exception (const char *test_name,
 		       int fe_flag,
 		       const char *flag_name)
 {
-# ifndef TEST_INLINE
+#ifndef TEST_INLINE
   int ok = 1;
   if (exception & exc_flag)
     {
@@ -635,9 +634,9 @@ test_single_exception (const char *test_name,
   if (!ok)
     ++noErrors;
 
-# endif
-}
 #endif
+}
+
 
 /* Test whether exceptions given by EXCEPTION are raised.  Ignore thereby
    allowed but not required exceptions.
@@ -9124,36 +9123,6 @@ static const struct test_fi_f_data scalbn_test_data[] =
 
     TEST_fi_f (scalbn, 1, 0L, 1, NO_INEXACT_EXCEPTION),
 
-    TEST_fi_f (scalbn, min_value / 2, 0, min_value / 2, NO_INEXACT_EXCEPTION),
-    TEST_fi_f (scalbn, -min_value / 2, 0, -min_value / 2, NO_INEXACT_EXCEPTION),
-    TEST_fi_f (scalbn, min_value / 2, 1, min_value, NO_INEXACT_EXCEPTION),
-    TEST_fi_f (scalbn, -min_value / 2, 1, -min_value, NO_INEXACT_EXCEPTION),
-    TEST_fi_f (scalbn, min_value * 0x0.ffffp0, 0, min_value * 0x0.ffffp0, NO_INEXACT_EXCEPTION),
-    TEST_fi_f (scalbn, -min_value * 0x0.ffffp0, 0, -min_value * 0x0.ffffp0, NO_INEXACT_EXCEPTION),
-    TEST_fi_f (scalbn, min_subnorm_value, 0, min_subnorm_value, NO_INEXACT_EXCEPTION),
-    TEST_fi_f (scalbn, -min_subnorm_value, 0, -min_subnorm_value, NO_INEXACT_EXCEPTION),
-    TEST_fi_f (scalbn, min_subnorm_value, MANT_DIG, min_value, NO_INEXACT_EXCEPTION),
-    TEST_fi_f (scalbn, -min_subnorm_value, MANT_DIG, -min_value, NO_INEXACT_EXCEPTION),
-
-    TEST_fi_f (scalbn, min_value, -MANT_DIG, min_subnorm_value, NO_INEXACT_EXCEPTION),
-    TEST_fi_f (scalbn, -min_value, -MANT_DIG, -min_subnorm_value, NO_INEXACT_EXCEPTION),
-    TEST_fi_f (scalbn, min_value, -MANT_DIG-1, plus_uflow, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION),
-    TEST_fi_f (scalbn, -min_value, -MANT_DIG-1, minus_uflow, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION),
-    TEST_fi_f (scalbn, min_value, -MANT_DIG-2, plus_uflow, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION),
-    TEST_fi_f (scalbn, -min_value, -MANT_DIG-2, minus_uflow, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION),
-    TEST_fi_f (scalbn, min_value * 1.5, -MANT_DIG, min_subnorm_value, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION, min_subnorm_value * 2, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION, min_subnorm_value, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION, min_subnorm_value * 2, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION),
-    TEST_fi_f (scalbn, -min_value * 1.5, -MANT_DIG, -min_subnorm_value * 2, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION, -min_subnorm_value * 2, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION, -min_subnorm_value, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION, -min_subnorm_value, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION),
-    TEST_fi_f (scalbn, min_value * 1.5, -MANT_DIG-1, plus_zero, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION, min_subnorm_value, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION, plus_zero, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION, min_subnorm_value, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION),
-    TEST_fi_f (scalbn, -min_value * 1.5, -MANT_DIG-1, -min_subnorm_value, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION, -min_subnorm_value, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION, minus_zero, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION, minus_zero, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION),
-    TEST_fi_f (scalbn, min_value * 1.5, -MANT_DIG-2, plus_uflow, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION),
-    TEST_fi_f (scalbn, -min_value * 1.5, -MANT_DIG-2, minus_uflow, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION),
-    TEST_fi_f (scalbn, min_value * 1.25, -MANT_DIG, min_subnorm_value, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION, min_subnorm_value, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION, min_subnorm_value, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION, min_subnorm_value * 2, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION),
-    TEST_fi_f (scalbn, -min_value * 1.25, -MANT_DIG, -min_subnorm_value * 2, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION, -min_subnorm_value, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION, -min_subnorm_value, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION, -min_subnorm_value, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION),
-    TEST_fi_f (scalbn, min_value * 1.25, -MANT_DIG-1, plus_zero, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION, min_subnorm_value, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION, plus_zero, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION, min_subnorm_value, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION),
-    TEST_fi_f (scalbn, -min_value * 1.25, -MANT_DIG-1, -min_subnorm_value, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION, -min_subnorm_value, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION, minus_zero, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION, minus_zero, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION),
-    TEST_fi_f (scalbn, min_value * 1.25, -MANT_DIG-2, plus_uflow, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION),
-    TEST_fi_f (scalbn, -min_value * 1.25, -MANT_DIG-2, minus_uflow, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION),
-
     TEST_fi_f (scalbn, 1, INT_MAX, plus_oflow, INEXACT_EXCEPTION|OVERFLOW_EXCEPTION),
     TEST_fi_f (scalbn, 1, INT_MIN, plus_uflow, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION),
     TEST_fi_f (scalbn, max_value, INT_MAX, plus_oflow, INEXACT_EXCEPTION|OVERFLOW_EXCEPTION),
@@ -9200,36 +9169,6 @@ static const struct test_fl_f_data scalbln_test_data[] =
     TEST_fl_f (scalbln, -0.854375L, 5, -27.34L, NO_INEXACT_EXCEPTION|ERRNO_UNCHANGED),
 
     TEST_fl_f (scalbln, 1, 0L, 1, NO_INEXACT_EXCEPTION|ERRNO_UNCHANGED),
-
-    TEST_fl_f (scalbln, min_value / 2, 0, min_value / 2, NO_INEXACT_EXCEPTION),
-    TEST_fl_f (scalbln, -min_value / 2, 0, -min_value / 2, NO_INEXACT_EXCEPTION),
-    TEST_fl_f (scalbln, min_value / 2, 1, min_value, NO_INEXACT_EXCEPTION),
-    TEST_fl_f (scalbln, -min_value / 2, 1, -min_value, NO_INEXACT_EXCEPTION),
-    TEST_fl_f (scalbln, min_value * 0x0.ffffp0, 0, min_value * 0x0.ffffp0, NO_INEXACT_EXCEPTION),
-    TEST_fl_f (scalbln, -min_value * 0x0.ffffp0, 0, -min_value * 0x0.ffffp0, NO_INEXACT_EXCEPTION),
-    TEST_fl_f (scalbln, min_subnorm_value, 0, min_subnorm_value, NO_INEXACT_EXCEPTION),
-    TEST_fl_f (scalbln, -min_subnorm_value, 0, -min_subnorm_value, NO_INEXACT_EXCEPTION),
-    TEST_fl_f (scalbln, min_subnorm_value, MANT_DIG, min_value, NO_INEXACT_EXCEPTION),
-    TEST_fl_f (scalbln, -min_subnorm_value, MANT_DIG, -min_value, NO_INEXACT_EXCEPTION),
-
-    TEST_fl_f (scalbln, min_value, -MANT_DIG, min_subnorm_value, NO_INEXACT_EXCEPTION),
-    TEST_fl_f (scalbln, -min_value, -MANT_DIG, -min_subnorm_value, NO_INEXACT_EXCEPTION),
-    TEST_fl_f (scalbln, min_value, -MANT_DIG-1, plus_uflow, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION),
-    TEST_fl_f (scalbln, -min_value, -MANT_DIG-1, minus_uflow, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION),
-    TEST_fl_f (scalbln, min_value, -MANT_DIG-2, plus_uflow, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION),
-    TEST_fl_f (scalbln, -min_value, -MANT_DIG-2, minus_uflow, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION),
-    TEST_fl_f (scalbln, min_value * 1.5, -MANT_DIG, min_subnorm_value, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION, min_subnorm_value * 2, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION, min_subnorm_value, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION, min_subnorm_value * 2, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION),
-    TEST_fl_f (scalbln, -min_value * 1.5, -MANT_DIG, -min_subnorm_value * 2, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION, -min_subnorm_value * 2, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION, -min_subnorm_value, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION, -min_subnorm_value, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION),
-    TEST_fl_f (scalbln, min_value * 1.5, -MANT_DIG-1, plus_zero, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION, min_subnorm_value, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION, plus_zero, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION, min_subnorm_value, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION),
-    TEST_fl_f (scalbln, -min_value * 1.5, -MANT_DIG-1, -min_subnorm_value, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION, -min_subnorm_value, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION, minus_zero, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION, minus_zero, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION),
-    TEST_fl_f (scalbln, min_value * 1.5, -MANT_DIG-2, plus_uflow, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION),
-    TEST_fl_f (scalbln, -min_value * 1.5, -MANT_DIG-2, minus_uflow, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION),
-    TEST_fl_f (scalbln, min_value * 1.25, -MANT_DIG, min_subnorm_value, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION, min_subnorm_value, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION, min_subnorm_value, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION, min_subnorm_value * 2, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION),
-    TEST_fl_f (scalbln, -min_value * 1.25, -MANT_DIG, -min_subnorm_value * 2, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION, -min_subnorm_value, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION, -min_subnorm_value, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION, -min_subnorm_value, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION),
-    TEST_fl_f (scalbln, min_value * 1.25, -MANT_DIG-1, plus_zero, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION, min_subnorm_value, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION, plus_zero, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION, min_subnorm_value, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION),
-    TEST_fl_f (scalbln, -min_value * 1.25, -MANT_DIG-1, -min_subnorm_value, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION, -min_subnorm_value, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION, minus_zero, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION, minus_zero, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION),
-    TEST_fl_f (scalbln, min_value * 1.25, -MANT_DIG-2, plus_uflow, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION),
-    TEST_fl_f (scalbln, -min_value * 1.25, -MANT_DIG-2, minus_uflow, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION),
 
     TEST_fl_f (scalbln, 1, INT_MAX, plus_oflow, INEXACT_EXCEPTION|OVERFLOW_EXCEPTION|ERRNO_PLUS_OFLOW),
     TEST_fl_f (scalbln, 1, INT_MIN, plus_uflow, INEXACT_EXCEPTION|UNDERFLOW_EXCEPTION|ERRNO_PLUS_UFLOW),

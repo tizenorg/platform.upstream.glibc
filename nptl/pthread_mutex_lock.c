@@ -1,4 +1,4 @@
-/* Copyright (C) 2002-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2002-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -276,10 +276,6 @@ __pthread_mutex_lock_full (pthread_mutex_t *mutex)
       THREAD_SETMEM (THREAD_SELF, robust_head.list_op_pending, NULL);
       break;
 
-    /* The PI support requires the Linux futex system call.  If that's not
-       available, pthread_mutex_init should never have allowed the type to
-       be set.  So it will get the default case for an invalid type.  */
-#ifdef __NR_futex
     case PTHREAD_MUTEX_PI_RECURSIVE_NP:
     case PTHREAD_MUTEX_PI_ERRORCHECK_NP:
     case PTHREAD_MUTEX_PI_NORMAL_NP:
@@ -325,9 +321,9 @@ __pthread_mutex_lock_full (pthread_mutex_t *mutex)
 	  }
 
 	int newval = id;
-# ifdef NO_INCR
+#ifdef NO_INCR
 	newval |= FUTEX_WAITERS;
-# endif
+#endif
 	oldval = atomic_compare_and_exchange_val_acq (&mutex->__data.__lock,
 						      newval, 0);
 
@@ -381,9 +377,9 @@ __pthread_mutex_lock_full (pthread_mutex_t *mutex)
 	       incremented which is not correct because the old owner
 	       has to be discounted.  If we are not supposed to
 	       increment __nusers we actually have to decrement it here.  */
-# ifdef NO_INCR
+#ifdef NO_INCR
 	    --mutex->__data.__nusers;
-# endif
+#endif
 
 	    return EOWNERDEAD;
 	  }
@@ -413,7 +409,6 @@ __pthread_mutex_lock_full (pthread_mutex_t *mutex)
 	  }
       }
       break;
-#endif  /* __NR_futex.  */
 
     case PTHREAD_MUTEX_PP_RECURSIVE_NP:
     case PTHREAD_MUTEX_PP_ERRORCHECK_NP:

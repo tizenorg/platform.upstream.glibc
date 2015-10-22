@@ -1,4 +1,4 @@
-/* Copyright (C) 2011-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2011-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Chris Metcalf <cmetcalf@tilera.com>, 2011.
    Based on work contributed by Jakub Jelinek <jakub@redhat.com>, 2003.
@@ -29,7 +29,7 @@
   ((void *) (address) < (void *) demangle ((jmpbuf)[JB_SP]))
 
 #define _JMPBUF_CFA_UNWINDS_ADJ(_jmpbuf, _context, _adj) \
-  _JMPBUF_UNWINDS_ADJ (_jmpbuf, (void *) (long) _Unwind_GetCFA (_context), _adj)
+  _JMPBUF_UNWINDS_ADJ (_jmpbuf, (void *) _Unwind_GetCFA (_context), _adj)
 
 static inline uintptr_t __attribute__ ((unused))
 _jmpbuf_sp (__jmp_buf regs)

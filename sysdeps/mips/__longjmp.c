@@ -1,4 +1,4 @@
-/* Copyright (C) 1992-2015 Free Software Foundation, Inc.
+/* Copyright (C) 1992-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Brendan Kehoe (brendan@zen.org).
 
@@ -24,7 +24,9 @@
 #endif
 
 static void __attribute__ ((nomips16))
-____longjmp (__jmp_buf env_arg, int val_arg)
+____longjmp (env_arg, val_arg)
+     __jmp_buf env_arg;
+     int val_arg;
 {
   /* gcc 1.39.19 miscompiled the longjmp routine (as it did setjmp before
      the hack around it); force it to use $a1 for the longjmp value.

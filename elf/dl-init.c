@@ -1,5 +1,5 @@
 /* Run initializers for newly loaded objects.
-   Copyright (C) 1995-2015 Free Software Foundation, Inc.
+   Copyright (C) 1995-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -22,6 +22,12 @@
 
 /* Type of the initializer.  */
 typedef void (*init_t) (int, char **, char **);
+
+#ifndef HAVE_INLINED_SYSCALLS
+/* Flag, nonzero during startup phase.  */
+extern int _dl_starting_up;
+extern int _dl_starting_up_internal attribute_hidden;
+#endif
 
 
 static void
@@ -121,6 +127,7 @@ _dl_init (struct link_map *main_map, int argc, char **argv, char **env)
 
 #ifndef HAVE_INLINED_SYSCALLS
   /* Finished starting up.  */
-  _dl_starting_up = 0;
+  INTUSE(_dl_starting_up) = 0;
 #endif
 }
+INTDEF (_dl_init)

@@ -1,5 +1,5 @@
 /* Install given floating-point environment.
-   Copyright (C) 1997-2015 Free Software Foundation, Inc.
+   Copyright (C) 1997-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by David Huggins-Daines <dhd@debian.org>, 2000
    Based on the m68k version by
@@ -22,7 +22,7 @@
 #include <fenv.h>
 
 int
-__fesetenv (const fenv_t *envp)
+fesetenv (const fenv_t *envp)
 {
   union { unsigned long long buf[4]; fenv_t env; } temp;
   unsigned long long *bufptr;
@@ -60,6 +60,4 @@ __fesetenv (const fenv_t *envp)
   /* Success.  */
   return 0;
 }
-libm_hidden_def (__fesetenv)
-weak_alias (__fesetenv, fesetenv)
-libm_hidden_weak (fesetenv)
+libm_hidden_def (fesetenv)

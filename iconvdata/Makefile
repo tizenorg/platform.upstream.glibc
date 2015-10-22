@@ -1,4 +1,4 @@
-# Copyright (C) 1997-2015 Free Software Foundation, Inc.
+# Copyright (C) 1997-2014 Free Software Foundation, Inc.
 # This file is part of the GNU C Library.
 
 # The GNU C Library is free software; you can redistribute it and/or
@@ -74,6 +74,9 @@ endif
 
 test-srcs := tst-table-from tst-table-to
 endif
+
+# No code here is in libc.so.
+CPPFLAGS += -DNOT_IN_libc
 
 libJIS-routines := jis0201 jis0208 jis0212
 libKSC-routines := ksc5601
@@ -208,7 +211,6 @@ $(objpfx)iconv-rules: Makefile
 	$(AWK) 'NR == 1 { \
 		  for (i = 1; i <= NF; i++) { \
 		    printf "%s-routines := %s\n", $$i, tolower($$i); \
-		    printf "libof-%s := iconvdata\n", tolower($$i); \
 		    printf "%s-map := gconv.map\n", $$i; \
 		  } \
 		}; \
@@ -270,13 +272,6 @@ endif
 endif
 
 include ../Rules
-
-# Set libof-* for each routine.
-cpp-srcs-left := $(modules) $(generated-modules) $(libJIS-routines) \
-		 $(libKSC-routines) $(libGB-routines) $(libCNS-routines) \
-		 $(libISOIR165-routines) $(libJISX0213-routines)
-lib := iconvdata
-include $(patsubst %,$(..)cppflags-iterator.mk,$(cpp-srcs-left))
 
 tst-loading-ENV = MALLOC_TRACE=$(objpfx)tst-loading.mtrace
 $(objpfx)mtrace-tst-loading.out: $(objpfx)tst-loading.out

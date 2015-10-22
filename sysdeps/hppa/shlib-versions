@@ -1,1 +1,1 @@
-libgcc_s=4
+hppa.*-.*-.*		libgcc_s=4

@@ -1,4 +1,4 @@
-/* Copyright (C) 2004-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2004-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Jakub Jelinek <jakub@redhat.com>, 2004.
 
@@ -53,7 +53,7 @@ ENTRY (__libc_vfork)
 	br	%r14
 PSEUDO_END (__libc_vfork)
 
-#if IS_IN (libc)
+#if !NOT_IN_libc
 weak_alias (__libc_vfork, vfork)
 strong_alias (__libc_vfork, __vfork)
 libc_hidden_def (__vfork)

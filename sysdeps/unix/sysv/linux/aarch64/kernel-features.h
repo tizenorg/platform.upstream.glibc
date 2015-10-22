@@ -1,7 +1,7 @@
 /* Set flags signalling availability of kernel features based on given
    kernel version number.
 
-   Copyright (C) 2009-2015 Free Software Foundation, Inc.
+   Copyright (C) 2009-2014 Free Software Foundation, Inc.
 
    This file is part of the GNU C Library.
 
@@ -29,3 +29,6 @@
 #define __ASSUME_SENDMMSG_SYSCALL       1
 
 #include_next <kernel-features.h>
+
+/* asm-generic architectures do not have the utimes syscall.  */
+#undef __ASSUME_UTIMES

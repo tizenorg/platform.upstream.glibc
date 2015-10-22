@@ -1,4 +1,4 @@
-/* Copyright (C) 1992-2015 Free Software Foundation, Inc.
+/* Copyright (C) 1992-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Brendan Kehoe (brendan@zen.org).
 
@@ -26,7 +26,7 @@
 # include <regdef.h>
 #endif
 
-#if IS_IN (rtld)
+#ifdef IS_IN_rtld
 # include <dl-sysdep.h>         /* Defines RTLD_PRIVATE_ERRNO.  */
 #endif
 
@@ -349,7 +349,7 @@ __LABEL(name)						\
    we don't deoptimize things by placing the pointer check value there.  */
 
 #ifdef __ASSEMBLER__
-# if IS_IN (rtld)
+# ifdef IS_IN_rtld
 #  define PTR_MANGLE(dst, src, tmp)				\
 	ldah	tmp, __pointer_chk_guard_local($29) !gprelhigh;	\
 	ldq	tmp, __pointer_chk_guard_local(tmp) !gprellow;	\
@@ -371,9 +371,9 @@ __LABEL(name)						\
 # define PTR_DEMANGLE2(dst, tmp)  PTR_MANGLE2(dst, dst, tmp)
 #else
 # include <stdint.h>
-# if (IS_IN (rtld) \
-      || (!defined SHARED && (IS_IN (libc) \
-			      || IS_IN (libpthread))))
+# if (defined IS_IN_rtld \
+      || (!defined SHARED && (!defined NOT_IN_libc \
+			      || defined IS_IN_libpthread)))
 extern uintptr_t __pointer_chk_guard_local attribute_relro attribute_hidden;
 #  define PTR_MANGLE(var) \
 	(var) = (__typeof (var)) ((uintptr_t) (var) ^ __pointer_chk_guard_local)

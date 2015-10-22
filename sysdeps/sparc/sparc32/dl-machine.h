@@ -1,5 +1,5 @@
 /* Machine-dependent ELF dynamic relocation inline functions.  SPARC version.
-   Copyright (C) 1996-2015 Free Software Foundation, Inc.
+   Copyright (C) 1996-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -282,7 +282,7 @@ _dl_start_user:\n\
 	add	%o3, 4, %o3\n\
 	mov	%i5, %o1\n\
 	add	%o2, %o3, %o3\n\
-	call	_dl_init\n\
+	call	_dl_init_internal\n\
 	 ld	[%o0], %o0\n\
   /* Pass our finalizer function to the user in %g1.  */\n\
 	" RTLD_GOT_ADDRESS(%l7, %g1, _dl_fini) "\n\

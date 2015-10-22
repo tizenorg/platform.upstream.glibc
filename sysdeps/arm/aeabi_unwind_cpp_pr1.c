@@ -1,4 +1,4 @@
-/* Copyright (C) 2005-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2005-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -27,7 +27,7 @@ attribute_hidden
 void
 __aeabi_unwind_cpp_pr0 (void)
 {
-#if !IS_IN (rtld)
+#ifndef IS_IN_rtld
   abort ();
 #endif
 }
@@ -36,7 +36,7 @@ attribute_hidden
 void
 __aeabi_unwind_cpp_pr1 (void)
 {
-#if !IS_IN (rtld)
+#ifndef IS_IN_rtld
   abort ();
 #endif
 }
@@ -45,7 +45,7 @@ attribute_hidden
 void
 __aeabi_unwind_cpp_pr2 (void)
 {
-#if !IS_IN (rtld)
+#ifndef IS_IN_rtld
   abort ();
 #endif
 }

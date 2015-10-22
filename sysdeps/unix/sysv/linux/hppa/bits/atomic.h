@@ -1,4 +1,4 @@
-/* Copyright (C) 2003-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2003-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Carlos O'Donell <carlos@baldric.uwo.ca>, 2005.
 
@@ -44,9 +44,6 @@ typedef uintptr_t uatomicptr_t;
 typedef intmax_t atomic_max_t;
 typedef uintmax_t uatomic_max_t;
 
-#define __HAVE_64B_ATOMICS 0
-#define USE_ATOMIC_COMPILER_BUILTINS 0
-
 /* prev = *addr;
    if (prev == old)
      *addr = new;
@@ -67,7 +64,7 @@ typedef uintmax_t uatomic_max_t;
 # define atomic_compare_and_exchange_val_acq(mem, newval, oldval)	\
   ({									\
      volatile int lws_errno;						\
-     __typeof__ (*mem) lws_ret;						\
+     volatile int lws_ret;						\
      asm volatile(							\
 	"0:					\n\t"			\
 	"copy	%2, %%r26			\n\t"			\
@@ -96,10 +93,10 @@ typedef uintmax_t uatomic_max_t;
 
 # define atomic_compare_and_exchange_bool_acq(mem, newval, oldval)	\
   ({									\
-     __typeof__ (*mem) ret;						\
+     int ret;								\
      ret = atomic_compare_and_exchange_val_acq(mem, newval, oldval);	\
      /* Return 1 if it was already acquired.  */			\
-     (ret != oldval);							\
+     (ret != (int)oldval);						\
    })
 #else
 # error __ASSUME_LWS_CAS is required to build glibc.

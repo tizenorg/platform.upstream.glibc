@@ -1,5 +1,5 @@
 /* setjmp for s390, ELF version.
-   Copyright (C) 2000-2015 Free Software Foundation, Inc.
+   Copyright (C) 2000-2014 Free Software Foundation, Inc.
    Contributed by Martin Schwidefsky (schwidefsky@de.ibm.com).
    This file is part of the GNU C Library.
 
@@ -22,14 +22,13 @@
 #define _SETJMP_H
 #include <bits/setjmp.h>
 #include <shlib-compat.h>
-#include <stap-probe.h>
 
-#if !IS_IN (rtld)
+#if !defined IS_IN_rtld
 # if defined SHARED &&  SHLIB_COMPAT (libc, GLIBC_2_19, GLIBC_2_20)
 	/* we need a unique name in case of symbol versioning.  */
 #  define __sigsetjmp __v1__sigsetjmp
 # endif /* if defined SHARED && SHLIB_COMPAT (libc, GLIBC_2_19, GLIBC_2_20)  */
-#endif /* !IS_IN (rtld)  */
+#endif /* !defined IS_IN_rtld  */
 
 	/* We include the BSD entry points here as well but we make
 	   them weak.  */
@@ -54,9 +53,6 @@ END (__setjmp)
 
 ENTRY(__sigsetjmp)
 .Linternal_sigsetjmp:
-	/* setjmp probe expects sig/setjmp first argument (4@%r2), second
-	   argument (-4@%r3) and target address (4@%r14).  */
-	LIBC_PROBE (setjmp, 3, 4@%r2, -4@%r3, 4@%r14)
 #ifdef PTR_MANGLE
 	stm    %r6,%r13,0(%r2)      /* store registers in jmp_buf */
 	lr     %r4,%r14
@@ -69,7 +65,7 @@ ENTRY(__sigsetjmp)
 #endif
 	std    %f4,40(%r2)
 	std    %f6,48(%r2)
-#if IS_IN (rtld)
+#ifdef IS_IN_rtld
 	/* In ld.so we never save the signal mask.  */
 	lhi    %r2,0
 	br     %r14
@@ -80,7 +76,7 @@ ENTRY(__sigsetjmp)
 	basr   %r1,0
 .L0:    al     %r1,.L1 - .L0(0,%r1) /* get address of global offset table */
 				    /* get address of __sigjmp_save from got */
-	l      %r1,__sigjmp_save@GOT(%r1)
+	l      %r1,__sigjmp_save@GOT12(0,%r1)
 	br     %r1
 .L1:    .long  _GLOBAL_OFFSET_TABLE_ - .L0
 #else
@@ -91,7 +87,7 @@ ENTRY(__sigsetjmp)
 #endif
 END (__sigsetjmp)
 
-#if !IS_IN (rtld)
+#if !defined IS_IN_rtld
 # if defined SHARED &&  SHLIB_COMPAT (libc, GLIBC_2_19, GLIBC_2_20)
 /* In glibc release 2.19 new versions of setjmp-functions were introduced,
    but were reverted before 2.20. Thus both versions are the same function.  */
@@ -112,4 +108,4 @@ strong_alias (__v1__sigsetjmp, __v2__sigsetjmp);
 versioned_symbol (libc, __v1__sigsetjmp, __sigsetjmp, GLIBC_2_0);
 compat_symbol (libc, __v2__sigsetjmp, __sigsetjmp, GLIBC_2_19);
 # endif /* if defined SHARED && SHLIB_COMPAT (libc, GLIBC_2_19, GLIBC_2_20)  */
-#endif /* if !IS_IN (rtld)  */
+#endif /* if !defined IS_IN_rtld  */

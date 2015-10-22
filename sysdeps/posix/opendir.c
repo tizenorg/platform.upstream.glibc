@@ -1,4 +1,4 @@
-/* Copyright (C) 1991-2015 Free Software Foundation, Inc.
+/* Copyright (C) 1991-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -122,7 +122,7 @@ __opendirat (int dfd, const char *name)
   flags |= O_CLOEXEC;
 #endif
   int fd;
-#if IS_IN (rtld)
+#ifdef IS_IN_rtld
   assert (dfd == AT_FDCWD);
   fd = open_not_cancel_2 (name, flags);
 #else
@@ -224,7 +224,7 @@ __alloc_dir (int fd, bool close_fd, int flags, const struct stat64 *statp)
     }
 
   dirp->fd = fd;
-#if IS_IN (libc)
+#ifndef NOT_IN_libc
   __libc_lock_init (dirp->lock);
 #endif
   dirp->allocation = allocation;

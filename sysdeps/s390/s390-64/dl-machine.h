@@ -1,6 +1,6 @@
 /* Machine-dependent ELF dynamic relocation inline functions.
    64 bit S/390 Version.
-   Copyright (C) 2001-2015 Free Software Foundation, Inc.
+   Copyright (C) 2001-2014 Free Software Foundation, Inc.
    Contributed by Martin Schwidefsky (schwidefsky@de.ibm.com).
    This file is part of the GNU C Library.
 
@@ -175,7 +175,7 @@ _dl_start_user:\n\
 	lgr   %r5,%r3\n\
 	sllg  %r5,%r5,3\n\
 	la    %r5,176(%r5,%r15)\n\
-	brasl %r14,_dl_init@PLT\n\
+	brasl %r14,_dl_init_internal@PLT\n\
 	# Pass our finalizer function to the user in %r14, as per ELF ABI.\n\
 	lghi  %r14,_dl_fini@GOT\n\
 	lg    %r14,0(%r14,%r12)\n\
@@ -278,8 +278,7 @@ elf_machine_rela (struct link_map *map, const Elf64_Rela *reloc,
     return;
   else
     {
-#if !defined RTLD_BOOTSTRAP && !defined RESOLVE_CONFLICT_FIND_MAP
-      /* Only needed for R_390_COPY below.  */
+#ifndef RESOLVE_CONFLICT_FIND_MAP
       const Elf64_Sym *const refsym = sym;
 #endif
       struct link_map *sym_map = RESOLVE_MAP (&sym, version, r_type);

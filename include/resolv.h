@@ -13,7 +13,7 @@
 
 #ifdef _RESOLV_H_
 
-# if IS_IN (libc)
+# ifndef NOT_IN_libc
 #  define __resp __libc_resp
 # endif
 extern __thread struct __res_state *__resp attribute_tls_model_ie;

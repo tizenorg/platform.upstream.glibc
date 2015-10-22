@@ -1,5 +1,5 @@
 /* Assembler macros for 64 bit S/390.
-   Copyright (C) 2001-2015 Free Software Foundation, Inc.
+   Copyright (C) 2001-2014 Free Software Foundation, Inc.
    Contributed by Martin Schwidefsky (schwidefsky@de.ibm.com).
    This file is part of the GNU C Library.
 
@@ -113,7 +113,7 @@
     lghi  %r2,-1;							      \
     br    %r14
 # elif defined _LIBC_REENTRANT
-#  if IS_IN (libc)
+#  ifndef NOT_IN_libc
 #   define SYSCALL_ERROR_ERRNO __libc_errno
 #  else
 #   define SYSCALL_ERROR_ERRNO errno
@@ -372,7 +372,7 @@
     _ret; })
 
 /* Pointer mangling support.  */
-#if IS_IN (rtld)
+#ifdef IS_IN_rtld
 /* We cannot use the thread descriptor because in ld.so we use setjmp
    earlier than the descriptor is initialized.  */
 #else

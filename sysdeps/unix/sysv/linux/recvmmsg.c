@@ -1,4 +1,4 @@
-/* Copyright (C) 2010-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2010-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Andreas Schwab <schwab@redhat.com>, 2010.
 
@@ -35,7 +35,7 @@
 #ifdef __NR_recvmmsg
 int
 recvmmsg (int fd, struct mmsghdr *vmessages, unsigned int vlen, int flags,
-	  struct timespec *tmo)
+	  const struct timespec *tmo)
 {
   if (SINGLE_THREAD_P)
     return INLINE_SYSCALL (recvmmsg, 5, fd, vmessages, vlen, flags, tmo);
@@ -52,14 +52,14 @@ recvmmsg (int fd, struct mmsghdr *vmessages, unsigned int vlen, int flags,
 # ifndef __ASSUME_RECVMMSG_SOCKETCALL
 extern int __internal_recvmmsg (int fd, struct mmsghdr *vmessages,
 				unsigned int vlen, int flags,
-				struct timespec *tmo)
+				const struct timespec *tmo)
      attribute_hidden;
 
 static int have_recvmmsg;
 
 int
 recvmmsg (int fd, struct mmsghdr *vmessages, unsigned int vlen, int flags,
-	  struct timespec *tmo)
+	  const struct timespec *tmo)
 {
   if (__glibc_likely (have_recvmmsg >= 0))
     {

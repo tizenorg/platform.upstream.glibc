@@ -1,5 +1,5 @@
 /* Software floating-point emulation: float to integer conversion.
-   Copyright (C) 1997-2015 Free Software Foundation, Inc.
+   Copyright (C) 1997-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Richard Henderson (rth@cygnus.com) and
 		  Jakub Jelinek (jj@ultra.linux.cz).
@@ -33,7 +33,7 @@ _OtsCvtXQ (long al, long ah, long _round)
   _round = _round & 3;
 
   FP_INIT_ROUNDMODE;
-  AXP_UNPACK_RAW_Q(A, a);
+  FP_UNPACK_RAW_Q(A, a);
   FP_TO_INT_Q(r, A, 64, s);
   FP_HANDLE_EXCEPTIONS;
 

@@ -1,5 +1,5 @@
 /* Examine and change blocked signals for a thread.  Generic POSIX version.
-   Copyright (C) 2014-2015 Free Software Foundation, Inc.
+   Copyright (C) 2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -18,18 +18,14 @@
 
 #include <errno.h>
 #include <signal.h>
-#include <pthreadP.h>
 
-#if defined SIGCANCEL || defined SIGTIMER || defined SIGSETXID
-# error "This implementation assumes no internal-only signal numbers."
-#endif
 
 int
 pthread_sigmask (int how, const sigset_t *newmask, sigset_t *oldmask)
 {
   /* Here we assume that sigprocmask actually does everything right.
      The only difference is the return value protocol.  */
-  int result = sigprocmask (how, newmask, oldmask);
+  int result = __sigprocmask (how, newmask, oldmask);
   if (result < 0)
     result = errno;
   return result;

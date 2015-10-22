@@ -1,5 +1,5 @@
 /* Software floating-point emulation: comparison.
-   Copyright (C) 1997-2015 Free Software Foundation, Inc.
+   Copyright (C) 1997-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Richard Henderson (rth@cygnus.com) and
 		  Jakub Jelinek (jj@ultra.linux.cz).
@@ -27,11 +27,16 @@ internal_compare (long al, long ah, long bl, long bh)
   FP_DECL_Q(A); FP_DECL_Q(B);
   long r;
 
-  AXP_UNPACK_RAW_Q(A, a);
-  AXP_UNPACK_RAW_Q(B, b);
-  FP_CMP_Q (r, A, B, 2, 2);
+  FP_UNPACK_RAW_Q(A, a);
+  FP_UNPACK_RAW_Q(B, b);
+  FP_CMP_Q (r, A, B, 2);
 
-  FP_HANDLE_EXCEPTIONS;
+  /* Relative comparisons signal invalid operation if either operand is NaN. */
+  if (r == 2)
+    {
+      FP_SET_EXCEPTION(FP_EX_INVALID);
+      FP_HANDLE_EXCEPTIONS;
+    }
 
   return r;
 }

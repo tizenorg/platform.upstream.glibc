@@ -1,4 +1,4 @@
-/* Copyright (C) 2011-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2011-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@gmail.com>, 2011.
 
@@ -27,7 +27,7 @@ invalid_fn (double x, double fn)
 {
   if (__rint (fn) != fn)
     {
-      __feraiseexcept (FE_INVALID);
+      feraiseexcept (FE_INVALID);
       return __nan ("");
     }
   else if (fn > 65000.0)

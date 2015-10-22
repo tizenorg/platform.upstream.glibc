@@ -1,5 +1,5 @@
 /* Store current floating-point environment and clear exceptions.
-   Copyright (C) 2000-2015 Free Software Foundation, Inc.
+   Copyright (C) 2000-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by David Huggins-Daines <dhd@debian.org>, 2000
 
@@ -21,7 +21,7 @@
 #include <string.h>
 
 int
-__feholdexcept (fenv_t *envp)
+feholdexcept (fenv_t *envp)
 {
   union { unsigned long long buf[4]; fenv_t env; } clear;
   unsigned long long *bufptr;
@@ -50,6 +50,4 @@ __feholdexcept (fenv_t *envp)
   return 0;
 }
 
-libm_hidden_def (__feholdexcept)
-weak_alias (__feholdexcept, feholdexcept)
-libm_hidden_weak (feholdexcept)
+libm_hidden_def (feholdexcept)

@@ -1,4 +1,4 @@
-# Copyright (C) 1991-2015 Free Software Foundation, Inc.
+# Copyright (C) 1991-2014 Free Software Foundation, Inc.
 # This file is part of the GNU C Library.
 
 # The GNU C Library is free software; you can redistribute it and/or
@@ -284,7 +284,7 @@ installed-headers = argp/argp.h assert/assert.h catgets/nl_types.h \
 		    malloc/obstack.h malloc/mcheck.h math/math.h \
 		    math/complex.h math/fenv.h math/tgmath.h misc/sys/uio.h \
 		    $(wildcard nis/rpcsvc/*.h) nptl_db/thread_db.h \
-		    sysdeps/nptl/pthread.h sysdeps/pthread/semaphore.h \
+		    sysdeps/nptl/pthread.h nptl/semaphore.h \
 		    nss/nss.h posix/sys/utsname.h posix/sys/times.h \
 		    posix/sys/wait.h posix/sys/types.h posix/unistd.h \
 		    posix/glob.h posix/regex.h posix/wordexp.h posix/fnmatch.h\

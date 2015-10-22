@@ -1,6 +1,6 @@
 /* Machine-dependent ELF dynamic relocation inline functions.
    PowerPC64 version.
-   Copyright 1995-2015 Free Software Foundation, Inc.
+   Copyright 1995-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -126,7 +126,7 @@ elf_machine_dynamic (void)
 #else
 # define DL_STARTING_UP_DEF \
 ".LC__dl_starting_up:\n"  \
-"	.tc __GI__dl_starting_up[TC],__GI__dl_starting_up\n"
+"	.tc _dl_starting_up_internal[TC],_dl_starting_up_internal\n"
 #endif
 
 
@@ -169,7 +169,7 @@ DL_STARTING_UP_DEF							\
 ".LC__dl_argc:\n"							\
 "	.tc _dl_argc[TC],_dl_argc\n"					\
 ".LC__dl_argv:\n"							\
-"	.tc __GI__dl_argv[TC],__GI__dl_argv\n"				\
+"	.tc _dl_argv_internal[TC],_dl_argv_internal\n"			\
 ".LC__dl_fini:\n"							\
 "	.tc _dl_fini[TC],_dl_fini\n"					\
 "	.popsection\n"							\
@@ -623,9 +623,7 @@ resolve_ifunc (Elf64_Addr value,
       opd.fd_func = func->fd_func + sym_map->l_addr;
       opd.fd_toc = func->fd_toc + sym_map->l_addr;
       opd.fd_aux = func->fd_aux;
-      /* GCC 4.9+ eliminates the branch as dead code, force the odp set
-         dependency.  */
-      asm ("" : "=r" (value) : "0" (&opd), "X" (opd));
+      value = (Elf64_Addr) &opd;
     }
 #endif
 #endif

@@ -1,5 +1,5 @@
 /* Inner loops of cache daemon.
-   Copyright (C) 1998-2015 Free Software Foundation, Inc.
+   Copyright (C) 1998-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@cygnus.com>, 1998.
 
@@ -59,7 +59,6 @@
 #include <resolv/resolv.h>
 
 #include <kernel-features.h>
-#include <libc-internal.h>
 
 
 /* Support to run nscd as an unprivileged user */
@@ -1465,7 +1464,7 @@ cannot change to old UID: %s; disabling paranoia mode"),
 cannot change to old GID: %s; disabling paranoia mode"),
 		   strerror (errno));
 
-	  ignore_value (setuid (server_uid));
+	  setuid (server_uid);
 	  paranoia = 0;
 	  return;
 	}
@@ -1480,8 +1479,8 @@ cannot change to old working directory: %s; disabling paranoia mode"),
 
       if (server_user != NULL)
 	{
-	  ignore_value (setuid (server_uid));
-	  ignore_value (setgid (server_gid));
+	  setuid (server_uid);
+	  setgid (server_gid);
 	}
       paranoia = 0;
       return;
@@ -1525,8 +1524,8 @@ cannot change to old working directory: %s; disabling paranoia mode"),
 
   if (server_user != NULL)
     {
-      ignore_value (setuid (server_uid));
-      ignore_value (setgid (server_gid));
+      setuid (server_uid);
+      setgid (server_gid);
     }
   if (chdir ("/") != 0)
     dbg_log (_("cannot change current working directory to \"/\": %s"),

@@ -1,4 +1,4 @@
-/* Copyright (C) 2003-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2003-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Martin Schwidefsky <schwidefsky@de.ibm.com>, 2003.
 
@@ -98,7 +98,9 @@ __condvar_cleanup (void *arg)
 
 
 int
-__pthread_cond_wait (pthread_cond_t *cond, pthread_mutex_t *mutex)
+__pthread_cond_wait (cond, mutex)
+     pthread_cond_t *cond;
+     pthread_mutex_t *mutex;
 {
   struct _pthread_cleanup_buffer buffer;
   struct _condvar_cleanup_buffer cbuffer;

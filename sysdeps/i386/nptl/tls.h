@@ -1,5 +1,5 @@
 /* Definition for thread-local data handling.  nptl/i386 version.
-   Copyright (C) 2002-2015 Free Software Foundation, Inc.
+   Copyright (C) 2002-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -141,6 +141,9 @@ union user_desc_init
 # define GET_DTV(descr) \
   (((tcbhead_t *) (descr))->dtv)
 
+#define THREAD_SELF_SYSINFO	THREAD_GETMEM (THREAD_SELF, header.sysinfo)
+#define THREAD_SYSINFO(pd)	((pd)->header.sysinfo)
+
 /* Macros to load from and store into segment registers.  */
 # ifndef TLS_GET_GS
 #  define TLS_GET_GS() \
@@ -151,13 +154,9 @@ union user_desc_init
   __asm ("movw %w0, %%gs" :: "q" (val))
 # endif
 
-#ifdef NEED_DL_SYSINFO
+#if defined NEED_DL_SYSINFO
 # define INIT_SYSINFO \
   _head->sysinfo = GLRO(dl_sysinfo)
-# define SETUP_THREAD_SYSINFO(pd) \
-  ((pd)->header.sysinfo = THREAD_GETMEM (THREAD_SELF, header.sysinfo))
-# define CHECK_THREAD_SYSINFO(pd) \
-  assert ((pd)->header.sysinfo == THREAD_GETMEM (THREAD_SELF, header.sysinfo))
 #else
 # define INIT_SYSINFO
 #endif

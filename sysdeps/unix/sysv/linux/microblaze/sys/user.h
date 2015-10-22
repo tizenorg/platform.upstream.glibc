@@ -1,4 +1,4 @@
-/* Copyright (C) 2009-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2009-2014 Free Software Foundation, Inc.
 
    This file is part of the GNU C Library.
 
@@ -65,5 +65,13 @@ struct user
   char				u_comm [32];
   int				u_debugreg [8];
 };
+
+# define PAGE_SHIFT		12
+# define PAGE_SIZE		(1UL << PAGE_SHIFT)
+# define PAGE_MASK		(~(PAGE_SIZE-1))
+# define NBPG			PAGE_SIZE
+# define UPAGES		1
+# define HOST_TEXT_START_ADDR	(u.start_code)
+# define HOST_STACK_END_ADDR	(u.start_stack + u.u_ssize * NBPG)
 
 #endif	/* _SYS_USER_H */

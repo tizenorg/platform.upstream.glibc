@@ -1,4 +1,4 @@
-/* Copyright (C) 2002-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2002-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -18,7 +18,7 @@
 
 #include <pthreadP.h>
 
-#if IS_IN (libc)
+#ifndef NOT_IN_libc
 # ifndef TLS_MULTIPLE_THREADS_IN_TCB
 /* Variable set to a nonzero value either if more than one thread runs or ran,
    or if a single-threaded process is trying to cancel itself.  See

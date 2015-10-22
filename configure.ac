@@ -151,6 +151,18 @@ AC_ARG_ENABLE([profile],
 	      [profile=$enableval],
 	      [profile=no])
 
+AC_ARG_ENABLE([oldest-abi],
+	      AC_HELP_STRING([--enable-oldest-abi=ABI],
+			     [configure the oldest ABI supported @<:@e.g. 2.2@:>@ @<:@default=glibc default@:>@]),
+	      [oldest_abi=$enableval],
+	      [oldest_abi=no])
+if test "$oldest_abi" = yes || test "$oldest_abi" = no; then
+  oldest_abi=default
+else
+  AC_DEFINE_UNQUOTED(GLIBC_OLDEST_ABI, "$oldest_abi")
+fi
+AC_SUBST(oldest_abi)
+
 AC_ARG_ENABLE([hardcoded-path-in-tests],
 	      AC_HELP_STRING([--enable-hardcoded-path-in-tests],
 			     [hardcode newly built glibc path in tests @<:@default=no@:>@]),
@@ -253,13 +265,6 @@ AC_ARG_ENABLE([all-warnings],
 	      [])
 AC_SUBST(all_warnings)
 
-AC_ARG_ENABLE([werror],
-	      AC_HELP_STRING([--disable-werror],
-			     [do not build with -Werror]),
-	      [enable_werror=$enableval],
-	      [enable_werror=yes])
-AC_SUBST(enable_werror)
-
 AC_ARG_ENABLE([multi-arch],
 	      AC_HELP_STRING([--enable-multi-arch],
 			     [enable single DSO with optimizations for multiple architectures]),
@@ -359,6 +364,19 @@ AC_SUBST(build_pt_chown)
 if test "$build_pt_chown" = yes; then
   AC_DEFINE(HAVE_PT_CHOWN)
 fi
+
+# The way shlib-versions is used to generate soversions.mk uses a
+# fairly simplistic model for name recognition that can't distinguish
+# i486-pc-linux-gnu fully from i486-pc-gnu.  So we mutate a $host_os
+# of `gnu*' here to be `gnu-gnu*' just so that shlib-versions can
+# tell.  This doesn't get used much beyond that, so it's fairly safe.
+case "$host_os" in
+linux*)
+  ;;
+gnu*)
+  host_os=`echo $host_os | sed -e 's/gnu/gnu-gnu/'`
+  ;;
+esac
 
 # We keep the original values in `$config_*' and never modify them, so we
 # can write them unchanged into config.make.  Everything else uses
@@ -907,18 +925,19 @@ AC_PROG_LN_S
 
 LIBC_PROG_BINUTILS
 
-# Accept binutils 2.22 or newer.
+# Accept binutils 2.20 or newer.
 AC_CHECK_PROG_VER(AS, $AS, --version,
 		  [GNU assembler.* \([0-9]*\.[0-9.]*\)],
-		  [2.1[0-9][0-9]*|2.2[2-9]*|2.[3-9][0-9]*|[3-9].*|[1-9][0-9]*],
-		  AS=: critic_missing="$critic_missing as")
+		  [2.1[0-9][0-9]*|2.[2-9][0-9]*|[3-9].*|[1-9][0-9]*], AS=: critic_missing="$critic_missing as")
 AC_CHECK_PROG_VER(LD, $LD, --version,
 		  [GNU ld.* \([0-9][0-9]*\.[0-9.]*\)],
-		  [2.1[0-9][0-9]*|2.2[2-9]*|2.[3-9][0-9]*|[3-9].*|[1-9][0-9]*],
-		  LD=: critic_missing="$critic_missing ld")
+		  [2.1[0-9][0-9]*|2.[2-9][0-9]*|[3-9].*|[1-9][0-9]*], LD=: critic_missing="$critic_missing ld")
 
 # These programs are version sensitive.
 AC_CHECK_TOOL_PREFIX
+AC_CHECK_PROG_VER(CC, ${ac_tool_prefix}gcc ${ac_tool_prefix}cc, -v,
+  [version \([egcygnustpi-]*[0-9.]*\)], [4.[4-9].* | 4.[1-9][0-9].* | [5-9].* ],
+  critic_missing="$critic_missing gcc")
 AC_CHECK_PROG_VER(MAKE, gnumake gmake make, --version,
   [GNU Make[^0-9]*\([0-9][0-9.]*\)],
   [3.79* | 3.[89]* | [4-9].* | [1-9][0-9]*], critic_missing="$critic_missing make")
@@ -929,7 +948,7 @@ AC_CHECK_PROG_VER(MSGFMT, gnumsgfmt gmsgfmt msgfmt, --version,
   MSGFMT=: aux_missing="$aux_missing msgfmt")
 AC_CHECK_PROG_VER(MAKEINFO, makeinfo, --version,
   [GNU texinfo.* \([0-9][0-9.]*\)],
-  [4.[7-9]*|4.[1-9][0-9]*|[5-9].*],
+  [4.[5-9]*|4.[1-9][0-9]*|[5-9].*],
   MAKEINFO=: aux_missing="$aux_missing makeinfo")
 AC_CHECK_PROG_VER(SED, sed, --version,
   [GNU sed[^0-9]* \([0-9]*\.[0-9.]*\)],
@@ -938,16 +957,6 @@ AC_CHECK_PROG_VER(SED, sed, --version,
 AC_CHECK_PROG_VER(AWK, gawk, --version,
   [GNU Awk[^0-9]*\([0-9][0-9.]*\)],
   [3.1.[2-9]*|3.[2-9]*|[4-9]*], critic_missing="$critic_missing gawk")
-
-AC_CACHE_CHECK([if $CC is sufficient to build libc], libc_cv_compiler_ok, [
-AC_TRY_COMPILE([], [
-#if !defined __GNUC__ || __GNUC__ < 4 || (__GNUC__ == 4 && __GNUC_MINOR__ < 6)
-#error insufficient compiler
-#endif],
-	       [libc_cv_compiler_ok=yes],
-	       [libc_cv_compiler_ok=no])])
-AS_IF([test $libc_cv_compiler_ok != yes],
-      [critic_missing="$critic_missing compiler"])
 
 AC_CHECK_TOOL(NM, nm, false)
 
@@ -1048,10 +1057,7 @@ if test "$PERL" != no &&
 fi
 AC_PATH_PROG(INSTALL_INFO, install-info, no,
 	     $PATH:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin)
-AC_CHECK_PROG_VER(BISON, bison, --version,
-		  [bison (GNU Bison) \([0-9]*\.[0-9.]*\)],
-		  [2.7*|[3-9].*|[1-9][0-9]*],
-		  BISON=no)
+AC_PATH_PROG(BISON, bison, no, $PATH:/usr/local/bin:/usr/bin:/bin)
 
 AC_CACHE_CHECK(for libc-friendly stddef.h, libc_cv_friendly_stddef, [dnl
 AC_TRY_COMPILE(dnl

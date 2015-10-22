@@ -1,5 +1,5 @@
 /* Skeleton for a conversion module.
-   Copyright (C) 1998-2015 Free Software Foundation, Inc.
+   Copyright (C) 1998-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@cygnus.com>, 1998.
 
@@ -501,9 +501,8 @@ FUNCTION_NAME (struct __gconv_step *step, struct __gconv_step_data *data,
     }
   else
     {
-      /* We preserve the initial values of the pointer variables,
-	 but only some conversion modules need it.  */
-      const unsigned char *inptr __attribute__ ((__unused__)) = *inptrp;
+      /* We preserve the initial values of the pointer variables.  */
+      const unsigned char *inptr = *inptrp;
       unsigned char *outbuf = (__builtin_expect (outbufstart == NULL, 1)
 			       ? data->__outbuf : *outbufstart);
       unsigned char *outend = data->__outbufend;
@@ -593,6 +592,8 @@ FUNCTION_NAME (struct __gconv_step *step, struct __gconv_step_data *data,
 
       while (1)
 	{
+	  struct __gconv_trans_data *trans;
+
 	  /* Remember the start value for this round.  */
 	  inptr = *inptrp;
 	  /* The outbuf buffer is empty.  */
@@ -638,6 +639,13 @@ FUNCTION_NAME (struct __gconv_step *step, struct __gconv_step_data *data,
 	      *outbufstart = outbuf;
 	      return status;
 	    }
+
+	  /* Give the transliteration module the chance to store the
+	     original text and the result in case it needs a context.  */
+	  for (trans = data->__trans; trans != NULL; trans = trans->__next)
+	    if (trans->__trans_context_fct != NULL)
+	      DL_CALL_FCT (trans->__trans_context_fct,
+			   (trans->__data, inptr, *inptrp, outstart, outbuf));
 
 	  /* We finished one use of the loops.  */
 	  ++data->__invocation_counter;

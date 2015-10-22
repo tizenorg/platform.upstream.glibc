@@ -1,5 +1,5 @@
 /* termios type and macro definitions.  Linux/MIPS version.
-   Copyright (C) 1993-2015 Free Software Foundation, Inc.
+   Copyright (C) 1993-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -197,10 +197,8 @@ struct termios
 # define EXTPROC 0200000
 #endif
 
-#ifdef __USE_MISC
 /* ioctl (fd, TIOCSERGETLSR, &result) where result may be as below */
-# define TIOCSER_TEMT    0x01	/* Transmitter physically empty */
-#endif
+#define TIOCSER_TEMT    0x01	/* Transmitter physically empty */
 
 /* tcflow() and TCXONC use these */
 #define	TCOOFF		0	/* Suspend output.  */

@@ -1,5 +1,5 @@
 /* Cache memory handling.
-   Copyright (C) 2004-2015 Free Software Foundation, Inc.
+   Copyright (C) 2004-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 2004.
 
@@ -423,8 +423,8 @@ gc (struct database_dyn *db)
 
       if (__glibc_unlikely (debug_level >= 3))
 	dbg_log (_("freed %zu bytes in %s cache"),
-		 (size_t) (db->head->first_free
-			   - ((char *) moves->to + moves->size - db->data)),
+		 db->head->first_free
+		 - ((char *) moves->to + moves->size - db->data),
 		 dbnames[db - dbs]);
 
       /* The byte past the end of the last copied block is the next

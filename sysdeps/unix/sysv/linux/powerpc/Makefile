@@ -3,8 +3,10 @@ abi-32-options := -U__powerpc64__
 abi-32-condition := __WORDSIZE == 32
 abi-64-v1-options := -D__powerpc64__ -U_CALL_ELF -D_CALL_ELF=1
 abi-64-v1-condition := __WORDSIZE == 64 && _CALL_ELF != 2
+abi-64-v1-ld-soname := ld64.so.1
 abi-64-v2-options := -D__powerpc64__ -U_CALL_ELF -D_CALL_ELF=2
 abi-64-v2-condition := __WORDSIZE == 64 && _CALL_ELF == 2
+abi-64-v2-ld-soname := ld64.so.2
 
 ifeq ($(subdir),rt)
 librt-routines += rt-sysdep
@@ -32,6 +34,4 @@ endif
 
 ifeq ($(subdir),nptl)
 libpthread-routines += sysdep
-libpthread-sysdep_routines += elision-lock elision-unlock elision-timed \
-			      elision-trylock
 endif

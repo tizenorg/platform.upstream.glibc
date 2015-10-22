@@ -1,4 +1,4 @@
-/* Copyright (C) 2011-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2011-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Chris Metcalf <cmetcalf@tilera.com>, 2011.
 
@@ -22,7 +22,7 @@
 # include <nptl/pthreadP.h>
 #endif
 
-#if IS_IN (libc) || IS_IN (libpthread) || IS_IN (librt)
+#if !defined NOT_IN_libc || defined IS_IN_libpthread || defined IS_IN_librt
 
 /* Allow hacking in some extra code if desired. */
 #ifndef PSEUDO_EXTRA
@@ -117,10 +117,10 @@
 
 # define STKSPACE	(13 * REGSIZE)
 
-# if IS_IN (libpthread)
+# ifdef IS_IN_libpthread
 #  define CENABLE	jal __pthread_enable_asynccancel
 #  define CDISABLE	jal __pthread_disable_asynccancel
-# elif IS_IN (librt)
+# elif defined IS_IN_librt
 #  define CENABLE	jal __librt_enable_asynccancel
 #  define CDISABLE	jal __librt_disable_asynccancel
 # else

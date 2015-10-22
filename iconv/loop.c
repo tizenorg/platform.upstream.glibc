@@ -1,5 +1,5 @@
 /* Conversion loop frame work.
-   Copyright (C) 1998-2015 Free Software Foundation, Inc.
+   Copyright (C) 1998-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@cygnus.com>, 1998.
 
@@ -56,7 +56,7 @@
 #include <sys/param.h>		/* For MIN.  */
 #define __need_size_t
 #include <stddef.h>
-#include <libc-internal.h>
+
 
 /* We have to provide support for machines which are not able to handled
    unaligned memory accesses.  Some of the character encodings have
@@ -213,6 +213,8 @@
    points.  */
 #define STANDARD_TO_LOOP_ERR_HANDLER(Incr) \
   {									      \
+    struct __gconv_trans_data *trans;					      \
+									      \
     result = __GCONV_ILLEGAL_INPUT;					      \
 									      \
     if (irreversible == NULL)						      \
@@ -225,10 +227,14 @@
     UPDATE_PARAMS;							      \
 									      \
     /* First try the transliteration methods.  */			      \
-    if ((step_data->__flags & __GCONV_TRANSLIT) != 0)			      \
-      result = __gconv_transliterate					      \
-	(step, step_data, *inptrp,					      \
-	 &inptr, inend, &outptr, irreversible);			      \
+    for (trans = step_data->__trans; trans != NULL; trans = trans->__next)    \
+      {									      \
+	result = DL_CALL_FCT (trans->__trans_fct,			      \
+			      (step, step_data, trans->__data, *inptrp,	      \
+			       &inptr, inend, &outptr, irreversible));	      \
+	if (result != __GCONV_ILLEGAL_INPUT)				      \
+	  break;							      \
+      }									      \
 									      \
     REINIT_PARAMS;							      \
 									      \
@@ -392,14 +398,8 @@ SINGLE(LOOPFCT) (struct __gconv_step *step,
     {
       *inptrp = inend;
 #  ifdef STORE_REST
-
-      /* Building with -O3 GCC emits a `array subscript is above array
-	 bounds' warning.  GCC BZ #64739 has been opened for this.  */
-      DIAG_PUSH_NEEDS_COMMENT;
-      DIAG_IGNORE_NEEDS_COMMENT (4.9, "-Warray-bounds");
       while (inptr < inend)
 	bytebuf[inlen++] = *inptr++;
-      DIAG_POP_NEEDS_COMMENT;
 
       inptr = bytebuf;
       inptrp = &inptr;

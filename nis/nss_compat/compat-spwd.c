@@ -1,4 +1,4 @@
-/* Copyright (C) 1996-2015 Free Software Foundation, Inc.
+/* Copyright (C) 1996-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Thorsten Kukuk <kukuk@vt.uni-paderborn.de>, 1996.
 
@@ -532,7 +532,7 @@ getspent_next_file (struct spwd *result, ent_t *ent,
 	  char *user, *host, *domain;
 	  struct __netgrent netgrdata;
 
-	  memset (&netgrdata, 0, sizeof (struct __netgrent));
+	  bzero (&netgrdata, sizeof (struct __netgrent));
 	  __internal_setnetgrent (&result->sp_namp[2], &netgrdata);
 	  while (__internal_getnetgrent_r (&host, &user, &domain,
 					   &netgrdata, buf2, sizeof (buf2),

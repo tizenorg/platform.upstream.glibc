@@ -1,6 +1,6 @@
 #! /bin/sh -f
 # Run available iconv(1) tests.
-# Copyright (C) 1998-2015 Free Software Foundation, Inc.
+# Copyright (C) 1998-2014 Free Software Foundation, Inc.
 # This file is part of the GNU C Library.
 # Contributed by Ulrich Drepper <drepper@cygnus.com>, 1998.
 
@@ -189,7 +189,7 @@ printf '\016\377\377\377\377\377\377\377' > $temp1
 for from in $iconv_modules ; do
     echo $ac_n "test decoder $from $ac_c"
     PROG=`eval echo $ICONV`
-    if $PROG -f $from -t UTF8 < $temp1 >/dev/null 2>&1 ; then
+    if $PROG < $temp1 >/dev/null 2>&1 ; then
 	: # fall through
     else
 	status=$?

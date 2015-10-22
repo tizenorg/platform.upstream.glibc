@@ -1,4 +1,4 @@
-/* Copyright (C) 2004-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2004-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -66,7 +66,7 @@ ENTRY (__libc_vfork)
 	.align	2
 PSEUDO_END (__libc_vfork)
 
-#if IS_IN (libc)
+#if !NOT_IN_libc
 weak_alias (__libc_vfork, vfork)
 strong_alias (__libc_vfork, __vfork)
 libc_hidden_def (__vfork)

@@ -1,5 +1,5 @@
 /* Resolve function pointers to VDSO functions.
-   Copyright (C) 2010-2015 Free Software Foundation, Inc.
+   Copyright (C) 2010-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Maxim Kuvyrkov <maxim@codesourcery.com>, 2010.
 
@@ -23,7 +23,7 @@
 
 #ifdef SHARED
 
-# if IS_IN (rtld)
+# ifdef IS_IN_rtld
 # define M68K_VDSO_SYMBOL(name) __rtld_##name
 # define STR_M68K_VDSO_SYMBOL(name) "__rtld_" #name
 # else
@@ -35,7 +35,7 @@
 
 /* We define __rtld_* copies for rtld.
    We need them visible in libc to initialize.  */
-#  if IS_IN (rtld) || IS_IN (libc)
+#  if defined IS_IN_rtld || !defined NOT_IN_libc
 extern void *__rtld___vdso_read_tp;
 extern void *__rtld___vdso_atomic_cmpxchg_32;
 extern void *__rtld___vdso_atomic_barrier;
@@ -44,14 +44,14 @@ extern void *__rtld___vdso_atomic_barrier;
 extern void __vdso_read_tp_stub (void);
 extern void __vdso_atomic_cmpxchg_32_stub (void);
 extern void __vdso_atomic_barrier_stub (void);
-#  endif /* IS_IN (rtld) || IS_IN (libc) */
+#  endif /* IS_IN_rtld || !NOT_IN_libc */
 
 /* RTLD should only use its own copies.  */
-#  if !IS_IN (rtld)
+#  ifndef IS_IN_rtld
 extern void *__vdso_read_tp;
 extern void *__vdso_atomic_cmpxchg_32;
 extern void *__vdso_atomic_barrier;
-#  endif /* !IS_IN (rtld) */
+#  endif /* !IS_IN_rtld */
 
 # endif /* !__ASSEMBLER__ */
 

@@ -1,4 +1,4 @@
-# Copyright (C) 1991-2015 Free Software Foundation, Inc.
+# Copyright (C) 1991-2014 Free Software Foundation, Inc.
 # This file is part of the GNU C Library.
 
 # The GNU C Library is free software; you can redistribute it and/or
@@ -48,6 +48,8 @@ extra-objs = mcheck-init.o libmcheck.a
 # Include the cleanup handler.
 aux := set-freeres thread-freeres
 
+CPPFLAGS-memusagestat = -DNOT_IN_libc
+
 # The Perl script to analyze the output of the mtrace functions.
 ifneq ($(PERL),no)
 install-bin-script = mtrace
@@ -87,11 +89,6 @@ endif
 do-memusagestat: $(objpfx)memusagestat
 
 memusagestat-modules = memusagestat
-
-cpp-srcs-left := $(memusagestat-modules)
-lib := memusagestat
-include $(patsubst %,$(..)cppflags-iterator.mk,$(cpp-srcs-left))
-
 $(objpfx)memusagestat: $(memusagestat-modules:%=$(objpfx)%.o)
 	$(LINK.o) -o $@ $^ $(libgd-LDFLAGS) -lgd -lpng -lz -lm
 

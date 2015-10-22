@@ -1,4 +1,4 @@
-/* Copyright (C) 2003-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2003-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Jakub Jelinek <jakub@redhat.com>.
 
@@ -22,12 +22,12 @@
 #include <pthreadP.h>
 #include <sysdep.h>
 #include <gnu/lib-names.h>
-#include <unwind-resume.h>
 
 static void *libgcc_s_handle;
-void (*__libgcc_s_resume) (struct _Unwind_Exception *exc)
-  attribute_hidden __attribute__ ((noreturn));
-static _Unwind_Reason_Code (*libgcc_s_personality) PERSONALITY_PROTO;
+static void (*libgcc_s_resume) (struct _Unwind_Exception *exc);
+static _Unwind_Reason_Code (*libgcc_s_personality)
+  (int, _Unwind_Action, _Unwind_Exception_Class, struct _Unwind_Exception *,
+   struct _Unwind_Context *);
 static _Unwind_Reason_Code (*libgcc_s_forcedunwind)
   (struct _Unwind_Exception *, _Unwind_Stop_Fn, void *);
 static _Unwind_Word (*libgcc_s_getcfa) (struct _Unwind_Context *);
@@ -64,7 +64,7 @@ pthread_cancel_init (void)
     __libc_fatal (LIBGCC_S_SO " must be installed for pthread_cancel to work\n");
 
   PTR_MANGLE (resume);
-  __libgcc_s_resume = resume;
+  libgcc_s_resume = resume;
   PTR_MANGLE (personality);
   libgcc_s_personality = personality;
   PTR_MANGLE (forcedunwind);
@@ -90,7 +90,6 @@ __unwind_freeres (void)
     }
 }
 
-#if !HAVE_ARCH_UNWIND_RESUME
 void
 _Unwind_Resume (struct _Unwind_Exception *exc)
 {
@@ -99,23 +98,27 @@ _Unwind_Resume (struct _Unwind_Exception *exc)
   else
     atomic_read_barrier ();
 
-  void (*resume) (struct _Unwind_Exception *exc) = __libgcc_s_resume;
+  void (*resume) (struct _Unwind_Exception *exc) = libgcc_s_resume;
   PTR_DEMANGLE (resume);
   resume (exc);
 }
-#endif
 
 _Unwind_Reason_Code
-__gcc_personality_v0 PERSONALITY_PROTO
+__gcc_personality_v0 (int version, _Unwind_Action actions,
+		      _Unwind_Exception_Class exception_class,
+		      struct _Unwind_Exception *ue_header,
+		      struct _Unwind_Context *context)
 {
   if (__glibc_unlikely (libgcc_s_handle == NULL))
     pthread_cancel_init ();
   else
     atomic_read_barrier ();
 
-  __typeof (libgcc_s_personality) personality = libgcc_s_personality;
+  _Unwind_Reason_Code (*personality)
+    (int, _Unwind_Action, _Unwind_Exception_Class, struct _Unwind_Exception *,
+     struct _Unwind_Context *) = libgcc_s_personality;
   PTR_DEMANGLE (personality);
-  return (*personality) PERSONALITY_ARGS;
+  return personality (version, actions, exception_class, ue_header, context);
 }
 
 _Unwind_Reason_Code

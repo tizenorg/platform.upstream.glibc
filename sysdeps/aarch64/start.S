@@ -1,4 +1,4 @@
-/* Copyright (C) 1995-2015 Free Software Foundation, Inc.
+/* Copyright (C) 1995-2014 Free Software Foundation, Inc.
 
    This file is part of the GNU C Library.
 
@@ -47,6 +47,7 @@ _start:
 	/* Create an initial frame with 0 LR and FP */
 	mov	x29, #0
 	mov	x30, #0
+	mov	x29, sp
 
 	/* Setup rtld_fini in argument register */
 	mov	x5, x0

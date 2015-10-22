@@ -1,4 +1,4 @@
-/* Copyright (C) 1997-2015 Free Software Foundation, Inc.
+/* Copyright (C) 1997-2014 Free Software Foundation, Inc.
 
    This file is part of the GNU C Library.
 
@@ -17,11 +17,16 @@
    <http://www.gnu.org/licenses/>.  */
 
 #include <fenv.h>
-#include <math_private.h>
+#include <fpu_control.h>
 
 int
 fetestexcept (int excepts)
 {
-  return libc_fetestexcept_aarch64 (excepts);
+  fpu_fpsr_t fpsr;
+
+  /* Get current exceptions.  */
+  _FPU_GETFPSR (fpsr);
+
+  return fpsr & excepts & FE_ALL_EXCEPT;
 }
 libm_hidden_def (fetestexcept)

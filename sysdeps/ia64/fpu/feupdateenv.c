@@ -1,5 +1,5 @@
 /* Install given floating-point environment and raise exceptions.
-   Copyright (C) 1997-2015 Free Software Foundation, Inc.
+   Copyright (C) 1997-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Christian Boissat <Christian.Boissat@cern.ch>, 1999.
 
@@ -20,7 +20,7 @@
 #include <fenv.h>
 
 int
-__feupdateenv (const fenv_t *envp)
+feupdateenv (const fenv_t *envp)
 {
   fenv_t fpsr;
 
@@ -29,14 +29,12 @@ __feupdateenv (const fenv_t *envp)
   __asm__ __volatile__ ("mov.m %0=ar.fpsr" : "=r" (fpsr));
 
   /* Install new environment.  */
-  __fesetenv (envp);
+  fesetenv (envp);
 
   /* Raise the saved exceptions.  */
-  __feraiseexcept ((int) (fpsr >> 13) & FE_ALL_EXCEPT);
+  feraiseexcept ((int) (fpsr >> 13) & FE_ALL_EXCEPT);
 
   /* Success.  */
   return 0;
 }
-libm_hidden_def (__feupdateenv)
-weak_alias (__feupdateenv, feupdateenv)
-libm_hidden_weak (feupdateenv)
+libm_hidden_def (feupdateenv)

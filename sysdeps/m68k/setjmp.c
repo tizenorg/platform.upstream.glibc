@@ -1,4 +1,4 @@
-/* Copyright (C) 1991-2015 Free Software Foundation, Inc.
+/* Copyright (C) 1991-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -57,7 +57,7 @@ __sigsetjmp (jmp_buf env, int savemask)
 		: : "m" (env[0].__jmpbuf[0].__fpregs[0]));
 #endif
 
-#if IS_IN (rtld)
+#ifdef IS_IN_rtld
   /* In ld.so we never save the signal mask.  */
   return 0;
 #else

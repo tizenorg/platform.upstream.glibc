@@ -1,5 +1,5 @@
 /* Software floating-point emulation: comparison.
-   Copyright (C) 1997-2015 Free Software Foundation, Inc.
+   Copyright (C) 1997-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Richard Henderson (rth@cygnus.com) and
 		  Jakub Jelinek (jj@ultra.linux.cz).
@@ -27,8 +27,8 @@ internal_equality (long al, long ah, long bl, long bh, long neq)
   FP_DECL_Q(A); FP_DECL_Q(B);
   long r;
 
-  AXP_UNPACK_RAW_Q(A, a);
-  AXP_UNPACK_RAW_Q(B, b);
+  FP_UNPACK_RAW_Q(A, a);
+  FP_UNPACK_RAW_Q(B, b);
 
   if ((A_e == _FP_EXPMAX_Q && !_FP_FRAC_ZEROP_2(A))
        || (B_e == _FP_EXPMAX_Q && !_FP_FRAC_ZEROP_2(B)))

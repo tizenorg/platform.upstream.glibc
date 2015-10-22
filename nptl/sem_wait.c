@@ -1,5 +1,5 @@
 /* sem_wait -- wait on a semaphore.  Generic futex-using version.
-   Copyright (C) 2003-2015 Free Software Foundation, Inc.
+   Copyright (C) 2003-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Paul Mackerras <paulus@au.ibm.com>, 2003.
 
@@ -17,17 +17,79 @@
    License along with the GNU C Library; if not, see
    <http://www.gnu.org/licenses/>.  */
 
-#include "sem_waitcommon.c"
+#include <errno.h>
+#include <sysdep.h>
+#include <lowlevellock.h>
+#include <internaltypes.h>
+#include <semaphore.h>
+
+#include <pthreadP.h>
+#include <shlib-compat.h>
+#include <atomic.h>
+
+
+void
+attribute_hidden
+__sem_wait_cleanup (void *arg)
+{
+  struct new_sem *isem = (struct new_sem *) arg;
+
+  atomic_decrement (&isem->nwaiters);
+}
+
+/* This is in a seperate function in order to make sure gcc
+   puts the call site into an exception region, and thus the
+   cleanups get properly run.  */
+static int
+__attribute__ ((noinline))
+do_futex_wait (struct new_sem *isem)
+{
+  int err, oldtype = __pthread_enable_asynccancel ();
+
+  err = lll_futex_wait (&isem->value, 0, isem->private ^ FUTEX_PRIVATE_FLAG);
+
+  __pthread_disable_asynccancel (oldtype);
+  return err;
+}
 
 int
 __new_sem_wait (sem_t *sem)
 {
-  if (__new_sem_wait_fast ((struct new_sem *) sem, 0) == 0)
+  struct new_sem *isem = (struct new_sem *) sem;
+  int err;
+
+  if (atomic_decrement_if_positive (&isem->value) > 0)
     return 0;
-  else
-    return __new_sem_wait_slow((struct new_sem *) sem, NULL);
+
+  atomic_increment (&isem->nwaiters);
+
+  pthread_cleanup_push (__sem_wait_cleanup, isem);
+
+  while (1)
+    {
+      err = do_futex_wait(isem);
+      if (err != 0 && err != -EWOULDBLOCK)
+	{
+	  __set_errno (-err);
+	  err = -1;
+	  break;
+	}
+
+      if (atomic_decrement_if_positive (&isem->value) > 0)
+	{
+	  err = 0;
+	  break;
+	}
+    }
+
+  pthread_cleanup_pop (0);
+
+  atomic_decrement (&isem->nwaiters);
+
+  return err;
 }
 versioned_symbol (libpthread, __new_sem_wait, sem_wait, GLIBC_2_1);
+
 
 #if SHLIB_COMPAT (libpthread, GLIBC_2_0, GLIBC_2_1)
 int
@@ -58,35 +120,4 @@ __old_sem_wait (sem_t *sem)
 }
 
 compat_symbol (libpthread, __old_sem_wait, sem_wait, GLIBC_2_0);
-#endif
-
-int
-__new_sem_trywait (sem_t *sem)
-{
-  /* We must not fail spuriously, so require a definitive result even if this
-     may lead to a long execution time.  */
-  if (__new_sem_wait_fast ((struct new_sem *) sem, 1) == 0)
-    return 0;
-  __set_errno (EAGAIN);
-  return -1;
-}
-versioned_symbol (libpthread, __new_sem_trywait, sem_trywait, GLIBC_2_1);
-#if SHLIB_COMPAT (libpthread, GLIBC_2_0, GLIBC_2_1)
-int
-__old_sem_trywait (sem_t *sem)
-{
-  int *futex = (int *) sem;
-  int val;
-
-  if (*futex > 0)
-    {
-      val = atomic_decrement_if_positive (futex);
-      if (val > 0)
-	return 0;
-    }
-
-  __set_errno (EAGAIN);
-  return -1;
-}
-compat_symbol (libpthread, __old_sem_trywait, sem_trywait, GLIBC_2_0);
 #endif

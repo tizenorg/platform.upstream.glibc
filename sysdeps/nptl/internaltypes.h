@@ -1,4 +1,4 @@
-/* Copyright (C) 2002-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2002-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -20,8 +20,6 @@
 #define _INTERNALTYPES_H	1
 
 #include <stdint.h>
-#include <atomic.h>
-#include <endian.h>
 
 
 struct pthread_attr
@@ -143,29 +141,9 @@ struct pthread_key_struct
 /* Semaphore variable structure.  */
 struct new_sem
 {
-#if __HAVE_64B_ATOMICS
-  /* The data field holds both value (in the least-significant 32 bytes) and
-     nwaiters.  */
-# if __BYTE_ORDER == __LITTLE_ENDIAN
-#  define SEM_VALUE_OFFSET 0
-# elif __BYTE_ORDER == __BIG_ENDIAN
-#  define SEM_VALUE_OFFSET 1
-# else
-# error Unsupported byte order.
-# endif
-# define SEM_NWAITERS_SHIFT 32
-# define SEM_VALUE_MASK (~(unsigned int)0)
-  uint64_t data;
-  int private;
-  int pad;
-#else
-# define SEM_VALUE_SHIFT 1
-# define SEM_NWAITERS_MASK ((unsigned int)1)
   unsigned int value;
   int private;
-  int pad;
-  unsigned int nwaiters;
-#endif
+  unsigned long int nwaiters;
 };
 
 struct old_sem

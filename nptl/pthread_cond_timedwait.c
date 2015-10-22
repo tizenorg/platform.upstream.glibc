@@ -1,4 +1,4 @@
-/* Copyright (C) 2003-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2003-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Martin Schwidefsky <schwidefsky@de.ibm.com>, 2003.
 
@@ -22,7 +22,6 @@
 #include <lowlevellock.h>
 #include <pthread.h>
 #include <pthreadP.h>
-#include <sys/time.h>
 #include <kernel-features.h>
 
 #include <shlib-compat.h>
@@ -49,8 +48,10 @@ struct _condvar_cleanup_buffer
 };
 
 int
-__pthread_cond_timedwait (pthread_cond_t *cond, pthread_mutex_t *mutex,
-			  const struct timespec *abstime)
+__pthread_cond_timedwait (cond, mutex, abstime)
+     pthread_cond_t *cond;
+     pthread_mutex_t *mutex;
+     const struct timespec *abstime;
 {
   struct _pthread_cleanup_buffer buffer;
   struct _condvar_cleanup_buffer cbuffer;
@@ -129,7 +130,7 @@ __pthread_cond_timedwait (pthread_cond_t *cond, pthread_mutex_t *mutex,
 # else
 	/* Get the current time.  So far we support only one clock.  */
 	struct timeval tv;
-	(void) __gettimeofday (&tv, NULL);
+	(void) gettimeofday (&tv, NULL);
 
 	/* Convert the absolute timeout value to a relative timeout.  */
 	rt.tv_sec = abstime->tv_sec - tv.tv_sec;

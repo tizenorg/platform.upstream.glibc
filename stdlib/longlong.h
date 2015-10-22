@@ -1,5 +1,5 @@
 /* longlong.h -- definitions for mixed size 32/64 bit arithmetic.
-   Copyright (C) 1991-2015 Free Software Foundation, Inc.
+   Copyright (C) 1991-2014 Free Software Foundation, Inc.
 
    This file is part of the GNU C Library.
 
@@ -1687,8 +1687,7 @@ extern UHItype __stormy16_count_leading_zeros (UHItype);
 #if !defined (udiv_qrnnd) && defined (sdiv_qrnnd)
 #define udiv_qrnnd(q, r, nh, nl, d) \
   do {									\
-    extern UWtype __udiv_w_sdiv (UWtype *, UWtype, UWtype, UWtype);	\
-    UWtype __r;								\
+    USItype __r;							\
     (q) = __udiv_w_sdiv (&__r, nh, nl, d);				\
     (r) = __r;								\
   } while (0)

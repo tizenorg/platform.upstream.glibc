@@ -1,4 +1,4 @@
-/* Copyright (C) 2002-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2002-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -32,14 +32,21 @@
 #include <arch-fork.h>
 
 
+unsigned long int *__fork_generation_pointer;
+
+
+
+/* The single linked list of all currently registered fork handlers.  */
+struct fork_handler *__fork_handlers;
+
+
 static void
 fresetlockfiles (void)
 {
   _IO_ITER i;
 
   for (i = _IO_iter_begin(); i != _IO_iter_end(); i = _IO_iter_next(i))
-    if ((_IO_iter_file (i)->_flags & _IO_USER_LOCK) == 0)
-      _IO_lock_init (*((_IO_lock_t *) _IO_iter_file(i)->_lock));
+    _IO_lock_init (*((_IO_lock_t *) _IO_iter_file(i)->_lock));
 }
 
 
@@ -134,9 +141,8 @@ __libc_fork (void)
 
       assert (THREAD_GETMEM (self, tid) != ppid);
 
-      /* See __pthread_once.  */
       if (__fork_generation_pointer != NULL)
-	*__fork_generation_pointer += __PTHREAD_ONCE_FORK_GEN_INCR;
+	*__fork_generation_pointer += 4;
 
       /* Adjust the PID field for the new process.  */
       THREAD_SETMEM (self, pid, THREAD_GETMEM (self, tid));
@@ -219,7 +225,7 @@ __libc_fork (void)
 
 	  if (atomic_decrement_and_test (&allp->handler->refcntr)
 	      && allp->handler->need_signal)
-	    lll_futex_wake (&allp->handler->refcntr, 1, LLL_PRIVATE);
+	    lll_futex_wake (allp->handler->refcntr, 1, LLL_PRIVATE);
 
 	  allp = allp->next;
 	}

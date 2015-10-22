@@ -1,5 +1,5 @@
 /* Machine-dependent ELF dynamic relocation inline functions.  IA-64 version.
-   Copyright (C) 1995-2015 Free Software Foundation, Inc.
+   Copyright (C) 1995-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -271,7 +271,7 @@ elf_machine_runtime_setup (struct link_map *l, int lazy, int profile)
 "	}\n"								      \
 "	{ .mmb\n"							      \
 "	  st8 [r2] = r17		/* Load the new _dl_argv. */\n"	      \
-"	  br.call.sptk.many b0 = _dl_init#\n"				      \
+"	  br.call.sptk.many b0 = _dl_init_internal#\n"			      \
 "	  ;;\n"								      \
 "	}\n"								      \
 "	/* Pass our finalizer function to the user,\n"			      \

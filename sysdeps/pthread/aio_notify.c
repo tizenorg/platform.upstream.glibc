@@ -1,5 +1,5 @@
 /* Notify initiator of AIO request.
-   Copyright (C) 1997-2015 Free Software Foundation, Inc.
+   Copyright (C) 1997-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@cygnus.com>, 1997.
 
@@ -22,7 +22,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <aio_misc.h>
-#include <signal.h>
 
 #ifndef aio_start_notify_thread
 # define aio_start_notify_thread() do { } while (0)

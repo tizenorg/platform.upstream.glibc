@@ -68,5 +68,7 @@ endif
 abi-includes :=
 abi-soft-options := -U__ARM_PCS_VFP
 abi-soft-condition := !defined __ARM_PCS_VFP
+abi-soft-ld-soname := ld-linux.so.3
 abi-hard-options := -D__ARM_PCS_VFP
 abi-hard-condition := defined __ARM_PCS_VFP
+abi-hard-ld-soname := ld-linux-armhf.so.3

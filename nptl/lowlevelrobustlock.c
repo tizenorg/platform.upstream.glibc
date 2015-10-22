@@ -1,4 +1,4 @@
-/* Copyright (C) 2006-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2006-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Jakub Jelinek <jakub@redhat.com>, 2006.
 
@@ -36,17 +36,14 @@ __lll_robust_lock_wait (int *futex, int private)
 
   do
     {
-      /* If the owner died, return the present value of the futex.  */
       if (__glibc_unlikely (oldval & FUTEX_OWNER_DIED))
 	return oldval;
 
-      /* Try to put the lock into state 'acquired, possibly with waiters'.  */
       int newval = oldval | FUTEX_WAITERS;
       if (oldval != newval
 	  && atomic_compare_and_exchange_bool_acq (futex, newval, oldval))
 	continue;
 
-      /* If *futex == 2, wait until woken.  */
       lll_futex_wait (futex, newval, private);
 
     try:
@@ -70,7 +67,7 @@ __lll_robust_timedlock_wait (int *futex, const struct timespec *abstime,
   int tid = THREAD_GETMEM (THREAD_SELF, tid);
   int oldval = *futex;
 
-  /* If the futex changed meanwhile, try locking again.  */
+  /* If the futex changed meanwhile try locking again.  */
   if (oldval == 0)
     goto try;
 
@@ -103,17 +100,15 @@ __lll_robust_timedlock_wait (int *futex, const struct timespec *abstime,
 	return ETIMEDOUT;
 #endif
 
-      /* If the owner died, return the present value of the futex.  */
+      /* Wait.  */
       if (__glibc_unlikely (oldval & FUTEX_OWNER_DIED))
 	return oldval;
 
-      /* Try to put the lock into state 'acquired, possibly with waiters'.  */
       int newval = oldval | FUTEX_WAITERS;
       if (oldval != newval
 	  && atomic_compare_and_exchange_bool_acq (futex, newval, oldval))
 	continue;
 
-      /* If *futex == 2, wait until woken or timeout.  */
 #if (!defined __ASSUME_FUTEX_CLOCK_REALTIME \
      || !defined lll_futex_timed_wait_bitset)
       lll_futex_timed_wait (futex, newval, &rt, private);

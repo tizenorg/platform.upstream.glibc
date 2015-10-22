@@ -1,4 +1,4 @@
-/* Copyright (C) 1997-2015 Free Software Foundation, Inc.
+/* Copyright (C) 1997-2014 Free Software Foundation, Inc.
 
    This file is part of the GNU C Library.
 
@@ -17,6 +17,7 @@
    <http://www.gnu.org/licenses/>.  */
 
 #include <fenv.h>
+#include <math.h>
 #include <fpu_control.h>
 
 int
@@ -27,11 +28,10 @@ fesetexceptflag (const fexcept_t *flagp, int excepts)
 
   /* Get the current environment.  */
   _FPU_GETFPSR (fpsr);
-  excepts &= FE_ALL_EXCEPT;
 
   /* Set the desired exception mask.  */
-  fpsr_new = fpsr & ~excepts;
-  fpsr_new |= *flagp & excepts;
+  fpsr_new = fpsr & ~(excepts & FE_ALL_EXCEPT);
+  fpsr_new |= (*flagp & excepts & FE_ALL_EXCEPT);
 
   /* Save state back to the FPU.  */
   if (fpsr != fpsr_new)

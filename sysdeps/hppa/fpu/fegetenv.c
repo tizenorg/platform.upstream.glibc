@@ -1,5 +1,5 @@
 /* Store current floating-point environment.
-   Copyright (C) 2000-2015 Free Software Foundation, Inc.
+   Copyright (C) 2000-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by David Huggins-Daines <dhd@debian.org>, 2000
 
@@ -21,7 +21,7 @@
 #include <string.h>
 
 int
-__fegetenv (fenv_t *envp)
+fegetenv (fenv_t *envp)
 {
   unsigned long long buf[4], *bufptr = buf;
 
@@ -32,6 +32,4 @@ __fegetenv (fenv_t *envp)
   memcpy(envp, buf, sizeof (*envp));
   return 0;
 }
-libm_hidden_def (__fegetenv)
-weak_alias (__fegetenv, fegetenv)
-libm_hidden_weak (fegetenv)
+libm_hidden_def (fegetenv)

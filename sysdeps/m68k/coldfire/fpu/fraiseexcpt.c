@@ -1,5 +1,5 @@
 /* Raise given exceptions.
-   Copyright (C) 2006-2015 Free Software Foundation, Inc.
+   Copyright (C) 2006-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -21,7 +21,7 @@
 #include <math.h>
 
 int
-__feraiseexcept (int excepts)
+feraiseexcept (int excepts)
 {
   /* Raise exceptions represented by EXCEPTS.  But we must raise only one
      signal at a time.  It is important that if the overflow/underflow
@@ -63,6 +63,4 @@ __feraiseexcept (int excepts)
   /* Success.  */
   return 0;
 }
-libm_hidden_def (__feraiseexcept)
-weak_alias (__feraiseexcept, feraiseexcept)
-libm_hidden_weak (feraiseexcept)
+libm_hidden_def (feraiseexcept)

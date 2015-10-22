@@ -1,5 +1,5 @@
 /* Private floating point rounding and exceptions handling.  AArch64 version.
-   Copyright (C) 2014-2015 Free Software Foundation, Inc.
+   Copyright (C) 2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -159,7 +159,7 @@ libc_feupdateenv_test_aarch64 (const fenv_t *envp, int ex)
 
   /* Raise the exceptions if enabled in the new FP state.  */
   if (__glibc_unlikely (excepts & (new_fpcr >> FE_EXCEPT_SHIFT)))
-    __feraiseexcept (excepts);
+    feraiseexcept (excepts);
 
   return excepts & ex;
 }

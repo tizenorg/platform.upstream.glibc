@@ -1,4 +1,4 @@
-# Copyright (C) 2013-2015 Free Software Foundation, Inc.
+# Copyright (C) 2013-2014 Free Software Foundation, Inc.
 # This file is part of the GNU C Library.
 
 # The GNU C Library is free software; you can redistribute it and/or
@@ -44,11 +44,8 @@ benchset := $(string-bench-all) $(stdlib-bench)
 CFLAGS-bench-ffs.c += -fno-builtin
 CFLAGS-bench-ffsll.c += -fno-builtin
 
-bench-malloc := malloc-thread
-
 $(addprefix $(objpfx)bench-,$(bench-math)): $(libm)
 $(addprefix $(objpfx)bench-,$(bench-pthread)): $(shared-thread-library)
-$(objpfx)bench-malloc-thread: $(shared-thread-library)
 
 
 
@@ -63,7 +60,6 @@ include ../Rules
 
 binaries-bench := $(addprefix $(objpfx)bench-,$(bench))
 binaries-benchset := $(addprefix $(objpfx)bench-,$(benchset))
-binaries-bench-malloc := $(addprefix $(objpfx)bench-,$(bench-malloc))
 
 # The default duration: 10 seconds.
 ifndef BENCH_DURATION
@@ -86,8 +82,7 @@ endif
 
 # This makes sure CPPFLAGS-nonlib and CFLAGS-nonlib are passed
 # for all these modules.
-cpp-srcs-left := $(binaries-benchset:=.c) $(binaries-bench:=.c) \
-		 $(binaries-bench-malloc:=.c)
+cpp-srcs-left := $(binaries-benchset:=.c) $(binaries-bench:=.c)
 lib := nonlib
 include $(patsubst %,$(..)cppflags-iterator.mk,$(cpp-srcs-left))
 
@@ -104,22 +99,14 @@ timing-type := $(objpfx)bench-timing-type
 bench-clean:
 	rm -f $(binaries-bench) $(addsuffix .o,$(binaries-bench))
 	rm -f $(binaries-benchset) $(addsuffix .o,$(binaries-benchset))
-	rm -f $(binaries-bench-malloc) $(addsuffix .o,$(binaries-bench-malloc))
 	rm -f $(timing-type) $(addsuffix .o,$(timing-type))
 
-bench: $(timing-type) bench-set bench-func bench-malloc
+bench: $(timing-type) bench-set bench-func
 
 bench-set: $(binaries-benchset)
 	for run in $^; do \
 	  echo "Running $${run}"; \
 	  $(run-bench) > $${run}.out; \
-	done
-
-bench-malloc: $(binaries-bench-malloc)
-	run=$(objpfx)bench-malloc-thread; \
-	for thr in 1 8 16 32; do \
-	  echo "Running $${run} $${thr}"; \
-	  $(run-bench) $${thr} > $${run}-$${thr}.out; \
 	done
 
 # Build and execute the benchmark functions.  This target generates JSON
@@ -147,8 +134,7 @@ bench-func: $(binaries-bench)
 	scripts/validate_benchout.py $(objpfx)bench.out \
 		scripts/benchout.schema.json
 
-$(timing-type) $(binaries-bench) $(binaries-benchset) \
-	$(binaries-bench-malloc): %: %.o $(objpfx)json-lib.o \
+$(timing-type) $(binaries-bench) $(binaries-benchset): %: %.o $(objpfx)json-lib.o \
   $(sort $(filter $(common-objpfx)lib%,$(link-libc))) \
   $(addprefix $(csu-objpfx),start.o) $(+preinit) $(+postinit)
 	$(+link)

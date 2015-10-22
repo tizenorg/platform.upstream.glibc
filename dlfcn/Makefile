@@ -1,4 +1,4 @@
-# Copyright (C) 1995-2015 Free Software Foundation, Inc.
+# Copyright (C) 1995-2014 Free Software Foundation, Inc.
 # This file is part of the GNU C Library.
 
 # The GNU C Library is free software; you can redistribute it and/or
@@ -36,13 +36,13 @@ endif
 ifeq (yes,$(build-shared))
 tests = glrefmain failtest tst-dladdr default errmsg1 tstcxaatexit \
 	bug-dlopen1 bug-dlsym1 tst-dlinfo bug-atexit1 bug-atexit2 \
-	bug-atexit3 tstatexit bug-dl-leaf tst-rec-dlopen
+	bug-atexit3 tstatexit bug-dl-leaf
 endif
 modules-names = glreflib1 glreflib2 glreflib3 failtestmod defaultmod1 \
 		defaultmod2 errmsg1mod modatexit modcxaatexit \
 		bug-dlsym1-lib1 bug-dlsym1-lib2 bug-atexit1-lib \
 		bug-atexit2-lib bug-atexit3-lib bug-dl-leaf-lib \
-		bug-dl-leaf-lib-cb moddummy1 moddummy2
+		bug-dl-leaf-lib-cb
 
 failtestmod.so-no-z-defs = yes
 glreflib2.so-no-z-defs = yes
@@ -139,6 +139,3 @@ $(objpfx)bug-dl-leaf: $(objpfx)bug-dl-leaf-lib.so
 $(objpfx)bug-dl-leaf.out: $(objpfx)bug-dl-leaf-lib-cb.so
 $(objpfx)bug-dl-leaf-lib.so: $(libdl)
 $(objpfx)bug-dl-leaf-lib-cb.so: $(objpfx)bug-dl-leaf-lib.so
-
-$(objpfx)tst-rec-dlopen: $(libdl)
-$(objpfx)tst-rec-dlopen.out: $(objpfx)moddummy1.so $(objpfx)moddummy2.so

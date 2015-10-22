@@ -1,4 +1,4 @@
-# Copyright (C) 1991-2015 Free Software Foundation, Inc.
+# Copyright (C) 1991-2014 Free Software Foundation, Inc.
 # This file is part of the GNU C Library.
 
 # The GNU C Library is free software; you can redistribute it and/or
@@ -57,7 +57,7 @@ tests := tstscanf test_rdwr test-popen tstgetln test-fseek \
 	 bug19 bug19a tst-popen2 scanf13 scanf14 scanf15 bug20 bug21 bug22 \
 	 scanf16 scanf17 tst-setvbuf1 tst-grouping bug23 bug24 \
 	 bug-vfprintf-nargs tst-long-dbl-fphex tst-fphex-wide tst-sprintf3 \
-	 bug25 tst-printf-round bug23-2 bug23-3 bug23-4 bug26
+	 bug25 tst-printf-round bug26
 
 test-srcs = tst-unbputc tst-printf
 
@@ -80,6 +80,11 @@ endif
 
 CFLAGS-vfprintf.c = -Wno-uninitialized
 CFLAGS-vfwprintf.c = -Wno-uninitialized
+CFLAGS-tst-printf.c = -Wno-format
+CFLAGS-tstdiomisc.c = -Wno-format
+CFLAGS-scanf4.c = -Wno-format
+CFLAGS-scanf7.c = -Wno-format
+CFLAGS-tst-printfsz.c = -Wno-format
 
 CFLAGS-tmpfile.c = -fexceptions
 CFLAGS-tmpfile64.c = -fexceptions
@@ -110,6 +115,9 @@ CFLAGS-scanf15.c = -I../libio -I../stdlib -I../wcsmbs -I../time -I../string \
 		   -I../wctype
 CFLAGS-scanf17.c = -I../libio -I../stdlib -I../wcsmbs -I../time -I../string \
 		   -I../wctype
+
+# We know the test has a format string problem.
+CFLAGS-tst-sprintf.c = -Wno-format
 
 CPPFLAGS += $(libio-mtsafe)
 

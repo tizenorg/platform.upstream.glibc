@@ -1,4 +1,4 @@
-/* Copyright (C) 2011-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2011-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Chris Metcalf <cmetcalf@tilera.com>, 2011.
 
@@ -41,6 +41,10 @@
 
 	.text
 ENTRY (__clone)
+	/* sanity check arguments */
+	BEQZ r0, .Linvalid
+	BEQZ r1, .Linvalid
+
 	/* Create a stack frame so we can pass callee-saves to new task. */
 	{
 	 move r10, sp
@@ -66,10 +70,6 @@ ENTRY (__clone)
 	cfi_offset (r31, FRAME_R31 - FRAME_SIZE)
 	ST r11, r32
 	cfi_offset (r32, FRAME_R32 - FRAME_SIZE)
-
-	/* sanity check arguments */
-	BEQZ r0, .Linvalid
-	BEQZ r1, .Linvalid
 
 	/* Make sure child stack is properly aligned, and set up the
 	   top frame so that we can call out of it immediately in the
@@ -120,7 +120,6 @@ ENTRY (__clone)
 	swint1
 	BEQZ r0, .Lthread_start  /* If in child task.  */
 
-.Ldone:
 	/* Restore the callee-saved registers and return. */
 	ADDLI_PTR lr, sp, FRAME_SIZE
 	{
@@ -150,7 +149,7 @@ ENTRY (__clone)
 .Linvalid:
 	{
 	 movei r1, EINVAL
-	 j .Ldone
+	 j SYSCALL_ERROR_NAME
 	}
 
 /* This function expects to receive:

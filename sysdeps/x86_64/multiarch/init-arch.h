@@ -1,5 +1,5 @@
 /* This file is part of the GNU C Library.
-   Copyright (C) 2008-2015 Free Software Foundation, Inc.
+   Copyright (C) 2008-2014 Free Software Foundation, Inc.
 
    The GNU C Library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -25,7 +25,6 @@
 #define bit_FMA4_Usable			(1 << 8)
 #define bit_Slow_SSE4_2			(1 << 9)
 #define bit_AVX2_Usable			(1 << 10)
-#define bit_AVX_Fast_Unaligned_Load	(1 << 11)
 
 /* CPUID Feature flags.  */
 
@@ -75,7 +74,6 @@
 # define index_FMA4_Usable		FEATURE_INDEX_1*FEATURE_SIZE
 # define index_Slow_SSE4_2		FEATURE_INDEX_1*FEATURE_SIZE
 # define index_AVX2_Usable		FEATURE_INDEX_1*FEATURE_SIZE
-# define index_AVX_Fast_Unaligned_Load	FEATURE_INDEX_1*FEATURE_SIZE
 
 #else	/* __ASSEMBLER__ */
 
@@ -124,7 +122,7 @@ extern void __init_cpu_features (void) attribute_hidden;
 extern const struct cpu_features *__get_cpu_features (void)
      __attribute__ ((const));
 
-# if IS_IN (libc)
+# ifndef NOT_IN_libc
 #  define __get_cpu_features()	(&__cpu_features)
 # endif
 
@@ -171,7 +169,6 @@ extern const struct cpu_features *__get_cpu_features (void)
 # define index_FMA4_Usable		FEATURE_INDEX_1
 # define index_Slow_SSE4_2		FEATURE_INDEX_1
 # define index_AVX2_Usable		FEATURE_INDEX_1
-# define index_AVX_Fast_Unaligned_Load	FEATURE_INDEX_1
 
 # define HAS_ARCH_FEATURE(name) \
   ((__get_cpu_features ()->feature[index_##name] & (bit_##name)) != 0)
@@ -184,6 +181,5 @@ extern const struct cpu_features *__get_cpu_features (void)
 # define HAS_AVX2			HAS_ARCH_FEATURE (AVX2_Usable)
 # define HAS_FMA			HAS_ARCH_FEATURE (FMA_Usable)
 # define HAS_FMA4			HAS_ARCH_FEATURE (FMA4_Usable)
-# define HAS_AVX_FAST_UNALIGNED_LOAD	HAS_ARCH_FEATURE (AVX_Fast_Unaligned_Load)
 
 #endif	/* __ASSEMBLER__ */

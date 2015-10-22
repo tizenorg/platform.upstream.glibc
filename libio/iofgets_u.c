@@ -1,4 +1,4 @@
-/* Copyright (C) 1993-2015 Free Software Foundation, Inc.
+/* Copyright (C) 1993-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -28,7 +28,7 @@
 #include <stdio.h>
 
 char *
-__fgets_unlocked (buf, n, fp)
+fgets_unlocked (buf, n, fp)
      char *buf;
      int n;
      _IO_FILE *fp;
@@ -66,6 +66,4 @@ __fgets_unlocked (buf, n, fp)
   fp->_IO_file_flags |= old_error;
   return result;
 }
-libc_hidden_def (__fgets_unlocked)
-weak_alias (__fgets_unlocked, fgets_unlocked)
-libc_hidden_weak (fgets_unlocked)
+libc_hidden_def (fgets_unlocked)

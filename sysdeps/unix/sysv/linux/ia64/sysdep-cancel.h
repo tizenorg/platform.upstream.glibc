@@ -1,4 +1,4 @@
-/* Copyright (C) 2002-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2002-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Jakub Jelinek <jakub@redhat.com>, 2002.
 
@@ -22,11 +22,11 @@
 # include <nptl/pthreadP.h>
 #endif
 
-#if IS_IN (libc) || IS_IN (libpthread) || IS_IN (librt)
+#if !defined NOT_IN_libc || defined IS_IN_libpthread || defined IS_IN_librt
 
 # undef PSEUDO
 
-# if IS_IN (libc)
+# ifndef NOT_IN_libc
 #  define SYSDEP_CANCEL_ERRNO __libc_errno
 # else
 #  define SYSDEP_CANCEL_ERRNO errno
@@ -179,13 +179,13 @@ __GC_##name:								      \
 # undef PSEUDO_END
 # define PSEUDO_END(name) .endp
 
-# if IS_IN (libpthread)
+# ifdef IS_IN_libpthread
 #  define CENABLE	br.call.sptk.many b0 = __pthread_enable_asynccancel
 #  define CDISABLE	br.call.sptk.many b0 = __pthread_disable_asynccancel
-# elif IS_IN (libc)
+# elif !defined NOT_IN_libc
 #  define CENABLE	br.call.sptk.many b0 = __libc_enable_asynccancel
 #  define CDISABLE	br.call.sptk.many b0 = __libc_disable_asynccancel
-# elif IS_IN (librt)
+# elif defined IS_IN_librt
 #  define CENABLE	br.call.sptk.many b0 = __librt_enable_asynccancel
 #  define CDISABLE	br.call.sptk.many b0 = __librt_disable_asynccancel
 # else

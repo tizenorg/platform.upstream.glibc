@@ -1,5 +1,5 @@
 /* Determine various system internal values, Linux version.
-   Copyright (C) 1996-2015 Free Software Foundation, Inc.
+   Copyright (C) 1996-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@cygnus.com>, 1996.
 
@@ -299,7 +299,7 @@ phys_pages_info (const char *format)
 	 string "processor".  We don't have to fear extremely long
 	 lines since the kernel will not generate them.  8192
 	 bytes are really enough.  */
-      while (__fgets_unlocked (buffer, sizeof buffer, fp) != NULL)
+      while (fgets_unlocked (buffer, sizeof buffer, fp) != NULL)
 	if (sscanf (buffer, format, &result) == 1)
 	  {
 	    result /= (__getpagesize () / 1024);

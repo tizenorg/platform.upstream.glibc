@@ -1,5 +1,5 @@
 /* PLT trampoline.  MIPS version.
-   Copyright (C) 1996-2015 Free Software Foundation, Inc.
+   Copyright (C) 1996-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Kazumoto Kojima <kkojima@info.kanagawa-u.ac.jp>.
 
@@ -139,7 +139,7 @@ __dl_runtime_resolve (ElfW(Word) sym_index,
   /* FIXME: The symbol versioning stuff is not tested yet.  */
   if (__builtin_expect (ELFW(ST_VISIBILITY) (sym->st_other), 0) == 0)
     {
-      switch (l->l_info[VERSYMIDX (DT_VERSYM)] != NULL ? 1 : 0)
+      switch (l->l_info[VERSYMIDX (DT_VERSYM)] != NULL)
 	{
 	default:
 	  {

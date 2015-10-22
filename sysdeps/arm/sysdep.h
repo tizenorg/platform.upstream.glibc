@@ -1,5 +1,5 @@
 /* Assembler macros for ARM.
-   Copyright (C) 1997-2015 Free Software Foundation, Inc.
+   Copyright (C) 1997-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -21,8 +21,6 @@
 
 #ifndef __ASSEMBLER__
 # include <stdint.h>
-#else
-# include <arm-features.h>
 #endif
 
 /* The __ARM_ARCH define is provided by gcc 4.8.  Construct it otherwise.  */
@@ -109,7 +107,8 @@
 
 /* If compiled for profiling, call `mcount' at the start of each function.  */
 #ifdef	PROF
-/* Call __gnu_mcount_nc (GCC >= 4.4).  */
+/* Call __gnu_mcount_nc if GCC >= 4.4.  */
+#if __GNUC_PREREQ(4,4)
 #define CALL_MCOUNT					\
 	push	{lr};					\
 	cfi_adjust_cfa_offset (4);			\
@@ -117,6 +116,16 @@
 	bl	PLTJMP(mcount);				\
 	cfi_adjust_cfa_offset (-4);			\
 	cfi_restore (lr)
+#else /* else call _mcount */
+#define CALL_MCOUNT					\
+	push	{lr};					\
+	cfi_adjust_cfa_offset (4);			\
+	cfi_rel_offset (lr, 0);				\
+	bl	PLTJMP(mcount);				\
+	pops	{lr};					\
+	cfi_adjust_cfa_offset (-4);			\
+	cfi_restore (lr)
+#endif
 #else
 #define CALL_MCOUNT		/* Do nothing.  */
 #endif
@@ -125,7 +134,11 @@
    on this system, the asm identifier `syscall_error' intrudes on the
    C name space.  Make sure we use an innocuous name.  */
 #define	syscall_error	__syscall_error
+#if __GNUC_PREREQ(4,4)
 #define mcount		__gnu_mcount_nc
+#else
+#define mcount		_mcount
+#endif
 
 /* Tag_ABI_align8_preserved: This code preserves 8-byte
    alignment in any callee.  */
@@ -144,32 +157,6 @@
 	.arm
 # endif
 
-/* Load or store to/from address X + Y into/from R, (maybe) using T.
-   X or Y can use T freely; T can be R if OP is a load.  The first
-   version eschews the two-register addressing mode, while the
-   second version uses it.  */
-# define LDST_INDEXED_NOINDEX(OP, R, T, X, Y)		\
-	add	T, X, Y;				\
-	sfi_breg T,					\
-	OP	R, [T]
-# define LDST_INDEXED_INDEX(OP, R, X, Y)		\
-	OP	R, [X, Y]
-
-# ifdef ARM_NO_INDEX_REGISTER
-/* We're never using the two-register addressing mode, so this
-   always uses an intermediate add.  */
-#  define LDST_INDEXED(OP, R, T, X, Y)	LDST_INDEXED_NOINDEX (OP, R, T, X, Y)
-#  define LDST_PC_INDEXED(OP, R, T, X)	LDST_INDEXED_NOINDEX (OP, R, T, pc, X)
-# else
-/* The two-register addressing mode is OK, except on Thumb with pc.  */
-#  define LDST_INDEXED(OP, R, T, X, Y)	LDST_INDEXED_INDEX (OP, R, X, Y)
-#  ifdef __thumb2__
-#   define LDST_PC_INDEXED(OP, R, T, X)	LDST_INDEXED_NOINDEX (OP, R, T, pc, X)
-#  else
-#   define LDST_PC_INDEXED(OP, R, T, X)	LDST_INDEXED_INDEX (OP, R, pc, X)
-#  endif
-# endif
-
 /* Load or store to/from a pc-relative EXPR into/from R, using T.  */
 # ifdef __thumb2__
 #  define LDST_PCREL(OP, R, T, EXPR) \
@@ -179,11 +166,6 @@
 	.previous;					\
 99:	add	T, T, pc;				\
 	OP	R, [T]
-# elif defined (ARCH_HAS_T2) && ARM_PCREL_MOVW_OK
-#  define LDST_PCREL(OP, R, T, EXPR)			\
-	movw	T, #:lower16:EXPR - 99f - PC_OFS;	\
-	movt	T, #:upper16:EXPR - 99f - PC_OFS;	\
-99:	LDST_PC_INDEXED (OP, R, T, T)
 # else
 #  define LDST_PCREL(OP, R, T, EXPR) \
 	ldr	T, 98f;					\
@@ -193,50 +175,17 @@
 99:	OP	R, [pc, T]
 # endif
 
-/* Load from a global SYMBOL + CONSTANT into R, using T.  */
-# if defined (ARCH_HAS_T2) && !defined (PIC)
-#  define LDR_GLOBAL(R, T, SYMBOL, CONSTANT)				\
-	movw	T, #:lower16:SYMBOL;					\
-	movt	T, #:upper16:SYMBOL;					\
-	ldr	R, [T, $CONSTANT]
-# elif defined (ARCH_HAS_T2) && defined (PIC) && ARM_PCREL_MOVW_OK
-#  define LDR_GLOBAL(R, T, SYMBOL, CONSTANT)				\
-	movw	R, #:lower16:_GLOBAL_OFFSET_TABLE_ - 97f - PC_OFS;	\
-	movw	T, #:lower16:99f - 98f - PC_OFS;			\
-	movt	R, #:upper16:_GLOBAL_OFFSET_TABLE_ - 97f - PC_OFS;	\
-	movt	T, #:upper16:99f - 98f - PC_OFS;			\
-	.pushsection .rodata.cst4, "aM", %progbits, 4;			\
-	.balign 4;							\
-99:	.word	SYMBOL##(GOT);						\
-	.popsection;							\
-97:	add	R, R, pc;						\
-98:	LDST_PC_INDEXED (ldr, T, T, T);					\
-	LDST_INDEXED (ldr, R, T, R, T);					\
-	ldr	R, [R, $CONSTANT]
-# else
-#  define LDR_GLOBAL(R, T, SYMBOL, CONSTANT)		\
+/* Load or store to/from a global EXPR into/from R, using T.  */
+# define LDST_GLOBAL(OP, R, T, EXPR)			\
 	ldr	T, 99f;					\
 	ldr	R, 100f;				\
 98:	add	T, T, pc;				\
 	ldr	T, [T, R];				\
 	.subsection 2;					\
 99:	.word	_GLOBAL_OFFSET_TABLE_ - 98b - PC_OFS;	\
-100:	.word	SYMBOL##(GOT);				\
+100:	.word	EXPR##(GOT);				\
 	.previous;					\
-	ldr	R, [T, $CONSTANT]
-# endif
-
-/* This is the same as LDR_GLOBAL, but for a SYMBOL that is known to
-   be in the same linked object (as for one with hidden visibility).
-   We can avoid the GOT indirection in the PIC case.  For the pure
-   static case, LDR_GLOBAL is already optimal.  */
-# ifdef PIC
-#  define LDR_HIDDEN(R, T, SYMBOL, CONSTANT) \
-  LDST_PCREL (ldr, R, T, SYMBOL + CONSTANT)
-# else
-#  define LDR_HIDDEN(R, T, SYMBOL, CONSTANT) \
-  LDR_GLOBAL (R, T, SYMBOL, CONSTANT)
-# endif
+	OP	R, [T]
 
 /* Cope with negative memory offsets, which thumb can't encode.
    Use NEGOFF_ADJ_BASE to (conditionally) alter the base register,
@@ -343,11 +292,11 @@
 #endif
 
 /* Pointer mangling support.  */
-#if (IS_IN (rtld) || \
-     (!defined SHARED && (IS_IN (libc) || IS_IN (libpthread))))
+#if (defined IS_IN_rtld || \
+     (!defined SHARED && (!defined NOT_IN_libc || defined IS_IN_libpthread)))
 # ifdef __ASSEMBLER__
 #  define PTR_MANGLE_LOAD(guard, tmp)					\
-  LDR_HIDDEN (guard, tmp, C_SYMBOL_NAME(__pointer_chk_guard_local), 0)
+  LDST_PCREL(ldr, guard, tmp, C_SYMBOL_NAME(__pointer_chk_guard_local));
 #  define PTR_MANGLE(dst, src, guard, tmp)				\
   PTR_MANGLE_LOAD(guard, tmp);						\
   PTR_MANGLE2(dst, src, guard)
@@ -367,7 +316,7 @@ extern uintptr_t __pointer_chk_guard_local attribute_relro attribute_hidden;
 #else
 # ifdef __ASSEMBLER__
 #  define PTR_MANGLE_LOAD(guard, tmp)					\
-  LDR_GLOBAL (guard, tmp, C_SYMBOL_NAME(__pointer_chk_guard), 0);
+  LDST_GLOBAL(ldr, guard, tmp, C_SYMBOL_NAME(__pointer_chk_guard));
 #  define PTR_MANGLE(dst, src, guard, tmp)				\
   PTR_MANGLE_LOAD(guard, tmp);						\
   PTR_MANGLE2(dst, src, guard)

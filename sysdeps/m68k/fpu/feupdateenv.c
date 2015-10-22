@@ -1,5 +1,5 @@
 /* Install given floating-point environment and raise exceptions.
-   Copyright (C) 1997-2015 Free Software Foundation, Inc.
+   Copyright (C) 1997-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Andreas Schwab <schwab@issan.informatik.uni-dortmund.de>
 
@@ -29,12 +29,12 @@ __feupdateenv (const fenv_t *envp)
   fpsr &= FE_ALL_EXCEPT;
 
   /* Install new environment.  */
-  __fesetenv (envp);
+  fesetenv (envp);
 
   /* Raise the saved exception.  Incidently for us the implementation
      defined format of the values in objects of type fexcept_t is the
      same as the ones specified using the FE_* constants.  */
-  __feraiseexcept ((int) fpsr);
+  feraiseexcept ((int) fpsr);
 
   /* Success.  */
   return 0;
@@ -46,6 +46,5 @@ strong_alias (__feupdateenv, __old_feupdateenv)
 compat_symbol (libm, __old_feupdateenv, feupdateenv, GLIBC_2_1);
 #endif
 
-libm_hidden_def (__feupdateenv)
 libm_hidden_ver (__feupdateenv, feupdateenv)
 versioned_symbol (libm, __feupdateenv, feupdateenv, GLIBC_2_2);

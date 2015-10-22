@@ -1,5 +1,5 @@
 /* Load a shared object at runtime, relocate it, and run its initializer.
-   Copyright (C) 1996-2015 Free Software Foundation, Inc.
+   Copyright (C) 1996-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -217,9 +217,7 @@ dl_open_worker (void *a)
 	args->nsid = call_map->l_ns;
     }
 
-  /* One might be tempted to assert that we are RT_CONSISTENT at this point, but that
-     may not be true if this is a recursive call to dlopen.  */
-  _dl_debug_initialize (0, args->nsid);
+  assert (_dl_debug_initialize (0, args->nsid)->r_state == RT_CONSISTENT);
 
   /* Load the named object.  */
   struct link_map *new;
@@ -739,7 +737,7 @@ _dl_show_scope (struct link_map *l, int from)
   _dl_debug_printf ("\n");
 }
 
-#if IS_IN (rtld)
+#ifdef IS_IN_rtld
 /* Return non-zero if ADDR lies within one of L's segments.  */
 int
 internal_function

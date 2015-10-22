@@ -1,4 +1,4 @@
-/* Copyright (C) 2003-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2003-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -35,4 +35,4 @@ __posix_fadvise64_l64 (int fd, off64_t offset, off64_t len, int advise)
     return 0;
   return INTERNAL_SYSCALL_ERRNO (ret, err);
 }
-weak_alias (__posix_fadvise64_l64, posix_fadvise64);
+strong_alias (__posix_fadvise64_l64, posix_fadvise64);

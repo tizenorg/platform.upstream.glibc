@@ -1,5 +1,5 @@
 /* Install given floating-point environment and raise exceptions.
-   Copyright (C) 1997-2015 Free Software Foundation, Inc.
+   Copyright (C) 1997-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@cygnus.com>, 1997.
 
@@ -23,7 +23,7 @@
 
 
 int
-__feupdateenv (const fenv_t *envp)
+feupdateenv (const fenv_t *envp)
 {
   fpu_control_t fpscr, new_fpscr, updated_fpscr;
   int excepts;
@@ -46,7 +46,7 @@ __feupdateenv (const fenv_t *envp)
 
       /* Raise the exceptions if enabled in the new FP state.  */
       if (excepts & (new_fpscr >> FE_EXCEPT_SHIFT))
-	return __feraiseexcept (excepts);
+	return feraiseexcept (excepts);
 
       return 0;
     }
@@ -69,10 +69,8 @@ __feupdateenv (const fenv_t *envp)
 
   /* Raise the exceptions if enabled in the new FP state.  */
   if (excepts & (new_fpscr >> FE_EXCEPT_SHIFT))
-    return __feraiseexcept (excepts);
+    return feraiseexcept (excepts);
 
   return 0;
 }
-libm_hidden_def (__feupdateenv)
-weak_alias (__feupdateenv, feupdateenv)
-libm_hidden_weak (feupdateenv)
+libm_hidden_def (feupdateenv)

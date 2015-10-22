@@ -1,5 +1,5 @@
 /* Automatic enabling of elision for mutexes
-   Copyright (C) 2014-2015 Free Software Foundation, Inc.
+   Copyright (C) 2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -17,6 +17,11 @@
    <http://www.gnu.org/licenses/>.  */
 
 #ifdef ENABLE_LOCK_ELISION
+/* Check for elision on this lock without upgrading.  */
+#define DO_ELISION(m)							\
+  (__pthread_force_elision						\
+   && (m->__data.__kind & PTHREAD_MUTEX_NO_ELISION_NP) == 0)		\
+
 /* Automatically enable elision for existing user lock kinds.  */
 #define FORCE_ELISION(m, s)						\
   if (__pthread_force_elision						\

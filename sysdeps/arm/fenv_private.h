@@ -1,5 +1,5 @@
 /* Private floating point rounding and exceptions handling.  ARM VFP version.
-   Copyright (C) 2014-2015 Free Software Foundation, Inc.
+   Copyright (C) 2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -129,7 +129,7 @@ libc_feupdateenv_test_vfp (const fenv_t *envp, int ex)
 
   /* Raise the exceptions if enabled in the new FP state.  */
   if (__glibc_unlikely (excepts & (new_fpscr >> FE_EXCEPT_SHIFT)))
-    __feraiseexcept (excepts);
+    feraiseexcept (excepts);
 
   return excepts & ex;
 }

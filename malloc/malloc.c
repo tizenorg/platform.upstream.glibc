@@ -1,5 +1,5 @@
 /* Malloc implementation for multiple threads without lock contention.
-   Copyright (C) 1996-2015 Free Software Foundation, Inc.
+   Copyright (C) 1996-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Wolfram Gloger <wg@malloc.de>
    and Doug Lea <dl@cs.oswego.edu>, 2001.
@@ -1418,10 +1418,8 @@ typedef struct malloc_chunk *mbinptr;
         BK->fd = FD;							      \
         if (!in_smallbin_range (P->size)				      \
             && __builtin_expect (P->fd_nextsize != NULL, 0)) {		      \
-	    if (__builtin_expect (P->fd_nextsize->bk_nextsize != P, 0)	      \
-		|| __builtin_expect (P->bk_nextsize->fd_nextsize != P, 0))    \
-	      malloc_printerr (check_action,				      \
-			       "corrupted double-linked list (not small)", P);\
+            assert (P->fd_nextsize->bk_nextsize == P);			      \
+            assert (P->bk_nextsize->fd_nextsize == P);			      \
             if (FD->fd_nextsize == NULL) {				      \
                 if (P->fd_nextsize == P)				      \
                   FD->fd_nextsize = FD->bk_nextsize = FD;		      \
@@ -1854,14 +1852,14 @@ static int check_action = DEFAULT_CHECK_ACTION;
 
 static int perturb_byte;
 
-static void
+static inline void
 alloc_perturb (char *p, size_t n)
 {
   if (__glibc_unlikely (perturb_byte))
     memset (p, perturb_byte ^ 0xff, n);
 }
 
-static void
+static inline void
 free_perturb (char *p, size_t n)
 {
   if (__glibc_unlikely (perturb_byte))
@@ -4973,7 +4971,7 @@ __posix_memalign (void **memptr, size_t alignment, size_t size)
   /* Test whether the SIZE argument is valid.  It must be a power of
      two multiple of sizeof (void *).  */
   if (alignment % sizeof (void *) != 0
-      || !powerof2 (alignment / sizeof (void *))
+      || !powerof2 (alignment / sizeof (void *)) != 0
       || alignment == 0)
     return EINVAL;
 
@@ -4993,7 +4991,7 @@ weak_alias (__posix_memalign, posix_memalign)
 
 
 int
-__malloc_info (int options, FILE *fp)
+malloc_info (int options, FILE *fp)
 {
   /* For now, at least.  */
   if (options != 0)
@@ -5166,7 +5164,6 @@ __malloc_info (int options, FILE *fp)
 
   return 0;
 }
-weak_alias (__malloc_info, malloc_info)
 
 
 strong_alias (__libc_calloc, __calloc) weak_alias (__libc_calloc, calloc)

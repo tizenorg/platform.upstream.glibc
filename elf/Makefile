@@ -1,4 +1,4 @@
-# Copyright (C) 1995-2015 Free Software Foundation, Inc.
+# Copyright (C) 1995-2014 Free Software Foundation, Inc.
 # This file is part of the GNU C Library.
 
 # The GNU C Library is free software; you can redistribute it and/or
@@ -96,7 +96,7 @@ extra-objs += sotruss-lib.os sotruss-lib.so
 install-others += $(inst_auditdir)/sotruss-lib.so
 install-bin-script += sotruss
 generated += sotruss
-libof-sotruss-lib = extramodules
+CPPFLAGS-sotruss-lib = -DNOT_IN_libc
 $(objpfx)sotruss-lib.so: $(objpfx)sotruss-lib.os
 	$(build-module-asneeded)
 $(objpfx)sotruss-lib.so: $(common-objpfx)libc.so $(objpfx)ld.so \
@@ -353,16 +353,10 @@ $(objpfx)ld.so: $(objpfx)librtld.os $(ld-map)
 	  | $(AWK) '($$7 ~ /^UND(|EF)$$/ && $$1 != "0:" && $$4 != "REGISTER") { print; p=1 } END { exit p != 0 }'
 	mv -f $@.new $@
 
-# interp.c exists just to get the runtime linker path into libc.so.
-$(objpfx)interp.os: $(elf-objpfx)runtime-linker.h
-
-$(elf-objpfx)runtime-linker.h: $(elf-objpfx)runtime-linker.st; @:
-$(elf-objpfx)runtime-linker.st: $(common-objpfx)config.make
-	$(name-target-directory)
-	echo '#define RUNTIME_LINKER "$(rtlddir)/$(rtld-installed-name)"' \
-		> ${@:st=T}
-	$(move-if-change) ${@:st=T} ${@:st=h}
-	touch $@
+# interp.c exists just to get this string into the libraries.
+CFLAGS-interp.c = -D'RUNTIME_LINKER="$(rtlddir)/$(rtld-installed-name)"' \
+		  -DNOT_IN_libc=1
+$(objpfx)interp.os: $(common-objpfx)config.make
 
 ifneq (ld.so,$(rtld-installed-name))
 # Make sure ld.so.1 exists in the build directory so we can link
@@ -436,15 +430,13 @@ $(objpfx)ldconfig: $(ldconfig-modules:%=$(objpfx)%.o)
 
 SYSCONF-FLAGS := -D'SYSCONFDIR="$(sysconfdir)"'
 CFLAGS-ldconfig.c = $(SYSCONF-FLAGS) -D'LIBDIR="$(libdir)"' \
-		    -D'SLIBDIR="$(slibdir)"'
-libof-ldconfig = ldconfig
+		    -D'SLIBDIR="$(slibdir)"' -DIS_IN_ldconfig=1
 CFLAGS-dl-cache.c = $(SYSCONF-FLAGS)
 CFLAGS-cache.c = $(SYSCONF-FLAGS)
 CFLAGS-rtld.c = $(SYSCONF-FLAGS)
 
-cpp-srcs-left := $(all-rtld-routines:=.os)
-lib := rtld
-include $(patsubst %,$(..)cppflags-iterator.mk,$(cpp-srcs-left))
+CPPFLAGS-.os += $(if $(filter $(@F),$(patsubst %,%.os,$(all-rtld-routines))),\
+		     -DNOT_IN_libc=1 -DIS_IN_rtld=1 -DIN_LIB=rtld)
 
 test-modules = $(addprefix $(objpfx),$(addsuffix .so,$(strip $(modules-names))))
 generated += $(addsuffix .so,$(strip $(modules-names)))
@@ -861,8 +853,6 @@ $(objpfx)tst-execstack-needed: $(objpfx)tst-execstack-mod.so
 LDFLAGS-tst-execstack-needed = -Wl,-z,noexecstack
 
 LDFLAGS-tst-execstack-prog = -Wl,-z,execstack
-CFLAGS-tst-execstack-prog.c += -Wno-trampolines
-CFLAGS-tst-execstack-mod.c += -Wno-trampolines
 endif
 
 LDFLAGS-tst-array2 = $(no-as-needed)
@@ -908,7 +898,7 @@ CFLAGS-tst-pie2.c += $(pie-ccflag)
 $(objpfx)tst-pie1: $(objpfx)tst-piemod1.so
 
 ifeq (yes,$(build-shared))
-all-built-dso := $(common-objpfx)elf/ld.so $(common-objpfx)libc.so \
+all-built-dso := $(common-objpfx)libc.so \
 		 $(filter-out $(common-objpfx)linkobj/libc.so, \
 			      $(sort $(wildcard $(addprefix $(common-objpfx), \
 							    */lib*.so \
@@ -967,7 +957,6 @@ common-generated += $(all-built-dso:$(common-objpfx)%=%.jmprel)
 
 localplt-built-dso := $(addprefix $(common-objpfx),\
 				  libc.so \
-				  elf/ld.so \
 				  math/libm.so \
 				  rt/librt.so \
 				  dlfcn/libdl.so \

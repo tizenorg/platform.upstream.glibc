@@ -1,5 +1,5 @@
 /* Software floating-point emulation: convert to fortran nearest.
-   Copyright (C) 1997-2015 Free Software Foundation, Inc.
+   Copyright (C) 1997-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Richard Henderson (rth@cygnus.com) and
 		  Jakub Jelinek (jj@ultra.linux.cz).
@@ -33,7 +33,7 @@ _OtsNintXQ (long al, long ah, long _round)
   _round = _round & 3;
 
   FP_INIT_ROUNDMODE;
-  AXP_UNPACK_SEMIRAW_Q(A, a);
+  FP_UNPACK_SEMIRAW_Q(A, a);
 
   /* Build 0.5 * sign(A) */
   B_e = _FP_EXPBIAS_Q;

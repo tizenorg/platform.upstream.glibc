@@ -1,5 +1,5 @@
 /* On-demand PLT fixup for shared objects.
-   Copyright (C) 1995-2015 Free Software Foundation, Inc.
+   Copyright (C) 1995-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -158,7 +158,7 @@ _dl_profile_fixup (
 		   struct link_map *l, ElfW(Word) reloc_arg,
 		   ElfW(Addr) retaddr, void *regs, long int *framesizep)
 {
-  void (*mcount_fct) (ElfW(Addr), ElfW(Addr)) = _dl_mcount;
+  void (*mcount_fct) (ElfW(Addr), ElfW(Addr)) = INTUSE(_dl_mcount);
 
   if (l->l_reloc_result == NULL)
     {

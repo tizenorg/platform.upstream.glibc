@@ -1,4 +1,4 @@
-# Copyright (C) 1991-2015 Free Software Foundation, Inc.
+# Copyright (C) 1991-2014 Free Software Foundation, Inc.
 # This file is part of the GNU C Library.
 
 # The GNU C Library is free software; you can redistribute it and/or
@@ -145,7 +145,7 @@ LDFLAGS-tst-putenv = $(no-as-needed)
 
 $(objpfx)tst-putenvmod.so: $(objpfx)tst-putenvmod.os $(link-libc-deps)
 	$(build-module)
-libof-tst-putenvmod = extramodules
+CFLAGS-tst-putenvmod.c = -DNOT_IN_libc=1
 
 $(objpfx)bug-getcontext: $(libm)
 $(objpfx)tst-strtod-round: $(libm)

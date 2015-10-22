@@ -1,4 +1,4 @@
-/* Copyright (C) 2005-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2005-2014 Free Software Foundation, Inc.
 
    This file is part of the GNU C Library.
 
@@ -59,9 +59,14 @@ typedef struct
   void *private;
 } tcbhead_t;
 
-#define READ_THREAD_POINTER() \
-  ({ register void *__microblaze_thread_area asm ("r21"); \
-     __microblaze_thread_area; })
+static inline void *__microblaze_get_thread_area (void)
+{
+  register void * volatile __microblaze_thread_area asm ("r21");
+  return (void *) __microblaze_thread_area;
+}
+
+# define READ_THREAD_POINTER() \
+  ({ __microblaze_get_thread_area(); })
 
 /* This is the size of the initial TCB.  */
 # define TLS_INIT_TCB_SIZE  sizeof (tcbhead_t)
@@ -94,7 +99,7 @@ typedef struct
 /* Code to initially initialize the thread pointer.
    r21 is reserved for thread pointer.  */
 # define TLS_INIT_TP(tcbp) \
-  ({ __asm __volatile ("or r21,r0,%0" : : "r" ((void *)tcbp)); NULL; })
+  ({ __asm __volatile ("or r21,r0,%0" : : "r" ((void *)tcbp)); 0; })
 
 # define TLS_DEFINE_INIT_TP(tp, pd) void *tp = (pd) + 1
 

@@ -174,13 +174,6 @@ setuid and owned by @code{root}.  The use of @file{pt_chown} introduces
 additional security risks to the system and you should enable it only if
 you understand and accept those risks.
 
-@item --disable-werror
-By default, @theglibc{} is built with @option{-Werror}.  If you wish
-to build without this option (for example, if building with a newer
-version of GCC than this version of @theglibc{} was tested with, so
-new warnings cause the build with @option{-Werror} to fail), you can
-configure with @option{--disable-werror}.
-
 @item --build=@var{build-system}
 @itemx --host=@var{host-system}
 These options are for cross-compiling.  If you specify both options and
@@ -379,13 +372,10 @@ recommend GNU @code{make} version 3.79.  All earlier versions have severe
 bugs or lack features.
 
 @item
-GCC 4.6 or newer
+GCC 4.4 or newer, GCC 4.6 recommended
 
-GCC 4.6 or higher is required.  In general it is recommended to use
-the newest version of the compiler that is known to work for building
-@theglibc{}, as newer compilers usually produce better code.  As of
-release time, GCC 4.9.2 is the newest compiler verified to work to build
-@theglibc{}.
+GCC 4.4 or higher is required; as of this writing, GCC 4.6 is the
+compiler we advise to use to build @theglibc{}.
 
 You can use whatever compiler you like to compile programs that use
 @theglibc{}.
@@ -393,22 +383,19 @@ You can use whatever compiler you like to compile programs that use
 Check the FAQ for any special compiler issues on particular platforms.
 
 @item
-GNU @code{binutils} 2.22 or later
+GNU @code{binutils} 2.20 or later
 
 You must use GNU @code{binutils} (as and ld) to build @theglibc{}.
 No other assembler or linker has the necessary functionality at the
-moment. As of release time, GNU @code{binutils} 2.25 is the newest
-verified to work to build @theglibc{}.
+moment.
 
 @item
-GNU @code{texinfo} 4.7 or later
+GNU @code{texinfo} 4.5 or later
 
 To correctly translate and install the Texinfo documentation you need
 this version of the @code{texinfo} package.  Earlier versions do not
 understand all the tags used in the document, and the installation
 mechanism for the info files is not present or works differently.
-As of release time, @code{texinfo} 5.2 is the newest verified to work
-to build @theglibc{}.
 
 @item
 GNU @code{awk} 3.1.2, or higher
@@ -440,7 +427,7 @@ If you change any of the @file{configure.ac} files you will also need
 
 @itemize @bullet
 @item
-GNU @code{autoconf} 2.69 (exactly)
+GNU @code{autoconf} 2.53 or higher
 @end itemize
 
 @noindent
@@ -449,15 +436,6 @@ and if you change any of the message translation files you will need
 @itemize @bullet
 @item
 GNU @code{gettext} 0.10.36 or later
-@end itemize
-
-@noindent
-If you wish to regenerate the @code{yacc} parser code in the @file{intl}
-subdirectory you will need
-
-@itemize @bullet
-@item
-GNU @code{bison} 2.7 or later
 @end itemize
 
 @noindent

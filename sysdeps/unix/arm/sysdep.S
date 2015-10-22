@@ -1,4 +1,4 @@
-/* Copyright (C) 1991-2015 Free Software Foundation, Inc.
+/* Copyright (C) 1991-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -19,7 +19,7 @@
 #define _ERRNO_H
 #include <bits/errno.h>
 
-#if IS_IN (rtld)
+#ifdef IS_IN_rtld
 # include <dl-sysdep.h>			/* Defines RTLD_PRIVATE_ERRNO.  */
 #endif
 
@@ -36,7 +36,7 @@ __syscall_error:
 	moveq	r0, $EAGAIN	/* Yes; translate it to EAGAIN.  */
 #endif
 
-#if !IS_IN (rtld)
+#ifndef IS_IN_rtld
 	mov	r1, r0
 	GET_TLS (r2)
 	ldr	r2, 1f

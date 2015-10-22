@@ -1,4 +1,4 @@
-/* Copyright (C) 2003-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2003-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Jakub Jelinek <jakub@redhat.com>, 2003.
 
@@ -34,17 +34,14 @@ clear_once_control (void *arg)
      other threads that see this value: This function will be called if we
      get interrupted (see __pthread_once), so all we need to relay to other
      threads is the state being reset again.  */
-  atomic_store_relaxed (once_control, 0);
+  *once_control = 0;
   lll_futex_wake (once_control, INT_MAX, LLL_PRIVATE);
 }
 
 
 /* This is similar to a lock implementation, but we distinguish between three
-   states: not yet initialized (0), initialization in progress
-   (__fork_generation | __PTHREAD_ONCE_INPROGRESS), and initialization
-   finished (__PTHREAD_ONCE_DONE); __fork_generation does not use the bits
-   that are used for __PTHREAD_ONCE_INPROGRESS and __PTHREAD_ONCE_DONE (which
-   is what __PTHREAD_ONCE_FORK_GEN_INCR is used for).  If in the first state,
+   states: not yet initialized (0), initialization finished (2), and
+   initialization in progress (__fork_generation | 1).  If in the first state,
    threads will try to run the initialization by moving to the second state;
    the first thread to do so via a CAS on once_control runs init_routine,
    other threads block.
@@ -58,47 +55,48 @@ clear_once_control (void *arg)
    initialization is interrupted, we then fork 2^30 times (30 bits of
    once_control are used for the fork generation), and try to initialize
    again, we can deadlock because we can't distinguish the in-progress and
-   interrupted cases anymore.
-   XXX: We split out this slow path because current compilers do not generate
-   as efficient code when the fast path in __pthread_once below is not in a
-   separate function.  */
-static int
-__attribute__ ((noinline))
-__pthread_once_slow (pthread_once_t *once_control, void (*init_routine) (void))
+   interrupted cases anymore.  */
+int
+__pthread_once (once_control, init_routine)
+     pthread_once_t *once_control;
+     void (*init_routine) (void);
 {
   while (1)
     {
-      int val, newval;
+      int oldval, val, newval;
 
       /* We need acquire memory order for this load because if the value
-         signals that initialization has finished, we need to see any
+         signals that initialization has finished, we need to be see any
          data modifications done during initialization.  */
-      val = atomic_load_acquire (once_control);
+      val = *once_control;
+      atomic_read_barrier();
       do
 	{
 	  /* Check if the initialization has already been done.  */
-	  if (__glibc_likely ((val & __PTHREAD_ONCE_DONE) != 0))
+	  if (__glibc_likely ((val & 2) != 0))
 	    return 0;
 
+	  oldval = val;
 	  /* We try to set the state to in-progress and having the current
 	     fork generation.  We don't need atomic accesses for the fork
 	     generation because it's immutable in a particular process, and
 	     forked child processes start with a single thread that modified
 	     the generation.  */
-	  newval = __fork_generation | __PTHREAD_ONCE_INPROGRESS;
+	  newval = __fork_generation | 1;
 	  /* We need acquire memory order here for the same reason as for the
 	     load from once_control above.  */
+	  val = atomic_compare_and_exchange_val_acq (once_control, newval,
+						     oldval);
 	}
-      while (__glibc_unlikely (!atomic_compare_exchange_weak_acquire (
-	  once_control, &val, newval)));
+      while (__glibc_unlikely (val != oldval));
 
       /* Check if another thread already runs the initializer.	*/
-      if ((val & __PTHREAD_ONCE_INPROGRESS) != 0)
+      if ((oldval & 1) != 0)
 	{
 	  /* Check whether the initializer execution was interrupted by a
-	     fork.  We know that for both values, __PTHREAD_ONCE_INPROGRESS
-	     is set and __PTHREAD_ONCE_DONE is not.  */
-	  if (val == newval)
+	     fork.  We know that for both values, bit 0 is set and bit 1 is
+	     not.  */
+	  if (oldval == newval)
 	    {
 	      /* Same generation, some other thread was faster. Wait.  */
 	      lll_futex_wait (once_control, newval, LLL_PRIVATE);
@@ -119,7 +117,8 @@ __pthread_once_slow (pthread_once_t *once_control, void (*init_routine) (void))
       /* Mark *once_control as having finished the initialization.  We need
          release memory order here because we need to synchronize with other
          threads that want to use the initialized data.  */
-      atomic_store_release (once_control, __PTHREAD_ONCE_DONE);
+      atomic_write_barrier();
+      *once_control = 2;
 
       /* Wake up all other threads.  */
       lll_futex_wake (once_control, INT_MAX, LLL_PRIVATE);
@@ -127,18 +126,6 @@ __pthread_once_slow (pthread_once_t *once_control, void (*init_routine) (void))
     }
 
   return 0;
-}
-
-int
-__pthread_once (pthread_once_t *once_control, void (*init_routine) (void))
-{
-  /* Fast path.  See __pthread_once_slow.  */
-  int val;
-  val = atomic_load_acquire (once_control);
-  if (__glibc_likely ((val & __PTHREAD_ONCE_DONE) != 0))
-    return 0;
-  else
-    return __pthread_once_slow (once_control, init_routine);
 }
 weak_alias (__pthread_once, pthread_once)
 hidden_def (__pthread_once)

@@ -1,4 +1,4 @@
-/* Copyright (C) 2003-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2003-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Jakub Jelinek <jakub@redhat.com>, 2003.
 
@@ -22,7 +22,7 @@
 # include <nptl/pthreadP.h>
 #endif
 
-#if IS_IN (libc) || IS_IN (libpthread) || IS_IN (librt)
+#if !defined NOT_IN_libc || defined IS_IN_libpthread || defined IS_IN_librt
 
 # undef PSEUDO
 # define PSEUDO(name, syscall_name, args)				      \
@@ -69,15 +69,15 @@ L(pseudo_check):							      \
 .size	__##syscall_name##_nocancel,.-__##syscall_name##_nocancel;	      \
 L(pseudo_end):
 
-# if IS_IN (libpthread)
+# ifdef IS_IN_libpthread
 #  define CENABLE	__pthread_enable_asynccancel
 #  define CDISABLE	__pthread_disable_asynccancel
 #  define __local_multiple_threads	__pthread_multiple_threads
-# elif IS_IN (libc)
+# elif !defined NOT_IN_libc
 #  define CENABLE	__libc_enable_asynccancel
 #  define CDISABLE	__libc_disable_asynccancel
 #  define __local_multiple_threads	__libc_multiple_threads
-# elif IS_IN (librt)
+# elif defined IS_IN_librt
 #  define CENABLE	__librt_enable_asynccancel
 #  define CDISABLE	__librt_disable_asynccancel
 # else
@@ -111,7 +111,7 @@ L(pseudo_end):
 #define LR7_6		lg %r7,56+160(%r15); \
 			cfi_restore (%r7);
 
-# if IS_IN (libpthread) || IS_IN (libc)
+# if defined IS_IN_libpthread || !defined NOT_IN_libc
 #  ifndef __ASSEMBLER__
 extern int __local_multiple_threads attribute_hidden;
 #   define SINGLE_THREAD_P \

@@ -1,6 +1,6 @@
 /* Verify that ftell returns the correct value at various points before and
    after the handler on which it is called becomes active.
-   Copyright (C) 2014-2015 Free Software Foundation, Inc.
+   Copyright (C) 2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -86,99 +86,8 @@ static size_t data_len;
 static size_t file_len;
 
 typedef int (*fputs_func_t) (const void *data, FILE *fp);
-typedef void *(*fgets_func_t) (void *ws, int n, FILE *fp);
 fputs_func_t fputs_func;
-fgets_func_t fgets_func;
 
-/* This test verifies that the offset reported by ftell is correct after the
-   file is truncated using ftruncate.  ftruncate does not change the file
-   offset on truncation and hence, SEEK_CUR should continue to point to the
-   old offset and not be changed to the new offset.  */
-static int
-do_ftruncate_test (const char *filename)
-{
-  FILE *fp = NULL;
-  int fd;
-  int ret = 0;
-  struct test
-    {
-      const char *mode;
-      int fd_mode;
-    } test_modes[] = {
-	  {"r+", O_RDWR},
-	  {"w", O_WRONLY | O_TRUNC},
-	  {"w+", O_RDWR | O_TRUNC},
-	  {"a", O_WRONLY},
-	  {"a+", O_RDWR}
-    };
-
-  for (int j = 0; j < 2; j++)
-    {
-      for (int i = 0; i < sizeof (test_modes) / sizeof (struct test); i++)
-	{
-	  int fileret;
-	  printf ("\tftruncate: %s (file, \"%s\"): ",
-		  j == 0 ? "fopen" : "fdopen",
-		  test_modes[i].mode);
-
-	  if (j == 0)
-	    fileret = get_handles_fopen (filename, fd, fp, test_modes[i].mode);
-	  else
-	    fileret = get_handles_fdopen (filename, fd, fp,
-					  test_modes[i].fd_mode,
-					  test_modes[i].mode);
-
-	  if (fileret != 0)
-	    return fileret;
-
-	  /* Write some data.  */
-	  size_t written = fputs_func (data, fp);
-
-	  if (written == EOF)
-	    {
-	      printf ("fputs[1] failed to write data\n");
-	      ret |= 1;
-	    }
-
-	  /* Record the offset.  */
-	  long offset = ftell (fp);
-
-	  /* Flush data to allow switching active handles.  */
-	  if (fflush (fp))
-	    {
-	      printf ("Flush failed: %m\n");
-	      ret |= 1;
-	    }
-
-	  /* Now truncate the file.  */
-	  if (ftruncate (fd, 0) != 0)
-	    {
-	      printf ("Failed to truncate file: %m\n");
-	      ret |= 1;
-	    }
-
-	  /* ftruncate does not change the offset, so there is no need to call
-	     anything to be able to switch active handles.  */
-	  long new_offset = ftell (fp);
-
-	  /* The offset should remain unchanged since ftruncate does not update
-	     it.  */
-	  if (offset != new_offset)
-	    {
-	      printf ("Incorrect offset.  Expected %ld, but got %ld\n",
-		      offset, new_offset);
-
-	      ret |= 1;
-	    }
-	  else
-	    printf ("offset = %ld\n", offset);
-
-	  fclose (fp);
-	}
-    }
-
-  return ret;
-}
 /* Test that ftell output after a rewind is correct.  */
 static int
 do_rewind_test (const char *filename)
@@ -191,8 +100,8 @@ do_rewind_test (const char *filename)
       size_t old_off;
       size_t new_off;
     } test_modes[] = {
-	  {"w", O_WRONLY | O_TRUNC, 0, data_len},
-	  {"w+", O_RDWR | O_TRUNC, 0, data_len},
+	  {"w", O_WRONLY, 0, data_len},
+	  {"w+", O_RDWR, 0, data_len},
 	  {"r+", O_RDWR, 0, data_len},
 	  /* The new offsets for 'a' and 'a+' modes have to factor in the
 	     previous writes since they always append to the end of the
@@ -292,22 +201,20 @@ do_ftell_test (const char *filename)
       int fd_mode;
       size_t old_off;
       size_t new_off;
-      size_t eof_off;
     } test_modes[] = {
 	  /* In w, w+ and r+ modes, the file position should be at the
 	     beginning of the file.  After the write, the offset should be
-	     updated to data_len.  We don't use eof_off in w and a modes since
-	     they don't allow reading.  */
-	  {"w", O_WRONLY | O_TRUNC, 0, data_len, 0},
-	  {"w+", O_RDWR | O_TRUNC, 0, data_len, 2 * data_len},
-	  {"r+", O_RDWR, 0, data_len, 3 * data_len},
+	     updated to data_len.  */
+	  {"w", O_WRONLY, 0, data_len},
+	  {"w+", O_RDWR, 0, data_len},
+	  {"r+", O_RDWR, 0, data_len},
 	  /* For the 'a' mode, the initial file position should be the
 	     current end of file. After the write, the offset has data_len
 	     added to the old value.  For a+ mode however, the initial file
 	     position is the file position of the underlying file descriptor,
 	     since it is initially assumed to be in read mode.  */
-	  {"a", O_WRONLY, 3 * data_len, 4 * data_len, 5 * data_len},
-	  {"a+", O_RDWR, 0, 5 * data_len, 6 * data_len},
+	  {"a", O_WRONLY, data_len, 2 * data_len},
+	  {"a+", O_RDWR, 0, 3 * data_len},
     };
   for (int j = 0; j < 2; j++)
     {
@@ -352,44 +259,12 @@ do_ftell_test (const char *filename)
 
 	  if (off != test_modes[i].new_off)
 	    {
-	      printf ("Incorrect new offset.  Expected %zu but got %ld",
+	      printf ("Incorrect new offset.  Expected %zu but got %ld\n",
 		      test_modes[i].new_off, off);
 	      ret |= 1;
 	    }
 	  else
-	    printf ("new offset = %ld", off);
-
-	  /* Read to the end, write some data to the fd and check if ftell can
-	     see the new ofset.  Do this test only for files that allow
-	     reading.  */
-	  if (test_modes[i].fd_mode != O_WRONLY)
-	    {
-	      wchar_t tmpbuf[data_len];
-
-	      rewind (fp);
-
-	      while (fgets_func (tmpbuf, data_len, fp) && !feof (fp));
-
-	      write_ret = write (fd, data, data_len);
-	      if (write_ret != data_len)
-		{
-		  printf ("write failed (%m)\n");
-		  ret |= 1;
-		}
-	      off = ftell (fp);
-
-	      if (off != test_modes[i].eof_off)
-		{
-		  printf (", Incorrect offset after read EOF.  "
-			  "Expected %zu but got %ld\n",
-			  test_modes[i].eof_off, off);
-		  ret |= 1;
-		}
-	      else
-		printf (", offset after EOF = %ld\n", off);
-	    }
-	  else
-	    putc ('\n', stdout);
+	    printf ("new offset = %ld\n", off);
 
 	  fclose (fp);
 	}
@@ -411,8 +286,8 @@ do_write_test (const char *filename)
       const char *mode;
       int fd_mode;
     } test_modes[] = {
-	  {"w", O_WRONLY | O_TRUNC},
-	  {"w+", O_RDWR | O_TRUNC},
+	  {"w", O_WRONLY},
+	  {"w+", O_RDWR},
 	  {"r+", O_RDWR}
     };
 
@@ -574,23 +449,23 @@ do_append_test (const char *filename)
 
   if (seek_ret != new_seek_ret)
     {
-      printf ("incorrectly modified file offset to %jd, should be %jd",
-	      (intmax_t)  new_seek_ret, (intmax_t) seek_ret);
+      printf ("incorrectly modified file offset to %ld, should be %ld",
+	      new_seek_ret, seek_ret);
       ret |= 1;
     }
   else
-    printf ("retained current file offset %jd", (intmax_t) seek_ret);
+    printf ("retained current file offset %ld", seek_ret);
 
   new_seek_ret = ftello (fp);
 
   if (seek_ret != new_seek_ret)
     {
-      printf (", ftello reported incorrect offset %jd, should be %jd\n",
-	      (intmax_t) new_seek_ret, (intmax_t) seek_ret);
+      printf (", ftello reported incorrect offset %ld, should be %ld\n",
+	      new_seek_ret, seek_ret);
       ret |= 1;
     }
   else
-    printf (", ftello reported correct offset %jd\n", (intmax_t) seek_ret);
+    printf (", ftello reported correct offset %ld\n", seek_ret);
 
   fclose (fp);
 
@@ -606,7 +481,6 @@ do_one_test (const char *filename)
   ret |= do_write_test (filename);
   ret |= do_append_test (filename);
   ret |= do_rewind_test (filename);
-  ret |= do_ftruncate_test (filename);
 
   return ret;
 }
@@ -653,7 +527,6 @@ do_test (void)
   /* Tests for regular files.  */
   puts ("Regular mode:");
   fputs_func = (fputs_func_t) fputs;
-  fgets_func = (fgets_func_t) fgets;
   data = char_data;
   data_len = strlen (char_data);
   ret |= do_one_test (filename);
@@ -675,7 +548,6 @@ do_test (void)
       return 1;
     }
   fputs_func = (fputs_func_t) fputws;
-  fgets_func = (fgets_func_t) fgetws;
   data = wide_data;
   data_len = wcslen (wide_data);
   ret |= do_one_test (filename);

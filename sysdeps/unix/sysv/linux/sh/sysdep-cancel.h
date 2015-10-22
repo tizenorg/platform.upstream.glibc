@@ -1,4 +1,4 @@
-/* Copyright (C) 2003-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2003-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -21,7 +21,7 @@
 # include <nptl/pthreadP.h>
 #endif
 
-#if IS_IN (libc) || IS_IN (libpthread) || IS_IN (librt)
+#if !defined NOT_IN_libc || defined IS_IN_libpthread || defined IS_IN_librt
 
 # define _IMM12 #-12
 # define _IMM16 #-16
@@ -105,13 +105,13 @@
 # define LOAD_ARGS_5	LOAD_ARGS_4
 # define LOAD_ARGS_6	LOAD_ARGS_5
 
-# if IS_IN (libpthread)
+# ifdef IS_IN_libpthread
 #  define __local_enable_asynccancel	__pthread_enable_asynccancel
 #  define __local_disable_asynccancel	__pthread_disable_asynccancel
-# elif IS_IN (libc)
+# elif !defined NOT_IN_libc
 #  define __local_enable_asynccancel	__libc_enable_asynccancel
 #  define __local_disable_asynccancel	__libc_disable_asynccancel
-# elif IS_IN (librt)
+# elif defined IS_IN_librt
 #  define __local_enable_asynccancel	__librt_enable_asynccancel
 #  define __local_disable_asynccancel	__librt_disable_asynccancel
 # else

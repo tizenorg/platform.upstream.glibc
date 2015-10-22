@@ -1,6 +1,6 @@
 /* Multiple versions of memmove.
    All versions must be listed in ifunc-impl-list.c.
-   Copyright (C) 2010-2015 Free Software Foundation, Inc.
+   Copyright (C) 2010-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -17,7 +17,7 @@
    License along with the GNU C Library; if not, see
    <http://www.gnu.org/licenses/>.  */
 
-#if IS_IN (libc)
+#ifndef NOT_IN_libc
 # define MEMMOVE __memmove_sse2
 # ifdef SHARED
 #  undef libc_hidden_builtin_def
@@ -41,7 +41,7 @@ extern __typeof (__redirect_memmove) __memmove_avx_unaligned attribute_hidden;
 
 #include "string/memmove.c"
 
-#if IS_IN (libc)
+#ifndef NOT_IN_libc
 # include <shlib-compat.h>
 # include "init-arch.h"
 
@@ -49,7 +49,7 @@ extern __typeof (__redirect_memmove) __memmove_avx_unaligned attribute_hidden;
    ifunc symbol properly.  */
 extern __typeof (__redirect_memmove) __libc_memmove;
 libc_ifunc (__libc_memmove,
-	    HAS_AVX_FAST_UNALIGNED_LOAD
+	    HAS_AVX
 	    ? __memmove_avx_unaligned
 	    : (HAS_SSSE3
 	       ? (HAS_FAST_COPY_BACKWARD

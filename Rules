@@ -1,4 +1,4 @@
-# Copyright (C) 1991-2015 Free Software Foundation, Inc.
+# Copyright (C) 1991-2014 Free Software Foundation, Inc.
 # This file is part of the GNU C Library.
 
 # The GNU C Library is free software; you can redistribute it and/or
@@ -84,6 +84,10 @@ common-generated += dummy.o dummy.c
 # This makes all the auxiliary and test programs.
 
 .PHONY: others tests bench
+ifeq ($(multi-arch),no)
+tests := $(filter-out $(tests-ifunc), $(tests))
+xtests := $(filter-out $(xtests-ifunc), $(xtests))
+endif
 
 ifeq ($(build-programs),yes)
 others: $(addprefix $(objpfx),$(others) $(sysdep-others) $(extra-objs))

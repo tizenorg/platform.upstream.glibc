@@ -1,6 +1,6 @@
 #! /bin/sh
 
-# Copyright 2014-2015 Free Software Foundation, Inc.
+# Copyright 2014 Free Software Foundation, Inc.
 # This file is part of the GNU C Library.
 
 # The GNU C Library is free software; you can redistribute it and/or
@@ -29,11 +29,6 @@ success=:
 
 # If no arguments are given, take all *.texi files in the current directory.
 test $# != 0 || set *.texi
-
-# FIXME: check that each @deftypefu?n is followed by a @safety note,
-# with nothing but @deftypefu?nx and comment lines in between.  (There
-# might be more stuff too).
-
 
 # Check that all safety remarks have entries for all of MT, AS and AC,
 # in this order, with an optional prelim note before them.

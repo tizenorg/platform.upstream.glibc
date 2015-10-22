@@ -1,4 +1,4 @@
-/* Copyright (C) 1999-2015 Free Software Foundation, Inc.
+/* Copyright (C) 1999-2014 Free Software Foundation, Inc.
    Contributed by David Mosberger-Tang <davidm@hpl.hp.com>.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -178,7 +178,7 @@ ENTRY(__sigsetjmp)
 	;;
 	st8.nta [r2]=r25		// ar.unat
 	st8.nta [r3]=in0		// &__jmp_buf
-#if IS_IN (rtld)
+#ifdef IS_IN_rtld
 	/* In ld.so we never save the signal mask.  */
 	;;
 #else

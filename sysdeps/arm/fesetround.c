@@ -1,5 +1,5 @@
 /* Set current rounding direction.
-   Copyright (C) 2004-2015 Free Software Foundation, Inc.
+   Copyright (C) 2004-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -21,7 +21,7 @@
 
 
 int
-__fesetround (int round)
+fesetround (int round)
 {
   /* FE_TONEAREST is the only supported rounding mode
      if a VFP unit isn't present.  */
@@ -34,6 +34,4 @@ __fesetround (int round)
   libc_fesetround_vfp (round);
   return 0;
 }
-libm_hidden_def (__fesetround)
-weak_alias (__fesetround, fesetround)
-libm_hidden_weak (fesetround)
+libm_hidden_def (fesetround)

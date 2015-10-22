@@ -1,4 +1,4 @@
-/* Copyright (C) 1997-2015 Free Software Foundation, Inc.
+/* Copyright (C) 1997-2014 Free Software Foundation, Inc.
 
    This file is part of the GNU C Library.
 
@@ -28,7 +28,7 @@ feclearexcept (int excepts)
   excepts &= FE_ALL_EXCEPT;
 
   _FPU_GETFPSR (fpsr);
-  fpsr_new = fpsr & ~excepts;
+  fpsr_new = (fpsr & ~FE_ALL_EXCEPT) | (fpsr & FE_ALL_EXCEPT & ~excepts);
 
   if (fpsr != fpsr_new)
     _FPU_SETFPSR (fpsr_new);

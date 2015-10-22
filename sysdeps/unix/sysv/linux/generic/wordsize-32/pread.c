@@ -1,4 +1,4 @@
-/* Copyright (C) 2011-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2011-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Chris Metcalf <cmetcalf@tilera.com>, 2011.
    Based on work contributed by Ulrich Drepper <drepper@cygnus.com>, 1997.
@@ -35,7 +35,11 @@ do_pread (int fd, void *buf, size_t count, off_t offset)
 }
 
 ssize_t
-__libc_pread (int fd, void *buf, size_t count, off_t offset)
+__libc_pread (fd, buf, count, offset)
+     int fd;
+     void *buf;
+     size_t count;
+     off_t offset;
 {
   if (SINGLE_THREAD_P)
     return do_pread (fd, buf, count, offset);

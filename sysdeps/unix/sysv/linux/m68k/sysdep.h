@@ -1,4 +1,4 @@
-/* Copyright (C) 1996-2015 Free Software Foundation, Inc.
+/* Copyright (C) 1996-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Written by Andreas Schwab, <schwab@issan.informatik.uni-dortmund.de>,
    December 1995.
@@ -101,7 +101,7 @@ SYSCALL_ERROR_LABEL:							      \
     move.l %d0, %a0;							      \
     rts;
 # elif defined _LIBC_REENTRANT
-#  if IS_IN (libc)
+#  ifndef NOT_IN_libc
 #   define SYSCALL_ERROR_ERRNO __libc_errno
 #  else
 #   define SYSCALL_ERROR_ERRNO errno

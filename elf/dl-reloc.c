@@ -1,5 +1,5 @@
 /* Relocate a shared object and resolve its references to other loaded objects.
-   Copyright (C) 1995-2015 Free Software Foundation, Inc.
+   Copyright (C) 1995-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -279,12 +279,8 @@ _dl_relocate_object (struct link_map *l, struct r_scope_elem *scope[],
 			      l->l_name);
 	  }
 
-	size_t sizeofrel = l->l_info[DT_PLTREL]->d_un.d_val == DT_RELA
-			   ? sizeof (ElfW(Rela))
-			   : sizeof (ElfW(Rel));
-	size_t relcount = l->l_info[DT_PLTRELSZ]->d_un.d_val / sizeofrel;
-	l->l_reloc_result = calloc (sizeof (l->l_reloc_result[0]), relcount);
-
+	l->l_reloc_result = calloc (sizeof (l->l_reloc_result[0]),
+				    l->l_info[DT_PLTRELSZ]->d_un.d_val);
 	if (l->l_reloc_result == NULL)
 	  {
 	    errstring = N_("\

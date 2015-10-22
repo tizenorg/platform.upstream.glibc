@@ -1,4 +1,4 @@
-/* Copyright (C) 2002-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2002-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 2002.
 
@@ -26,9 +26,12 @@
 #define lll_trylock_elision(a,t) lll_trylock(a)
 #endif
 
-#ifndef FORCE_ELISION
-#define FORCE_ELISION(m, s)
+#ifndef DO_ELISION
+#define DO_ELISION(m) 0
 #endif
+
+/* We don't force elision in trylock, because this can lead to inconsistent
+   lock state if the lock was actually busy.  */
 
 int
 __pthread_mutex_trylock (mutex)
@@ -66,7 +69,7 @@ __pthread_mutex_trylock (mutex)
       break;
 
     case PTHREAD_MUTEX_TIMED_ELISION_NP:
-    elision: __attribute__((unused))
+    elision:
       if (lll_trylock_elision (mutex->__data.__lock,
 			       mutex->__data.__elision) != 0)
 	break;
@@ -74,7 +77,8 @@ __pthread_mutex_trylock (mutex)
       return 0;
 
     case PTHREAD_MUTEX_TIMED_NP:
-      FORCE_ELISION (mutex, goto elision);
+      if (DO_ELISION (mutex))
+	goto elision;
       /*FALL THROUGH*/
     case PTHREAD_MUTEX_ADAPTIVE_NP:
     case PTHREAD_MUTEX_ERRORCHECK_NP:
@@ -187,10 +191,6 @@ __pthread_mutex_trylock (mutex)
 
       return 0;
 
-    /* The PI support requires the Linux futex system call.  If that's not
-       available, pthread_mutex_init should never have allowed the type to
-       be set.  So it will get the default case for an invalid type.  */
-#ifdef __NR_futex
     case PTHREAD_MUTEX_PI_RECURSIVE_NP:
     case PTHREAD_MUTEX_PI_ERRORCHECK_NP:
     case PTHREAD_MUTEX_PI_NORMAL_NP:
@@ -319,7 +319,6 @@ __pthread_mutex_trylock (mutex)
 
 	return 0;
       }
-#endif  /* __NR_futex.  */
 
     case PTHREAD_MUTEX_PP_RECURSIVE_NP:
     case PTHREAD_MUTEX_PP_ERRORCHECK_NP:

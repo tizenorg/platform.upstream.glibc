@@ -1,6 +1,6 @@
 /* Multiple versions of memset
    All versions must be listed in ifunc-impl-list.c.
-   Copyright (C) 2014-2015 Free Software Foundation, Inc.
+   Copyright (C) 2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -23,7 +23,7 @@
 #include <init-arch.h>
 
 /* Define multiple versions only for the definition in lib.  */
-# if IS_IN (libc)
+# ifndef NOT_IN_libc
 ENTRY(memset)
 	.type	memset, @gnu_indirect_function
 	cmpl	$0, __cpu_features+KIND_OFFSET(%rip)
@@ -37,7 +37,7 @@ ENTRY(memset)
 END(memset)
 # endif
 
-# if IS_IN (libc)
+# if !defined NOT_IN_libc
 #  undef memset
 #  define memset __memset_sse2
 

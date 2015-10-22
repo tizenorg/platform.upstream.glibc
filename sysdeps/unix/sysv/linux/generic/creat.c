@@ -1,4 +1,4 @@
-/* Copyright (C) 2011-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2011-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Chris Metcalf <cmetcalf@tilera.com>, 2011.
 
@@ -24,14 +24,15 @@
 
 /* Create FILE with protections MODE.  */
 int
-creat (const char *file, mode_t mode)
+__libc_creat (const char *file, mode_t mode)
 {
   return __open (file, O_WRONLY | O_CREAT | O_TRUNC, mode);
 }
+weak_alias (__libc_creat, creat)
 
 /* __open handles cancellation.  */
 LIBC_CANCEL_HANDLED ();
 
 #if __WORDSIZE == 64
-weak_alias (creat, creat64)
+weak_alias (__libc_creat, creat64)
 #endif

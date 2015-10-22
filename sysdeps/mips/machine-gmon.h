@@ -1,5 +1,5 @@
 /* Machine-specific calling sequence for `mcount' profiling function.  MIPS
-   Copyright (C) 1996-2015 Free Software Foundation, Inc.
+   Copyright (C) 1996-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -83,13 +83,8 @@ static void __attribute_used__ __mcount (u_long frompc, u_long selfpc)
 #endif
 
 #if _MIPS_SIM == _ABIN32
-# if __mips_isa_rev < 6
-#  define PTR_ADDU_STRING "add" /* no u */
-#  define PTR_SUBU_STRING "sub" /* no u */
-# else
-#  define PTR_ADDU_STRING "addu"
-#  define PTR_SUBU_STRING "subu"
-# endif
+# define PTR_ADDU_STRING "add" /* no u */
+# define PTR_SUBU_STRING "sub" /* no u */
 #elif _MIPS_SIM == _ABI64
 # define PTR_ADDU_STRING "daddu"
 # define PTR_SUBU_STRING "dsubu"

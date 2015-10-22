@@ -1,4 +1,4 @@
-/* Copyright (C) 2001-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2001-2014 Free Software Foundation, Inc.
 
    This file is part of the GNU C Library.
 
@@ -17,11 +17,17 @@
    <http://www.gnu.org/licenses/>.  */
 
 #include <fenv.h>
-#include <math_private.h>
+#include <fpu_control.h>
 
 int
 fegetexceptflag (fexcept_t *flagp, int excepts)
 {
-  *flagp = libc_fetestexcept_aarch64 (excepts);
+  fpu_fpsr_t fpsr;
+
+  /* Get the current exceptions.  */
+  _FPU_GETFPSR (fpsr);
+
+  *flagp = fpsr & excepts & FE_ALL_EXCEPT;
+
   return 0;
 }

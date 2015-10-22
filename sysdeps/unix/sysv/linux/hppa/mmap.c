@@ -1,4 +1,4 @@
-/* Copyright (C) 1994-2015 Free Software Foundation, Inc.
+/* Copyright (C) 1994-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -46,4 +46,4 @@ __mmap (__ptr_t addr, size_t len, int prot, int flags, int fd, off_t offset)
 
 }
 
-weak_alias (__mmap, mmap)
+strong_alias (__mmap, mmap)

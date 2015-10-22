@@ -1,4 +1,4 @@
-/* Copyright (C) 2010-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2010-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Maxim Kuvyrkov <maxim@codesourcery.com>, 2010.
 
@@ -51,7 +51,7 @@ END (__vdso_read_tp_stub)
    equivalent helper function (which clobbers fewer registers than
    a normal function call) in a vdso; tail call to the
    helper.  */
-# if IS_IN (rtld)
+# ifdef IS_IN_rtld
 /* rtld gets a hidden copy of __m68k_read_tp.  */
 	.hidden __m68k_read_tp
 # endif

@@ -1,5 +1,5 @@
 /* low level locking for pthread library.  Generic futex-using version.
-   Copyright (C) 2003-2015 Free Software Foundation, Inc.
+   Copyright (C) 2003-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Paul Mackerras <paulus@au.ibm.com>, 2003.
 
@@ -27,23 +27,23 @@ void
 __lll_lock_wait_private (int *futex)
 {
   if (*futex == 2)
-    lll_futex_wait (futex, 2, LLL_PRIVATE); /* Wait if *futex == 2.  */
+    lll_futex_wait (futex, 2, LLL_PRIVATE);
 
   while (atomic_exchange_acq (futex, 2) != 0)
-    lll_futex_wait (futex, 2, LLL_PRIVATE); /* Wait if *futex == 2.  */
+    lll_futex_wait (futex, 2, LLL_PRIVATE);
 }
 
 
 /* These functions don't get included in libc.so  */
-#if IS_IN (libpthread)
+#ifdef IS_IN_libpthread
 void
 __lll_lock_wait (int *futex, int private)
 {
   if (*futex == 2)
-    lll_futex_wait (futex, 2, private); /* Wait if *futex == 2.  */
+    lll_futex_wait (futex, 2, private);
 
   while (atomic_exchange_acq (futex, 2) != 0)
-    lll_futex_wait (futex, 2, private); /* Wait if *futex == 2.  */
+    lll_futex_wait (futex, 2, private);
 }
 
 
@@ -75,7 +75,7 @@ __lll_timedlock_wait (int *futex, const struct timespec *abstime, int private)
       if (rt.tv_sec < 0)
 	return ETIMEDOUT;
 
-      /* If *futex == 2, wait until woken or timeout.  */
+      /* Wait.  */
       lll_futex_timed_wait (futex, 2, &rt, private);
     }
 
@@ -83,11 +83,6 @@ __lll_timedlock_wait (int *futex, const struct timespec *abstime, int private)
 }
 
 
-/* The kernel notifies a process which uses CLONE_CHILD_CLEARTID via futex
-   wake-up when the clone terminates.  The memory location contains the
-   thread ID while the clone is running and is reset to zero by the kernel
-   afterwards.  The kernel up to version 3.16.3 does not use the private futex
-   operations for futex wake-up when the clone terminates.  */
 int
 __lll_timedwait_tid (int *tidp, const struct timespec *abstime)
 {
@@ -118,10 +113,8 @@ __lll_timedwait_tid (int *tidp, const struct timespec *abstime)
       if (rt.tv_sec < 0)
 	return ETIMEDOUT;
 
-      /* If *tidp == tid, wait until thread terminates or the wait times out.
-         The kernel up to version 3.16.3 does not use the private futex
-         operations for futex wake-up when the clone terminates.
-      */
+      /* Wait until thread terminates.  The kernel so far does not use
+	 the private futex operations for this.  */
       if (lll_futex_timed_wait (tidp, tid, &rt, LLL_SHARED) == -ETIMEDOUT)
 	return ETIMEDOUT;
     }

@@ -1,4 +1,4 @@
-/* Copyright (C) 2004-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2004-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@cygnus.com>, 2004.
 
@@ -28,7 +28,6 @@
 #define __sendto sendto
 #define __strchrnul strchrnul
 #define __getline getline
-#define __qsort_r qsort_r
 /* nscd uses 1MB or 2MB thread stacks.  */
 #define __libc_use_alloca(size) (size <= __MAX_ALLOCA_CUTOFF)
 

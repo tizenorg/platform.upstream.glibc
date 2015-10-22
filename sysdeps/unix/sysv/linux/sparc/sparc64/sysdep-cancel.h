@@ -1,4 +1,4 @@
-/* Copyright (C) 2002-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2002-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Jakub Jelinek <jakub@redhat.com>, 2002.
 
@@ -22,7 +22,7 @@
 # include <nptl/pthreadP.h>
 #endif
 
-#if IS_IN (libc) || IS_IN (libpthread) || IS_IN (librt)
+#if !defined NOT_IN_libc || defined IS_IN_libpthread || defined IS_IN_librt
 
 # undef PSEUDO
 # define PSEUDO(name, syscall_name, args)	\
@@ -66,13 +66,13 @@ __##syscall_name##_nocancel:			\
 2:	jmpl %i7 + 8, %g0;			\
 	 restore %g0, %l1, %o0;
 
-# if IS_IN (libpthread)
+# ifdef IS_IN_libpthread
 #  define CENABLE	call __pthread_enable_asynccancel
 #  define CDISABLE	call __pthread_disable_asynccancel
-# elif IS_IN (libc)
+# elif !defined NOT_IN_libc
 #  define CENABLE	call __libc_enable_asynccancel
 #  define CDISABLE	call __libc_disable_asynccancel
-# elif IS_IN (librt)
+# elif defined IS_IN_librt
 #  define CENABLE	call __librt_enable_asynccancel
 #  define CDISABLE	call __librt_disable_asynccancel
 # else

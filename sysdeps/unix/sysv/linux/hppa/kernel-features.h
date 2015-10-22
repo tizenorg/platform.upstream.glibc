@@ -1,6 +1,6 @@
 /* Set flags signalling availability of kernel features based on given
    kernel version number.
-   Copyright (C) 2006-2015 Free Software Foundation, Inc.
+   Copyright (C) 2006-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -32,9 +32,9 @@
 # define __ASSUME_SENDMMSG_SYSCALL	1
 #endif
 
-/* Support for the utimes syscall was added in 3.14.  */
-#if __LINUX_KERNEL_VERSION >= 0x030e00
-# define __ASSUME_UTIMES		1
-#endif
-
 #include_next <kernel-features.h>
+
+/* hppa did not get the utimes syscall until 3.14.  */
+#if __LINUX_KERNEL_VERSION < 0x030e00
+# undef __ASSUME_UTIMES
+#endif

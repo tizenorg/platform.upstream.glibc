@@ -1,4 +1,4 @@
-/* Copyright (C) 2003-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2003-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Martin Schwidefsky <schwidefsky@de.ibm.com>, 2003.
 
@@ -21,7 +21,6 @@
 #include <lowlevellock.h>
 #include <pthread.h>
 #include <pthreadP.h>
-#include <sys/time.h>
 #include <kernel-features.h>
 
 
@@ -81,7 +80,7 @@ pthread_rwlock_timedwrlock (rwlock, abstime)
      || !defined lll_futex_timed_wait_bitset)
       /* Get the current time.  So far we support only one clock.  */
       struct timeval tv;
-      (void) __gettimeofday (&tv, NULL);
+      (void) gettimeofday (&tv, NULL);
 
       /* Convert the absolute timeout value to a relative timeout.  */
       struct timespec rt;

@@ -1,4 +1,4 @@
-# Copyright (C) 1996-2015 Free Software Foundation, Inc.
+# Copyright (C) 1996-2014 Free Software Foundation, Inc.
 # This file is part of the GNU C Library.
 
 # The GNU C Library is free software; you can redistribute it and/or
@@ -92,14 +92,14 @@ install-others := $(addprefix $(inst_i18ndir)/, \
 
 tests: $(objdir)/iconvdata/gconv-modules
 
-tests-static += tst-langinfo-static
-
-ifeq ($(run-built-tests),yes)
 tests-special += $(objpfx)sort-test.out $(objpfx)tst-fmon.out \
 		 $(objpfx)tst-locale.out $(objpfx)tst-rpmatch.out \
 		 $(objpfx)tst-trans.out $(objpfx)tst-ctype.out \
 		 $(objpfx)tst-langinfo.out $(objpfx)tst-langinfo-static.out \
 		 $(objpfx)tst-numeric.out
+tests-static += tst-langinfo-static
+
+ifeq ($(run-built-tests),yes)
 # We have to generate locales
 LOCALES := de_DE.ISO-8859-1 de_DE.UTF-8 en_US.ANSI_X3.4-1968 \
 	   en_US.ISO-8859-1 en_US.UTF-8 ja_JP.EUC-JP da_DK.ISO-8859-1 \
@@ -125,6 +125,14 @@ $(inst_i18ndir)/charmaps/%.gz: charmaps/% $(+force)
 
 # Install the locale source files in the appropriate directory.
 $(inst_i18ndir)/locales/%: locales/% $(+force); $(do-install)
+
+# gcc does not know all the format specifiers we are using here.
+CFLAGS-tst-mbswcs1.c = -Wno-format
+CFLAGS-tst-mbswcs2.c = -Wno-format
+CFLAGS-tst-mbswcs3.c = -Wno-format
+CFLAGS-tst-mbswcs4.c = -Wno-format
+CFLAGS-tst-mbswcs5.c = -Wno-format
+CFLAGS-tst-trans.c = -Wno-format
 
 
 ifeq ($(run-built-tests),yes)

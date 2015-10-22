@@ -1,4 +1,4 @@
-/* Copyright (C) 2005-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2005-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -108,4 +108,3 @@ L(error):
 
 libc_hidden_def(__vfork)
 weak_alias (__vfork, vfork)
-strong_alias (__vfork, __libc_vfork)

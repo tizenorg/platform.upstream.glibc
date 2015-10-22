@@ -1,4 +1,4 @@
-/* Copyright (C) 2003-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2003-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Jakub Jelinek <jakub@redhat.com>, 2003.
 
@@ -52,7 +52,7 @@
 #define LLL_SHARED	FUTEX_PRIVATE_FLAG
 
 
-#if IS_IN (libc) || IS_IN (rtld)
+#if !defined NOT_IN_libc || defined IS_IN_rtld
 /* In libc.so or ld.so all futexes are private.  */
 # ifdef __ASSUME_PRIVATE_FUTEX
 #  define __lll_private_flag(fl, private) \
@@ -117,7 +117,6 @@
 		     __lll_private_flag (FUTEX_CMP_REQUEUE, private),	     \
 		     (int) (nr_wake), (int) (nr_move), (long) (mutex),	     \
 		     (int) val);					     \
-   (void) _retval;							     \
    _r10 == -1;								     \
 })
 
@@ -128,7 +127,6 @@
 		     __lll_private_flag (FUTEX_WAKE_OP, private),	     \
 		     (int) (nr_wake), (int) (nr_wake2), (long) (ftx2),	     \
 		     FUTEX_OP_CLEAR_WAKE_IF_GT_ONE);			     \
-   (void) _retval;							     \
    _r10 == -1;								     \
 })
 
@@ -144,7 +142,6 @@
    DO_INLINE_SYSCALL(futex, 5, (long) (futexp),				      \
 		     __lll_private_flag (__op, private),		      \
 		     (val), (timespec), mutex); 			      \
-   (void) _retval;							     \
    _r10 == -1;								      \
 })
 

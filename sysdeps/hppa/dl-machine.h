@@ -1,5 +1,5 @@
 /* Machine-dependent ELF dynamic relocation inline functions.  PA-RISC version.
-   Copyright (C) 1995-2015 Free Software Foundation, Inc.
+   Copyright (C) 1995-2014 Free Software Foundation, Inc.
    Contributed by David Huggins-Daines <dhd@debian.org>
    This file is part of the GNU C Library.
 
@@ -432,7 +432,7 @@ asm (									\
 									\
 	/* envp = argv + argc + 1 */					\
 "	sh2add	%r25,%r24,%r23\n"					\
-"	bl	_dl_init,%r2\n"						\
+"	bl	_dl_init_internal,%r2\n"				\
 "	ldo	4(%r23),%r23\n"	/* delay slot */			\
 									\
 	/* Reload argc, argv to the registers start.S expects.  */	\

@@ -1,4 +1,4 @@
-/* Copyright (C) 2000-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2000-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -38,9 +38,9 @@
    * 10 x 64-bit fprs in this order:
      - fr12-fr21 (callee saves)
    Note: We have 8 bytes of free space for future uses.  */
-typedef union __jmp_buf_internal_tag
+typedef union
   {
-    struct
+    struct __jmp_buf_internal_tag
       {
 	int __r3;
 	int __pad0;

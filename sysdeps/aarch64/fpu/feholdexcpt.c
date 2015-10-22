@@ -1,4 +1,4 @@
-/* Copyright (C) 1997-2015 Free Software Foundation, Inc.
+/* Copyright (C) 1997-2014 Free Software Foundation, Inc.
 
    This file is part of the GNU C Library.
 
@@ -17,14 +17,35 @@
    <http://www.gnu.org/licenses/>.  */
 
 #include <fenv.h>
-#include <math_private.h>
+#include <fpu_control.h>
 
 int
-__feholdexcept (fenv_t *envp)
+feholdexcept (fenv_t *envp)
 {
-  libc_feholdexcept_aarch64 (envp);
+  fpu_control_t fpcr;
+  fpu_control_t fpcr_new;
+  fpu_fpsr_t fpsr;
+  fpu_fpsr_t fpsr_new;
+
+  _FPU_GETCW (fpcr);
+  envp->__fpcr = fpcr;
+
+  _FPU_GETFPSR (fpsr);
+  envp->__fpsr = fpsr;
+
+  /* Now set all exceptions to non-stop.  */
+  fpcr_new = fpcr & ~(FE_ALL_EXCEPT << FE_EXCEPT_SHIFT);
+
+  /* And clear all exception flags.  */
+  fpsr_new = fpsr & ~FE_ALL_EXCEPT;
+
+  if (fpsr != fpsr_new)
+    _FPU_SETFPSR (fpsr_new);
+
+  if (fpcr != fpcr_new)
+    _FPU_SETCW (fpcr_new);
+
   return 0;
 }
-libm_hidden_def (__feholdexcept)
-weak_alias (__feholdexcept, feholdexcept)
-libm_hidden_weak (feholdexcept)
+
+libm_hidden_def (feholdexcept)

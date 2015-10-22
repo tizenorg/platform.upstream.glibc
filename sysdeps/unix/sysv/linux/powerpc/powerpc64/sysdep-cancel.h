@@ -1,5 +1,5 @@
 /* Cancellable system call stubs.  Linux/PowerPC64 version.
-   Copyright (C) 2003-2015 Free Software Foundation, Inc.
+   Copyright (C) 2003-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Franz Sirl <Franz.Sirl-kernel@lauterbach.com>, 2003.
 
@@ -23,7 +23,7 @@
 # include <nptl/pthreadP.h>
 #endif
 
-#if IS_IN (libc) || IS_IN (libpthread) || IS_IN (librt)
+#if !defined NOT_IN_libc || defined IS_IN_libpthread || defined IS_IN_librt
 
 # ifdef HAVE_ASM_GLOBAL_DOT_NAME
 #  define DASHDASHPFX(str) .__##str
@@ -99,7 +99,7 @@
 # define DOCARGS_6	std 8,CANCEL_PARM_SAVE+40(1); DOCARGS_5
 # define UNDOCARGS_6	ld 8,CANCEL_PARM_SAVE+40(1); UNDOCARGS_5
 
-# if IS_IN (libpthread)
+# ifdef IS_IN_libpthread
 #  ifdef SHARED
 #   define CENABLE	bl JUMPTARGET(__pthread_enable_asynccancel)
 #   define CDISABLE	bl JUMPTARGET(__pthread_disable_asynccancel)
@@ -107,7 +107,7 @@
 #   define CENABLE	bl JUMPTARGET(__pthread_enable_asynccancel); nop
 #   define CDISABLE	bl JUMPTARGET(__pthread_disable_asynccancel); nop
 #  endif
-# elif IS_IN (libc)
+# elif !defined NOT_IN_libc
 #  ifdef SHARED
 #   define CENABLE	bl JUMPTARGET(__libc_enable_asynccancel)
 #   define CDISABLE	bl JUMPTARGET(__libc_disable_asynccancel)
@@ -115,7 +115,7 @@
 #   define CENABLE	bl JUMPTARGET(__libc_enable_asynccancel); nop
 #   define CDISABLE	bl JUMPTARGET(__libc_disable_asynccancel); nop
 #  endif
-# elif IS_IN (librt)
+# elif defined IS_IN_librt
 #  ifdef SHARED
 #   define CENABLE	bl JUMPTARGET(__librt_enable_asynccancel)
 #   define CDISABLE	bl JUMPTARGET(__librt_disable_asynccancel)

@@ -1,5 +1,5 @@
 /* isnan().  PowerPC64/POWER8 version.
-   Copyright (C) 2014-2015 Free Software Foundation, Inc.
+   Copyright (C) 2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -17,9 +17,14 @@
    <http://www.gnu.org/licenses/>.  */
 
 #include <sysdep.h>
+#include <endian.h>
 #include <math_ldbl_opt.h>
 
-#define MFVSRD_R3_V1  .long 0x7c230066     /* mfvsrd  r3,vs1  */
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+#define MFVSRD_R3_V1  .byte 0x66,0x00,0x23,0x7c     /* mfvsrd  r3,vs1  */
+#else
+#define MFVSRD_R3_V1  .byte 0x7c,0x23,0x00,0x66     /* mfvsrd  r3,vs1  */
+#endif
 
 /* int [r3] __isnan([f1] x)  */
 
@@ -48,7 +53,7 @@ strong_alias (__isnan, __isnanl)
 weak_alias (__isnan, isnanl)
 #endif
 
-#if !IS_IN (libm)
+#ifndef IS_IN_libm
 # if LONG_DOUBLE_COMPAT(libc, GLIBC_2_0)
 compat_symbol (libc, __isnan, __isnanl, GLIBC_2_0);
 compat_symbol (libc, isnan, isnanl, GLIBC_2_0);

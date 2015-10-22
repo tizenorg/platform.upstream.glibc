@@ -1,4 +1,4 @@
-/* Copyright (C) 1996-2015 Free Software Foundation, Inc.
+/* Copyright (C) 1996-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@cygnus.com>, 1996.
 
@@ -79,8 +79,8 @@ valid_locale_name (const char *name)
     return 0;
   /* Directory traversal attempt.  */
   static const char slashdot[4] = {'/', '.', '.', '/'};
-  if (__glibc_unlikely (__memmem (name, namelen,
-				  slashdot, sizeof (slashdot)) != NULL))
+  if (__glibc_unlikely (memmem (name, namelen,
+				slashdot, sizeof (slashdot)) != NULL))
     return 0;
   if (namelen == 2 && __glibc_unlikely (name[0] == '.' && name [1] == '.'))
     return 0;

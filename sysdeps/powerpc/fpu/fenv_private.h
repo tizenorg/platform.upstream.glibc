@@ -1,5 +1,5 @@
 /* Private floating point rounding and exceptions handling. PowerPC version.
-   Copyright (C) 2013-2015 Free Software Foundation, Inc.
+   Copyright (C) 2013-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -57,7 +57,7 @@ libc_feholdexcept_ppc (fenv_t *envp)
 static __always_inline void
 libc_fesetround_ppc (int r)
 {
-  __fesetround_inline (r);
+  __fesetround (r);
 }
 
 static __always_inline void

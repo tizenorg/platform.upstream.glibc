@@ -1,6 +1,6 @@
 /* Multiple versions of memcpy
    All versions must be listed in ifunc-impl-list.c.
-   Copyright (C) 2013-2015 Free Software Foundation, Inc.
+   Copyright (C) 2013-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -22,7 +22,7 @@
 #include <sysdep.h>
 #include <rtld-global-offsets.h>
 
-#if IS_IN (libc)
+#ifndef NOT_IN_libc
 /* Under __ARM_NEON__, memcpy_neon.S defines the name memcpy.  */
 # ifndef __ARM_NEON__
 	.text

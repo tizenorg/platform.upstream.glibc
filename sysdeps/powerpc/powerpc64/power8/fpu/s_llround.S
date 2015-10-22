@@ -1,5 +1,5 @@
 /* llround function.  POWER8 PowerPC64 version.
-   Copyright (C) 2014-2015 Free Software Foundation, Inc.
+   Copyright (C) 2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -20,7 +20,11 @@
 #include <endian.h>
 #include <math_ldbl_opt.h>
 
-#define MFVSRD_R3_V1  .long 0x7c230066     /* mfvsrd  r3,vs1  */
+#if __BYTE_ORDER == __LITTLE_ENDIAN
+#define MFVSRD_R3_V1  .byte 0x66,0x00,0x23,0x7c     /* mfvsrd  r3,vs1  */
+#else
+#define MFVSRD_R3_V1  .byte 0x7c,0x23,0x00,0x66     /* mfvsrd  r3,vs1  */
+#endif
 
 /* long long [r3] llround (float x [fp1])  */
 

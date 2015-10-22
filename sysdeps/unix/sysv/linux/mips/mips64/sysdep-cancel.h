@@ -1,4 +1,4 @@
-/* Copyright (C) 2003-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2003-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -27,7 +27,7 @@
    happen before any instructions.  So we use cfi_same_value instead of
    cfi_restore.  */
 
-#if IS_IN (libc) || IS_IN (libpthread) || IS_IN (librt)
+#if !defined NOT_IN_libc || defined IS_IN_libpthread || defined IS_IN_librt
 
 #ifdef __PIC__
 # undef PSEUDO
@@ -213,10 +213,10 @@
 #  define PSEUDO_JMP(sym) jal sym
 # endif
 
-# if IS_IN (libpthread)
+# ifdef IS_IN_libpthread
 #  define CENABLE	PSEUDO_JMP (__pthread_enable_asynccancel)
 #  define CDISABLE	PSEUDO_JMP (__pthread_disable_asynccancel)
-# elif IS_IN (librt)
+# elif defined IS_IN_librt
 #  define CENABLE	PSEUDO_JMP (__librt_enable_asynccancel)
 #  define CDISABLE	PSEUDO_JMP (__librt_disable_asynccancel)
 # else

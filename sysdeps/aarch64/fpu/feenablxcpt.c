@@ -1,4 +1,4 @@
-/* Copyright (C) 2001-2015 Free Software Foundation, Inc.
+/* Copyright (C) 2001-2014 Free Software Foundation, Inc.
 
    This file is part of the GNU C Library.
 
@@ -24,9 +24,14 @@ feenableexcept (int excepts)
 {
   fpu_control_t fpcr;
   fpu_control_t fpcr_new;
+  int original_excepts;
 
   _FPU_GETCW (fpcr);
+
+  original_excepts = (fpcr >> FE_EXCEPT_SHIFT) & FE_ALL_EXCEPT;
+
   excepts &= FE_ALL_EXCEPT;
+
   fpcr_new = fpcr | (excepts << FE_EXCEPT_SHIFT);
 
   if (fpcr != fpcr_new)
@@ -45,5 +50,5 @@ feenableexcept (int excepts)
 	return -1;
     }
 
-  return (fpcr >> FE_EXCEPT_SHIFT) & FE_ALL_EXCEPT;
+  return original_excepts;
 }

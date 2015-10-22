@@ -1,4 +1,4 @@
-# Copyright (C) 1997-2015 Free Software Foundation, Inc.
+# Copyright (C) 1997-2014 Free Software Foundation, Inc.
 # This file is part of the GNU C Library.
 
 # The GNU C Library is free software; you can redistribute it and/or
@@ -52,10 +52,11 @@ CFLAGS-gconv_cache.c += -DGCONV_DIR='"$(gconvdir)"'
 CFLAGS-gconv_conf.c = -DGCONV_PATH='"$(gconvdir)"'
 CFLAGS-iconvconfig.c = -DGCONV_PATH='"$(gconvdir)"' -DGCONV_DIR='"$(gconvdir)"'
 
-# Set libof-* for each routine.
-cpp-srcs-left := $(iconv_prog-modules) $(iconvconfig-modules)
-lib := iconvprogs
-include $(patsubst %,$(..)cppflags-iterator.mk,$(cpp-srcs-left))
+CPPFLAGS-iconv_charmap = -DNOT_IN_libc
+CPPFLAGS-linereader = -DNOT_IN_libc
+CPPFLAGS-strtab = -DNOT_IN_libc
+CPPFLAGS-charmap = -DNOT_IN_libc
+CPPFLAGS-charmap-dir = -DNOT_IN_libc
 
 ifeq ($(run-built-tests),yes)
 xtests-special += $(objpfx)test-iconvconfig.out

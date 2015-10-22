@@ -1,4 +1,4 @@
-/* Copyright (C) 1993-2015 Free Software Foundation, Inc.
+/* Copyright (C) 1993-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Written by Ulrich Drepper <drepper@cygnus.com>.
    Based on the single byte version by Per Bothner <bothner@cygnus.com>.
@@ -54,7 +54,10 @@
 /* Convert TO_DO wide character from DATA to FP.
    Then mark FP as having empty buffers. */
 int
-_IO_wdo_write (_IO_FILE *fp, const wchar_t *data, _IO_size_t to_do)
+_IO_wdo_write (fp, data, to_do)
+     _IO_FILE *fp;
+     const wchar_t *data;
+     _IO_size_t to_do;
 {
   struct _IO_codecvt *cc = fp->_codecvt;
 
@@ -72,32 +75,17 @@ _IO_wdo_write (_IO_FILE *fp, const wchar_t *data, _IO_size_t to_do)
 	{
 	  enum __codecvt_result result;
 	  const wchar_t *new_data;
-	  char mb_buf[MB_LEN_MAX];
-	  char *write_base, *write_ptr, *buf_end;
-
-	  if (fp->_IO_write_ptr - fp->_IO_write_base < sizeof (mb_buf))
-	    {
-	      /* Make sure we have room for at least one multibyte
-		 character.  */
-	      write_ptr = write_base = mb_buf;
-	      buf_end = mb_buf + sizeof (mb_buf);
-	    }
-	  else
-	    {
-	      write_ptr = fp->_IO_write_ptr;
-	      write_base = fp->_IO_write_base;
-	      buf_end = fp->_IO_buf_end;
-	    }
 
 	  /* Now convert from the internal format into the external buffer.  */
 	  result = (*cc->__codecvt_do_out) (cc, &fp->_wide_data->_IO_state,
 					    data, data + to_do, &new_data,
-					    write_ptr,
-					    buf_end,
-					    &write_ptr);
+					    fp->_IO_write_ptr,
+					    fp->_IO_buf_end,
+					    &fp->_IO_write_ptr);
 
 	  /* Write out what we produced so far.  */
-	  if (_IO_new_do_write (fp, write_base, write_ptr - write_base) == EOF)
+	  if (_IO_new_do_write (fp, fp->_IO_write_base,
+				fp->_IO_write_ptr - fp->_IO_write_base) == EOF)
 	    /* Something went wrong.  */
 	    return WEOF;
 
@@ -128,7 +116,8 @@ libc_hidden_def (_IO_wdo_write)
 
 
 wint_t
-_IO_wfile_underflow (_IO_FILE *fp)
+_IO_wfile_underflow (fp)
+     _IO_FILE *fp;
 {
   struct _IO_codecvt *cd;
   enum __codecvt_result status;
@@ -253,10 +242,7 @@ _IO_wfile_underflow (_IO_FILE *fp)
   if (count <= 0)
     {
       if (count == 0 && naccbuf == 0)
-	{
-	  fp->_flags |= _IO_EOF_SEEN;
-	  fp->_offset = _IO_pos_BAD;
-	}
+	fp->_flags |= _IO_EOF_SEEN;
       else
 	fp->_flags |= _IO_ERR_SEEN, count = 0;
     }
@@ -424,7 +410,9 @@ _IO_wfile_underflow_maybe_mmap (_IO_FILE *fp)
 
 
 wint_t
-_IO_wfile_overflow (_IO_FILE *f, wint_t wch)
+_IO_wfile_overflow (f, wch)
+     _IO_FILE *f;
+     wint_t wch;
 {
   if (f->_flags & _IO_NO_WRITES) /* SET ERROR */
     {
@@ -496,7 +484,8 @@ _IO_wfile_overflow (_IO_FILE *f, wint_t wch)
 libc_hidden_def (_IO_wfile_overflow)
 
 wint_t
-_IO_wfile_sync (_IO_FILE *fp)
+_IO_wfile_sync (fp)
+     _IO_FILE *fp;
 {
   _IO_ssize_t delta;
   wint_t retval = 0;
@@ -622,15 +611,16 @@ do_ftell_wide (_IO_FILE *fp)
       const wchar_t *wide_read_base;
       const wchar_t *wide_read_ptr;
       const wchar_t *wide_read_end;
-      bool unflushed_writes = (fp->_wide_data->_IO_write_ptr
-			       > fp->_wide_data->_IO_write_base);
+      bool was_writing = ((fp->_wide_data->_IO_write_ptr
+			   > fp->_wide_data->_IO_write_base)
+			  || _IO_in_put_mode (fp));
 
       bool append_mode = (fp->_flags & _IO_IS_APPENDING) == _IO_IS_APPENDING;
 
       /* When we have unflushed writes in append mode, seek to the end of the
 	 file and record that offset.  This is the only time we change the file
 	 stream state and it is safe since the file handle is active.  */
-      if (unflushed_writes && append_mode)
+      if (was_writing && append_mode)
 	{
 	  result = _IO_SYSSEEK (fp, 0, _IO_seek_end);
 	  if (result == _IO_pos_BAD)
@@ -669,7 +659,7 @@ do_ftell_wide (_IO_FILE *fp)
       struct _IO_codecvt *cv = fp->_codecvt;
       int clen = (*cv->__codecvt_do_encoding) (cv);
 
-      if (!unflushed_writes)
+      if (!was_writing)
 	{
 	  if (clen > 0)
 	    {
@@ -760,7 +750,11 @@ do_ftell_wide (_IO_FILE *fp)
 }
 
 _IO_off64_t
-_IO_wfile_seekoff (_IO_FILE *fp, _IO_off64_t offset, int dir, int mode)
+_IO_wfile_seekoff (fp, offset, dir, mode)
+     _IO_FILE *fp;
+     _IO_off64_t offset;
+     int dir;
+     int mode;
 {
   _IO_off64_t result;
   _IO_off64_t delta, new_offset;
@@ -971,7 +965,10 @@ libc_hidden_def (_IO_wfile_seekoff)
 
 
 _IO_size_t
-_IO_wfile_xsputn (_IO_FILE *f, const void *data, _IO_size_t n)
+_IO_wfile_xsputn (f, data, n)
+     _IO_FILE *f;
+     const void *data;
+     _IO_size_t n;
 {
   const wchar_t *s = (const wchar_t *) data;
   _IO_size_t to_do = n;

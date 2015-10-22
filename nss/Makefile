@@ -1,4 +1,4 @@
-# Copyright (C) 1996-2015 Free Software Foundation, Inc.
+# Copyright (C) 1996-2014 Free Software Foundation, Inc.
 # This file is part of the GNU C Library.
 
 # The GNU C Library is free software; you can redistribute it and/or
@@ -105,7 +105,7 @@ $(objpfx)makedb: $(makedb-modules:%=$(objpfx)%.o)
 $(inst_vardbdir)/Makefile: db-Makefile $(+force)
 	$(do-install)
 
-libof-nss_test1 = extramodules
+CFLAGS-nss_test1.c = -DNOT_IN_libc=1
 $(objpfx)/libnss_test1.so: $(objpfx)nss_test1.os $(link-libc-deps)
 	$(build-module)
 ifdef libnss_test1.so-version

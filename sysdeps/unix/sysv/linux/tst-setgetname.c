@@ -1,5 +1,5 @@
 /* Test pthread_setname_np and pthread_getname_np.
-   Copyright (C) 2013-2015 Free Software Foundation, Inc.
+   Copyright (C) 2013-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -101,7 +101,7 @@ do_test (int argc, char **argv)
     {
       res = get_self_comm (gettid (), name_check, TASK_COMM_LEN);
 
-#ifndef __ASSUME_PROC_PID_TASK_COMM
+#if !__ASSUME_PROC_PID_TASK_COMM
       /* On this first test we look for ENOENT to be returned from
          get_self_comm to indicate that the kernel is older than
          2.6.33 and doesn't contain comm within the proc structure.

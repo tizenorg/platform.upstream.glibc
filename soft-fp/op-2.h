@@ -1,6 +1,6 @@
 /* Software floating-point emulation.
    Basic two-word fraction declaration and manipulation.
-   Copyright (C) 1997-2015 Free Software Foundation, Inc.
+   Copyright (C) 1997-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Richard Henderson (rth@cygnus.com),
 		  Jakub Jelinek (jj@ultra.linux.cz),
@@ -122,16 +122,16 @@
   do						\
     {						\
       if (X##_f1)				\
-	__FP_CLZ ((R), X##_f1);			\
+	__FP_CLZ (R, X##_f1);			\
       else					\
 	{					\
-	  __FP_CLZ ((R), X##_f0);		\
-	  (R) += _FP_W_TYPE_SIZE;		\
+	  __FP_CLZ (R, X##_f0);			\
+	  R += _FP_W_TYPE_SIZE;			\
 	}					\
     }						\
   while (0)
 
-/* Predicates.  */
+/* Predicates */
 #define _FP_FRAC_NEGP_2(X)	((_FP_WS_TYPE) X##_f1 < 0)
 #define _FP_FRAC_ZEROP_2(X)	((X##_f1 | X##_f0) == 0)
 #define _FP_FRAC_OVERP_2(fs, X)	(_FP_FRAC_HIGH_##fs (X) & _FP_OVERFLOW_##fs)
@@ -148,7 +148,9 @@
 #define _FP_MINFRAC_2		0, 1
 #define _FP_MAXFRAC_2		(~(_FP_WS_TYPE) 0), (~(_FP_WS_TYPE) 0)
 
-/* Internals.  */
+/*
+ * Internals
+ */
 
 #define __FP_FRAC_SET_2(X, I1, I0)	(X##_f0 = I0, X##_f1 = I1)
 
@@ -156,11 +158,11 @@
   do						\
     {						\
       if (xh)					\
-	__FP_CLZ ((R), xh);			\
+	__FP_CLZ (R, xh);			\
       else					\
 	{					\
-	  __FP_CLZ ((R), xl);			\
-	  (R) += _FP_W_TYPE_SIZE;		\
+	  __FP_CLZ (R, xl);			\
+	  R += _FP_W_TYPE_SIZE;			\
 	}					\
     }						\
   while (0)
@@ -203,8 +205,10 @@
 
 #endif
 
-/* Unpack the raw bits of a native fp value.  Do not classify or
-   normalize the data.  */
+/*
+ * Unpack the raw bits of a native fp value.  Do not classify or
+ * normalize the data.
+ */
 
 #define _FP_UNPACK_RAW_2(fs, X, val)			\
   do							\
@@ -233,7 +237,9 @@
   while (0)
 
 
-/* Repack the raw bits of a native fp value.  */
+/*
+ * Repack the raw bits of a native fp value.
+ */
 
 #define _FP_PACK_RAW_2(fs, val, X)		\
   do						\
@@ -263,7 +269,9 @@
   while (0)
 
 
-/* Multiplication algorithms: */
+/*
+ * Multiplication algorithms:
+ */
 
 /* Given a 1W * 1W => 2W primitive, do the extended multiplication.  */
 
@@ -302,14 +310,13 @@
     {									\
       _FP_FRAC_DECL_4 (_FP_MUL_MEAT_2_wide_z);				\
 									\
-      _FP_MUL_MEAT_DW_2_wide ((wfracbits), _FP_MUL_MEAT_2_wide_z,	\
+      _FP_MUL_MEAT_DW_2_wide (wfracbits, _FP_MUL_MEAT_2_wide_z,		\
 			      X, Y, doit);				\
 									\
       /* Normalize since we know where the msb of the multiplicands	\
 	 were (bit B), we know that the msb of the of the product is	\
 	 at either 2B or 2B-1.  */					\
-      _FP_FRAC_SRS_4 (_FP_MUL_MEAT_2_wide_z, (wfracbits)-1,		\
-		      2*(wfracbits));					\
+      _FP_FRAC_SRS_4 (_FP_MUL_MEAT_2_wide_z, wfracbits-1, 2*wfracbits);	\
       R##_f0 = _FP_FRAC_WORD_4 (_FP_MUL_MEAT_2_wide_z, 0);		\
       R##_f1 = _FP_FRAC_WORD_4 (_FP_MUL_MEAT_2_wide_z, 1);		\
     }									\
@@ -376,7 +383,7 @@
     {									\
       _FP_FRAC_DECL_4 (_FP_MUL_MEAT_2_wide_3mul_z);			\
 									\
-      _FP_MUL_MEAT_DW_2_wide_3mul ((wfracbits),				\
+      _FP_MUL_MEAT_DW_2_wide_3mul (wfracbits,				\
 				   _FP_MUL_MEAT_2_wide_3mul_z,		\
 				   X, Y, doit);				\
 									\
@@ -384,7 +391,7 @@
 	 were (bit B), we know that the msb of the of the product is	\
 	 at either 2B or 2B-1.  */					\
       _FP_FRAC_SRS_4 (_FP_MUL_MEAT_2_wide_3mul_z,			\
-		      (wfracbits)-1, 2*(wfracbits));			\
+		      wfracbits-1, 2*wfracbits);			\
       R##_f0 = _FP_FRAC_WORD_4 (_FP_MUL_MEAT_2_wide_3mul_z, 0);		\
       R##_f1 = _FP_FRAC_WORD_4 (_FP_MUL_MEAT_2_wide_3mul_z, 1);		\
     }									\
@@ -410,13 +417,12 @@
     {									\
       _FP_FRAC_DECL_4 (_FP_MUL_MEAT_2_gmp_z);				\
 									\
-      _FP_MUL_MEAT_DW_2_gmp ((wfracbits), _FP_MUL_MEAT_2_gmp_z, X, Y);	\
+      _FP_MUL_MEAT_DW_2_gmp (wfracbits, _FP_MUL_MEAT_2_gmp_z, X, Y);	\
 									\
       /* Normalize since we know where the msb of the multiplicands	\
 	 were (bit B), we know that the msb of the of the product is	\
 	 at either 2B or 2B-1.  */					\
-      _FP_FRAC_SRS_4 (_FP_MUL_MEAT_2_gmp_z, (wfracbits)-1,		\
-		      2*(wfracbits));					\
+      _FP_FRAC_SRS_4 (_FP_MUL_MEAT_2_gmp_z, wfracbits-1, 2*wfracbits);	\
       R##_f0 = _FP_MUL_MEAT_2_gmp_z_f[0];				\
       R##_f1 = _FP_MUL_MEAT_2_gmp_z_f[1];				\
     }									\
@@ -454,7 +460,7 @@
 				       _p240, _q240, _r240, _s240;	\
       UDItype _t240, _u240, _v240, _w240, _x240, _y240 = 0;		\
 									\
-      if ((wfracbits) < 106 || (wfracbits) > 120)			\
+      if (wfracbits < 106 || wfracbits > 120)				\
 	abort ();							\
 									\
       setfetz;								\
@@ -526,7 +532,9 @@
     }									\
   while (0)
 
-/* Division algorithms: */
+/*
+ * Division algorithms:
+ */
 
 #define _FP_DIV_MEAT_2_udiv(fs, R, X, Y)				\
   do									\
@@ -555,7 +563,7 @@
 	}								\
 									\
       /* Normalize, i.e. make the most significant bit of the		\
-	 denominator set.  */						\
+	 denominator set. */						\
       _FP_FRAC_SLL_2 (Y, _FP_WFRACXBITS_##fs);				\
 									\
       udiv_qrnnd (R##_f1, _FP_DIV_MEAT_2_udiv_r_f1,			\
@@ -622,40 +630,42 @@
   while (0)
 
 
-/* Square root algorithms:
-   We have just one right now, maybe Newton approximation
-   should be added for those machines where division is fast.  */
+/*
+ * Square root algorithms:
+ * We have just one right now, maybe Newton approximation
+ * should be added for those machines where division is fast.
+ */
 
 #define _FP_SQRT_MEAT_2(R, S, T, X, q)				\
   do								\
     {								\
       while (q)							\
 	{							\
-	  T##_f1 = S##_f1 + (q);				\
+	  T##_f1 = S##_f1 + q;					\
 	  if (T##_f1 <= X##_f1)					\
 	    {							\
-	      S##_f1 = T##_f1 + (q);				\
+	      S##_f1 = T##_f1 + q;				\
 	      X##_f1 -= T##_f1;					\
-	      R##_f1 += (q);					\
+	      R##_f1 += q;					\
 	    }							\
 	  _FP_FRAC_SLL_2 (X, 1);				\
-	  (q) >>= 1;						\
+	  q >>= 1;						\
 	}							\
-      (q) = (_FP_W_TYPE) 1 << (_FP_W_TYPE_SIZE - 1);		\
-      while ((q) != _FP_WORK_ROUND)				\
+      q = (_FP_W_TYPE) 1 << (_FP_W_TYPE_SIZE - 1);		\
+      while (q != _FP_WORK_ROUND)				\
 	{							\
-	  T##_f0 = S##_f0 + (q);				\
+	  T##_f0 = S##_f0 + q;					\
 	  T##_f1 = S##_f1;					\
 	  if (T##_f1 < X##_f1					\
 	      || (T##_f1 == X##_f1 && T##_f0 <= X##_f0))	\
 	    {							\
-	      S##_f0 = T##_f0 + (q);				\
+	      S##_f0 = T##_f0 + q;				\
 	      S##_f1 += (T##_f0 > S##_f0);			\
 	      _FP_FRAC_DEC_2 (X, T);				\
-	      R##_f0 += (q);					\
+	      R##_f0 += q;					\
 	    }							\
 	  _FP_FRAC_SLL_2 (X, 1);				\
-	  (q) >>= 1;						\
+	  q >>= 1;						\
 	}							\
       if (X##_f0 | X##_f1)					\
 	{							\
@@ -668,29 +678,31 @@
   while (0)
 
 
-/* Assembly/disassembly for converting to/from integral types.
-   No shifting or overflow handled here.  */
+/*
+ * Assembly/disassembly for converting to/from integral types.
+ * No shifting or overflow handled here.
+ */
 
 #define _FP_FRAC_ASSEMBLE_2(r, X, rsize)	\
-  (void) (((rsize) <= _FP_W_TYPE_SIZE)		\
-	  ? ({ (r) = X##_f0; })			\
+  (void) ((rsize <= _FP_W_TYPE_SIZE)		\
+	  ? ({ r = X##_f0; })			\
 	  : ({					\
-	      (r) = X##_f1;			\
-	      (r) <<= _FP_W_TYPE_SIZE;		\
-	      (r) += X##_f0;			\
+	      r = X##_f1;			\
+	      r <<= _FP_W_TYPE_SIZE;		\
+	      r += X##_f0;			\
 	    }))
 
-#define _FP_FRAC_DISASSEMBLE_2(X, r, rsize)	\
-  do						\
-    {						\
-      X##_f0 = (r);				\
-      X##_f1 = ((rsize) <= _FP_W_TYPE_SIZE	\
-		? 0				\
-		: (r) >> _FP_W_TYPE_SIZE);	\
-    }						\
+#define _FP_FRAC_DISASSEMBLE_2(X, r, rsize)				\
+  do									\
+    {									\
+      X##_f0 = r;							\
+      X##_f1 = (rsize <= _FP_W_TYPE_SIZE ? 0 : r >> _FP_W_TYPE_SIZE);	\
+    }									\
   while (0)
 
-/* Convert FP values between word sizes.  */
+/*
+ * Convert FP values between word sizes
+ */
 
 #define _FP_FRAC_COPY_1_2(D, S)		(D##_f = S##_f0)
 

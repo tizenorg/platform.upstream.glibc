@@ -1,4 +1,4 @@
-/* Copyright (C) 1992-2015 Free Software Foundation, Inc.
+/* Copyright (C) 1992-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper, <drepper@gnu.ai.mit.edu>, August 1995.
    ARM changes by Philip Blundell, <pjb27@cam.ac.uk>, May 1997.
@@ -40,6 +40,7 @@
 #undef SYS_ify
 #define SYS_ify(syscall_name)	(__NR_##syscall_name)
 
+#define _SYS_AUXV_H 1
 #include <bits/hwcap.h>
 
 #ifdef __ASSEMBLER__
@@ -136,7 +137,7 @@
 
 #define ret_ERRVAL PSEUDO_RET_NOERRNO
 
-#if !IS_IN (libc)
+#if NOT_IN_libc
 # define SYSCALL_ERROR __local_syscall_error
 # if RTLD_PRIVATE_ERRNO
 #  define SYSCALL_ERROR_HANDLER					\

@@ -1,4 +1,4 @@
-/* Copyright (C) 1999-2015 Free Software Foundation, Inc.
+/* Copyright (C) 1999-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by David Mosberger-Tang <davidm@hpl.hp.com>.
 
@@ -34,7 +34,7 @@ ENTRY(__syscall_error)
 	st4	[r2]=r8
 	mov	r8=-1
 #else
-# if IS_IN (libc)
+# ifndef NOT_IN_libc
 #  define SYSCALL_ERROR_ERRNO __libc_errno
 # else
 #  define SYSCALL_ERROR_ERRNO errno

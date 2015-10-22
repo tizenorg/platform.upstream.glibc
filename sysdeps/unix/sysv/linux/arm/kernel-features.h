@@ -1,6 +1,6 @@
 /* Set flags signalling availability of kernel features based on given
    kernel version number.
-   Copyright (C) 2006-2015 Free Software Foundation, Inc.
+   Copyright (C) 2006-2014 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -34,11 +34,9 @@
 
 #include_next <kernel-features.h>
 
-/* The ARM kernel before 3.14.3 may or may not support
+/* The ARM kernel may or may not support
    futex_atomic_cmpxchg_inatomic, depending on kernel
    configuration.  */
-#if __LINUX_KERNEL_VERSION < 0x030E03
-# undef __ASSUME_FUTEX_LOCK_PI
-# undef __ASSUME_REQUEUE_PI
-# undef __ASSUME_SET_ROBUST_LIST
-#endif
+#undef __ASSUME_FUTEX_LOCK_PI
+#undef __ASSUME_REQUEUE_PI
+#undef __ASSUME_SET_ROBUST_LIST

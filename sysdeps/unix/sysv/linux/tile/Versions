@@ -13,6 +13,5 @@ libc {
   }
   GLIBC_PRIVATE {
     __syscall_error;
-    __vdso_clock_gettime;
   }
 }
