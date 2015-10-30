@@ -1,0 +1,24 @@
+* Tue Sep 09 2014 Chanho Park <chanho61.park@samsung.com> upstream/2.20-26-g1a827dc
+- Update to 2.20
+
+* Tue Oct 15 2013 Jacek Bukarewicz <j.bukarewicz@samsung.com> accepted/tizen/20130912.200215@1ee152e
+- Subpackage reorganization - devel-utils package
+
+* Mon Aug 26 2013 Anas Nashif <anas.nashif@intel.com> glibc-2.18@e8510fa
+- Update to 2.18
+
+* Thu Aug 01 2013 Anas Nashif <anas.nashif@intel.com> submit/tizen/20130711.122834@23f8266
+- Update package groups
+
+* Mon Jul 08 2013 Junfeng Dong <junfeng.dong@intel.com> accepted/tizen/20130520.095530@99d0fc1
+- No ld-linux-armhf.so.3 on armv7l architecture.
+
+* Fri Mar 22 2013 Anas Nashif <anas.nashif@intel.com> submit/trunk/20130115.205551@642c22b
+- Fixed package groups
+
+* Tue Jan 15 2013 Anas Nashif <anas.nashif@intel.com> submit/trunk/20130114.165606@6013fa6
+- do not provide /usr/lib/locale
+
+* Mon Jan 14 2013 Anas Nashif <anas.nashif@intel.com> glibc-2.17@fe086f2
+- Update to 2.17
+
